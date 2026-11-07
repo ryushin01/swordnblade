@@ -26,7 +26,7 @@ export function SearchForm({ category, q, sort }: { category?: SwordCategory; q:
           type="search"
           name="q"
           defaultValue={q}
-          placeholder="예: 쌍수도, katana, 신화"
+          placeholder="예: 쌍수도, Excalibur, 신화"
           autoComplete="off"
           className="h-11 rounded-sm border border-input bg-wall-raised px-3 text-base placeholder:text-ink-muted"
         />

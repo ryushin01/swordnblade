@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Noto_Serif_KR } from 'next/font/google';
+import { Cormorant_Garamond } from 'next/font/google';
 
 import { SITE } from '@/shared/config';
 import { Toaster } from '@/shared/ui';
@@ -19,13 +19,6 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 });
 
-const notoSerifKr = Noto_Serif_KR({
-  weight: ['400', '600'],
-  variable: '--font-noto-serif-kr',
-  display: 'swap',
-  preload: false,
-});
-
 export const metadata: Metadata = {
   title: { default: `${SITE.name} · 도검의 벽`, template: `%s · ${SITE.name}` },
   description: SITE.description,
@@ -37,7 +30,7 @@ export const viewport: Viewport = {
 
 export function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ko" className={`${cormorant.variable} ${notoSerifKr.variable}`}>
+    <html lang="ko" className={`${cormorant.variable}`}>
       <body>
         <a
           href="#main"

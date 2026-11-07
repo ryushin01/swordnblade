@@ -56,3 +56,10 @@ body {
 .scroll-region .ant-table {
   min-width: 720px;
 }
+
+/* 이야기 지우기 버튼을 넓은 화면에서 입력 칸 높이에 맞춥니다(레이블 줄만큼 내림). */
+@media (min-width: 768px) {
+  .story-remove {
+    margin-top: 30px;
+  }
+}

@@ -1,13 +1,30 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, Card, Col, ColorPicker, Flex, Form, Input, InputNumber, Radio, Row, Select, Typography } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  ColorPicker,
+  Flex,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Row,
+  Select,
+  Typography,
+} from 'antd';
 
 import { CATEGORY_LABEL, COUNTRY_NAME, type CountryCode, type Sword, type SwordArt } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
 import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
+
+import { normalizeArt, normalizeStories } from '../model/normalize-art';
 
 import type { Color } from 'antd/es/color-picker';
 
@@ -28,6 +45,16 @@ const WRAP_LABEL: Record<SwordArt['grip']['wrap'], string> = {
   leather: '가죽',
   ribbed: '홈 파인 뼈',
 };
+const TIP_LABEL: Record<SwordArt['blade']['tip'], string> = {
+  kissaki: '휜 칼끝(기사키)',
+  spear: '뾰족한 칼끝',
+  round: '둥근 칼끝',
+  sickle: '낫 모양 갈고리',
+};
+const INSCRIPTION_OPTIONS = [
+  { value: 'stars', label: '별자리 상감' },
+  { value: 'runes', label: '룬 문양 새김' },
+];
 const POMMEL_LABEL: Record<SwordArt['pommel']['type'], string> = {
   cap: '캡',
   wheel: '바퀴형',
@@ -41,7 +68,9 @@ const POMMEL_LABEL: Record<SwordArt['pommel']['type'], string> = {
 interface ColorInputProps {
   id?: string;
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: string | undefined) => void;
+  /** 있으면 색을 없애는 버튼을 함께 보여 줍니다(이 이름으로 읽힘). */
+  clearLabel?: string;
   'aria-invalid'?: boolean | 'true' | 'false';
   'aria-describedby'?: string;
   'aria-required'?: boolean | 'true' | 'false';
@@ -51,24 +80,42 @@ interface ColorInputProps {
  * ColorPicker의 기본 트리거는 역할이 없는 div라서 레이블과 ARIA 속성을 받을 수 없습니다.
  * 버튼을 트리거로 써서 Form.Item이 주는 id·aria 속성이 버튼에 붙게 합니다.
  */
-function ColorInput({ id, value, onChange, ...aria }: ColorInputProps) {
+function ColorInput({ id, value, onChange, clearLabel, ...aria }: ColorInputProps) {
   return (
-    <ColorPicker value={value} disabledAlpha format="hex" onChange={(color: Color) => onChange?.(color.toHexString())}>
-      <Button id={id} aria-invalid={aria['aria-invalid']} aria-describedby={aria['aria-describedby']}>
-        <span
-          aria-hidden="true"
-          style={{ width: 16, height: 16, borderRadius: 2, background: value, border: '1px solid #d9d9d9' }}
-        />
-        {value?.toUpperCase()}
-      </Button>
-    </ColorPicker>
+    <Flex gap={4}>
+      <ColorPicker
+        value={value || '#b48a3c'}
+        disabledAlpha
+        format="hex"
+        onChange={(color: Color) => onChange?.(color.toHexString())}
+      >
+        <Button id={id} aria-invalid={aria['aria-invalid']} aria-describedby={aria['aria-describedby']}>
+          <span
+            aria-hidden="true"
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: 2,
+              background: value || 'transparent',
+              border: '1px solid #d9d9d9',
+            }}
+          />
+          {value ? value.toUpperCase() : '없음'}
+        </Button>
+      </ColorPicker>
+      {clearLabel && value ? <Button onClick={() => onChange?.(undefined)}>{clearLabel}</Button> : null}
+    </Flex>
   );
 }
 
-function ColorField({ name, label }: { name: (string | number)[]; label: string }) {
+function ColorField({ name, label, optional }: { name: (string | number)[]; label: string; optional?: boolean }) {
   return (
-    <Form.Item name={name} label={label} rules={[{ required: true, message: `${label}을 골라 주세요.` }]}>
-      <ColorInput />
+    <Form.Item
+      name={name}
+      label={label}
+      rules={optional ? [] : [{ required: true, message: `${label}을 골라 주세요.` }]}
+    >
+      <ColorInput clearLabel={optional ? `${label} 없애기` : undefined} />
     </Form.Item>
   );
 }
@@ -103,11 +150,9 @@ export function ProductForm({ initial }: { initial?: Sword }) {
       : undefined);
 
   const previewArt: SwordArt | undefined = watched?.art?.blade
-    ? {
-        ...watched.art,
-        blade: { ...watched.art.blade, length: watched.specs?.bladeLength || watched.art.blade.length },
-      }
+    ? normalizeArt(watched.art, watched.specs?.bladeLength)
     : initialValues?.art;
+  const pommelType = watched?.art?.pommel?.type;
 
   if (!initialValues) return <Card loading />;
 
@@ -124,8 +169,8 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           ...initial,
           ...values,
           id: initial?.id,
-          stories: initial?.stories ?? [],
-          art: { ...values.art, blade: { ...values.art.blade, length: values.specs.bladeLength } },
+          stories: normalizeStories(values.stories),
+          art: normalizeArt(values.art, values.specs.bladeLength),
         };
         save.mutate(data);
       }}
@@ -341,12 +386,82 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Form.Item>
               </Col>
             </Row>
+            <Row gutter={16}>
+              <Col xs={12} md={6}>
+                <Form.Item name={['art', 'blade', 'tip']} label="칼끝" rules={[{ required: true }]}>
+                  <Select options={Object.entries(TIP_LABEL).map(([value, label]) => ({ value, label }))} />
+                </Form.Item>
+              </Col>
+              <Col xs={12} md={6}>
+                <Form.Item name={['art', 'blade', 'inscription']} label="상감·새김">
+                  <Select allowClear placeholder="없음" options={INSCRIPTION_OPTIONS} />
+                </Form.Item>
+              </Col>
+              <Col xs={12} md={6}>
+                <Form.Item name={['art', 'guard', 'width']} label="코등이 너비(mm)" rules={[{ required: true }]}>
+                  <InputNumber min={0} max={320} style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label="칼날 무늬" style={{ marginBottom: 16 }}>
+              <Flex wrap gap={16}>
+                <Form.Item name={['art', 'blade', 'fuller']} valuePropName="checked" noStyle>
+                  <Checkbox>홈(피 홈)</Checkbox>
+                </Form.Item>
+                <Form.Item name={['art', 'blade', 'ridge']} valuePropName="checked" noStyle>
+                  <Checkbox>능선</Checkbox>
+                </Form.Item>
+                <Form.Item name={['art', 'blade', 'hamon']} valuePropName="checked" noStyle>
+                  <Checkbox>하몬(물결 무늬)</Checkbox>
+                </Form.Item>
+              </Flex>
+            </Form.Item>
             <Flex wrap gap={16}>
               <ColorField name={['art', 'grip', 'color']} label="손잡이 바탕색" />
               <ColorField name={['art', 'grip', 'wrapColor']} label="손잡이 끈 색" />
               <ColorField name={['art', 'guard', 'color']} label="코등이 색" />
+              <ColorField name={['art', 'guard', 'accent']} label="코등이 장식 색" optional />
               <ColorField name={['art', 'pommel', 'color']} label="끝장식 색" />
+              {pommelType === 'gem' ? <ColorField name={['art', 'pommel', 'gem']} label="보석 색" /> : null}
+              <ColorField name={['art', 'collar', 'color']} label="칼날 고리 색" optional />
+              <ColorField name={['art', 'tassel']} label="술 색" optional />
             </Flex>
+          </Card>
+
+          <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>전해지는 이야기</h2>} style={{ marginTop: 16 }}>
+            <Form.List name="stories">
+              {(fields, { add, remove }) => (
+                <Flex vertical gap={12}>
+                  {fields.map((field, index) => (
+                    <Row key={field.key} gutter={12} align="top">
+                      <Col xs={24} md={6}>
+                        <Form.Item name={[field.name, 'when']} label={`이야기 ${index + 1}: 때`}>
+                          <Input placeholder="예: 1790, 전설" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={15}>
+                        <Form.Item name={[field.name, 'text']} label={`이야기 ${index + 1}: 내용`}>
+                          <Input.TextArea autoSize={{ minRows: 1, maxRows: 4 }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={3}>
+                        <Button
+                          className="story-remove"
+                          icon={<DeleteOutlined aria-hidden />}
+                          onClick={() => remove(field.name)}
+                          danger
+                        >
+                          <span className="sr-only">이야기 {index + 1} </span>지우기
+                        </Button>
+                      </Col>
+                    </Row>
+                  ))}
+                  <Button icon={<PlusOutlined aria-hidden />} onClick={() => add({ when: '', text: '' })}>
+                    이야기 추가
+                  </Button>
+                </Flex>
+              )}
+            </Form.List>
           </Card>
         </Col>
 

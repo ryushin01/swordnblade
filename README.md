@@ -61,7 +61,7 @@
 |---|---|
 | 구성 | pnpm 워크스페이스, Turborepo, Feature-Sliced Design v2.1 (Steiger로 검사) |
 | 프레임워크 | Next.js 16 (App Router, multi-zones), React 19, TypeScript 6 |
-| 쇼핑몰 UI | Tailwind CSS 4, shadcn/ui(Button, Sonner), lucide-react, Cormorant Garamond·Noto Serif KR |
+| 쇼핑몰 UI | Tailwind CSS 4, shadcn/ui(Button, Sonner), lucide-react, Cormorant Garamond(영문), 운영체제 명조체(한글) |
 | 어드민 UI | Ant Design 6, @ant-design/icons |
 | 상태·데이터 | TanStack Query 5, Zustand 5, MSW 3 (Mock API) |
 | 품질 | ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged, Vitest 5 + Testing Library, Storybook 10 스토리 테스트(실제 브라우저 + axe), Playwright + axe(프로덕션 빌드·배포 사이트 E2E) |

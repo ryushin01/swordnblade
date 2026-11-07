@@ -65,7 +65,11 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
 
-  --font-serif: var(--font-cormorant), var(--font-noto-serif-kr), 'Apple SD Gothic Neo', serif;
+  /*
+   * 한글은 웹 글꼴 없이 운영체제의 명조체를 씁니다(맥 AppleMyungjo, 안드로이드 Noto Serif CJK, 윈도 바탕).
+   * Noto Serif KR 웹 글꼴은 한 화면에 조각 파일을 10여 개(약 700KB) 받아 모바일 첫 화면을 4~5초 늦췄습니다.
+   */
+  --font-serif: var(--font-cormorant), AppleMyungjo, 'Noto Serif CJK KR', 'Nanum Myeongjo', Batang, serif;
 }
 
 @layer base {
@@ -80,6 +84,9 @@
     font-family: var(--font-serif);
     -webkit-font-smoothing: antialiased;
     font-variant-numeric: lining-nums;
+    /* 한글은 낱말 중간에서 줄을 바꾸지 않습니다. 아주 긴 낱말만 넘칠 때 끊습니다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   body {
     background: radial-gradient(120% 80% at 50% 0%, #e4e3de 0%, transparent 60%), var(--wall);

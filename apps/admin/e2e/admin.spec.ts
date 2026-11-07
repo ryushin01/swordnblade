@@ -80,3 +80,25 @@ test('설정: 관세율을 바꿔 저장한다', async ({ page }) => {
   await page.reload();
   await expect(page.getByLabel('대한민국 관세율(%)')).toHaveValue('6.5');
 });
+
+test('상품: 칼날 무늬·술·전해지는 이야기를 고쳐 저장한다', async ({ page }) => {
+  await page.goto('/admin/products/sw-002');
+  await expect(page.getByRole('heading', { level: 1, name: '환도 수정' })).toBeVisible();
+
+  await page.getByRole('checkbox', { name: '하몬(물결 무늬)' }).check();
+  await page.getByRole('button', { name: '술 색 없애기' }).click();
+  await expect(page.getByRole('button', { name: '술 색 없애기' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: '이야기 추가' }).click();
+  await page.getByLabel('이야기 3: 때').fill('오늘');
+  await page.getByLabel('이야기 3: 내용').fill('어드민에서 덧붙인 이야기');
+  await expectNoA11yViolations(page);
+
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByRole('checkbox', { name: '하몬(물결 무늬)' })).toBeChecked();
+  await expect(page.getByLabel('이야기 3: 내용')).toHaveValue('어드민에서 덧붙인 이야기');
+  await expect(page.getByRole('button', { name: '술 색 없애기' })).toHaveCount(0);
+});

@@ -20,6 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
         token: {
           colorPrimary: '#0958d9',
           colorLink: '#0958d9',
+          colorError: '#cf1322',
           colorTextSecondary: 'rgba(0, 0, 0, 0.65)',
           colorTextDescription: 'rgba(0, 0, 0, 0.65)',
           colorTextPlaceholder: 'rgba(0, 0, 0, 0.6)',
