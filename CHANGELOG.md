@@ -1,5 +1,11 @@
 # 버전 기록
 
+## 0.1.1 - 2026-11-07
+
+- 배포: Vercel에 쇼핑몰(https://swordnblade.vercel.app/)과 어드민(https://swordnblade-admin.vercel.app/)을 Git 연동으로 배포. 쓰지 않게 된 Netlify 설정 파일 삭제
+- CI: pnpm 12에서 설치가 실패하던 문제 수정(`esbuild` 빌드 스크립트 허용)
+- E2E: `E2E_BASE_URL`로 배포된 사이트를 검사하는 기능 추가
+
 ## 0.1.0 - 2026-11-07
 
 처음 공개한 버전입니다.
