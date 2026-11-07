@@ -47,7 +47,7 @@
 | 스토리 | 컴포넌트 옆 `*.stories.tsx` | `pnpm --filter @snb/shop storybook` |
 | E2E | `apps/*/e2e` | `pnpm build` 후 `pnpm --filter @snb/shop e2e` |
 
-E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel 7) 두 화면에서 실행합니다. 쇼핑몰은 3101, 어드민은 3102 포트를 씁니다(`E2E_PORT`로 바꿀 수 있음). 매 페이지에서 axe(WCAG 2.2 AA 태그)를 돌리고, 쇼핑몰은 가로 넘침도 검사합니다.
+E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel 7) 두 화면에서 실행합니다. 쇼핑몰은 3101, 어드민은 3102 포트를 씁니다(`E2E_PORT`로 바꿀 수 있음). `E2E_BASE_URL`을 주면 로컬 서버를 띄우지 않고 그 주소(배포된 사이트)를 검사합니다. 매 페이지에서 axe(WCAG 2.2 AA 태그)를 돌리고, 쇼핑몰은 가로 넘침도 검사합니다.
 
 ## 접근성 점검 (KWCAG 2.2)
 
