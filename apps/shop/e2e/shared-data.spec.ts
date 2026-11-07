@@ -43,3 +43,18 @@ test('쇼핑몰 주문이 어드민 주문 목록에 보인다', async ({ page }
   await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
   await expect(page.getByRole('cell', { name: '공유확인' })).toBeVisible();
 });
+
+test('어드민에서 덧붙인 이야기가 쇼핑몰 상세에 보인다', async ({ page }) => {
+  await page.goto('/admin/products/sw-010');
+  await expect(page.getByRole('heading', { level: 1, name: '글라디우스 수정' })).toBeVisible();
+  await page.getByRole('button', { name: '이야기 추가' }).click();
+  await page.getByLabel('이야기 2: 때').fill('오늘');
+  await page.getByLabel('이야기 2: 내용').fill('공방에서 새로 벼린 한 자루');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+
+  await page.goto('/swords/gladius');
+  await expect(
+    page.getByRole('region', { name: '전해지는 이야기' }).getByText('공방에서 새로 벼린 한 자루'),
+  ).toBeVisible();
+});

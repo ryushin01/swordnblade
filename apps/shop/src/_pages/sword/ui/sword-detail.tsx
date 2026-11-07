@@ -23,8 +23,8 @@ import { LiveTotal, OrnamentHeading } from '@/shared/ui';
 
 import { AddToCart } from './add-to-cart';
 
-export function SwordDetail({ slug }: { slug: string }) {
-  const { data: sword, isPending, error } = useSword(slug);
+export function SwordDetail({ slug, initialSword }: { slug: string; initialSword?: Sword }) {
+  const { data: sword, isPending, error } = useSword(slug, initialSword);
 
   if (error) {
     const notFound = error instanceof ApiRequestError && error.status === 404;
