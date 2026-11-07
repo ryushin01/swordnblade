@@ -77,3 +77,12 @@ test('영어 404와 검색', async ({ page }) => {
   await page.goto('/en?q=legend');
   await expect(page.getByRole('status').filter({ hasText: '5 results for “legend”' })).toBeVisible();
 });
+
+test('언어별 대체 주소(hreflang)를 절대 주소로 알린다', async ({ page }) => {
+  await page.goto('/en/swords/ssangsudo');
+  const en = await page.locator('link[rel="alternate"][hreflang="en"]').getAttribute('href');
+  const ko = await page.locator('link[rel="alternate"][hreflang="ko"]').getAttribute('href');
+  expect(en).toMatch(/^https:\/\/.+\/en\/swords\/ssangsudo$/);
+  expect(ko).toMatch(/^https:\/\/.+\/swords\/ssangsudo$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', en!);
+});

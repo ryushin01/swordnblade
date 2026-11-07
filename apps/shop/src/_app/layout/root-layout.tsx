@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { SITE } from '@/shared/config';
 import { languageAlternates, routing } from '@/shared/i18n';
 import { Toaster } from '@/shared/ui';
 import { SiteFooter } from '@/widgets/site-footer';
@@ -33,6 +34,8 @@ export async function generateMetadata({ params }: { params: LayoutParams }): Pr
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: 'Meta' });
   return {
+    // 언어별 대체 주소(hreflang)와 canonical을 절대 주소로 내보냅니다. 하위 페이지에도 적용됩니다.
+    metadataBase: new URL(SITE.url),
     title: { default: t('defaultTitle'), template: `%s · ${t('siteName')}` },
     description: t('description'),
     alternates: languageAlternates('', locale),
