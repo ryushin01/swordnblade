@@ -1,11 +1,12 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 
+import { Link } from '@/shared/i18n';
 import { Wordmark } from '@/shared/ui';
 
 import { CartLink } from './cart-link';
 import { CategoryNav } from './category-nav';
 import { HeaderNav } from './header-nav';
+import { LocaleSwitch } from './locale-switch';
 
 export function SiteHeader() {
   return (
@@ -19,7 +20,10 @@ export function SiteHeader() {
             <HeaderNav />
           </Suspense>
         </div>
-        <div className="order-2 sm:order-3">
+        <div className="order-2 flex items-center gap-2 sm:order-3">
+          <Suspense fallback={null}>
+            <LocaleSwitch />
+          </Suspense>
           <CartLink />
         </div>
       </div>

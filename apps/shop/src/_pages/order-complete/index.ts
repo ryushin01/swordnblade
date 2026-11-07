@@ -1,1 +1,1 @@
-export { OrderCompletePage } from './ui/order-complete-page';
+export { generateOrderMetadata, OrderCompletePage } from './ui/order-complete-page';

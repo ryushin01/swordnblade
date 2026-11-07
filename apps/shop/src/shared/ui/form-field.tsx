@@ -1,4 +1,5 @@
 import { type InputHTMLAttributes, useId } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/shared/lib/utils';
 
@@ -11,6 +12,7 @@ export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 
 /** 레이블, 도움말, 오류를 input과 연결한 입력 칸 */
 export function TextField({ id: idProp, label, name, hint, error, className, required, ...props }: TextFieldProps) {
+  const t = useTranslations('Common');
   const generatedId = useId();
   const id = idProp ?? generatedId;
   const hintId = hint ? `${id}-hint` : undefined;
@@ -19,7 +21,7 @@ export function TextField({ id: idProp, label, name, hint, error, className, req
     <div className={cn('grid gap-1.5', className)}>
       <label htmlFor={id} className="text-sm">
         {label}
-        {required ? <span className="text-danger"> (필수)</span> : null}
+        {required ? <span className="text-danger"> {t('required')}</span> : null}
       </label>
       <input
         id={id}

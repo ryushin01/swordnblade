@@ -1,1 +1,1 @@
-export { metadata, RootLayout, viewport } from './layout/root-layout';
+export { generateMetadata, generateStaticParams, RootLayout, viewport } from './layout/root-layout';

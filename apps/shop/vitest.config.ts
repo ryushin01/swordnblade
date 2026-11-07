@@ -20,6 +20,8 @@ export default defineConfig({
           globals: true,
           setupFiles: ['./vitest.setup.ts'],
           include: ['src/**/*.test.{ts,tsx}'],
+          // next-intl이 next/navigation을 확장자 없이 불러와 Node가 못 찾으므로 Vite가 풀게 합니다.
+          server: { deps: { inline: ['next-intl'] } },
         },
       },
       /**

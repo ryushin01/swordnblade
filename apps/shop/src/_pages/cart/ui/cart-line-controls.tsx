@@ -1,6 +1,7 @@
 'use client';
 
 import { useId } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { MAX_QUANTITY, useCartStore } from '@/entities/cart';
 
@@ -15,13 +16,14 @@ export function QuantitySelect({
   quantity: number;
   stock: number;
 }) {
+  const t = useTranslations('Cart');
   const id = useId();
   const setQuantity = useCartStore((state) => state.setQuantity);
   const max = Math.max(1, Math.min(stock, MAX_QUANTITY));
   return (
     <>
       <label htmlFor={id} className="sr-only">
-        {name} 수량
+        {t('quantityOf', { name })}
       </label>
       <select
         id={id}
@@ -40,6 +42,7 @@ export function QuantitySelect({
 }
 
 export function RemoveLineButton({ swordId, name }: { swordId: string; name: string }) {
+  const t = useTranslations('Cart');
   const remove = useCartStore((state) => state.remove);
   return (
     <button
@@ -47,8 +50,8 @@ export function RemoveLineButton({ swordId, name }: { swordId: string; name: str
       onClick={() => remove(swordId)}
       className="min-h-11 px-2 text-sm text-ink-muted underline underline-offset-4 hover:text-ink"
     >
-      <span>삭제</span>
-      <span className="sr-only">: {name}</span>
+      <span>{t('remove')}</span>
+      <span className="sr-only">{t('removeOf', { name })}</span>
     </button>
   );
 }

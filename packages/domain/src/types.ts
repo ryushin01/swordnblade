@@ -50,6 +50,18 @@ export interface SwordStory {
   text: string;
 }
 
+/** 쇼핑몰이 지원하는 언어 */
+export type Locale = 'ko' | 'en';
+
+/** 한국어 원문을 다른 언어로 옮긴 글. 이름은 nameEn을 씁니다. */
+export interface SwordTranslation {
+  summary: string;
+  description: string;
+  era: string;
+  material: string;
+  stories: SwordStory[];
+}
+
 export interface Sword {
   id: string;
   slug: string;
@@ -74,6 +86,8 @@ export interface Sword {
   price: number;
   stock: number;
   art: SwordArt;
+  /** 언어별 번역. 없으면 한국어 원문을 보여 줍니다. */
+  translations?: Partial<Record<Exclude<Locale, 'ko'>, SwordTranslation>>;
 }
 
 export interface CartLine {
@@ -136,6 +150,8 @@ export interface CountryRule {
   valuation: 'CIF' | 'FOB';
   /** 수입·소지 관련 안내 */
   permitNote: string;
+  /** 영어 안내. 없으면 한국어 안내를 씁니다. */
+  permitNoteEn?: string;
 }
 
 export interface CustomsConfig {

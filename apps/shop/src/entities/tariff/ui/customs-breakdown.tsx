@@ -1,15 +1,20 @@
+import { useLocale, useTranslations } from 'next-intl';
+
 import {
-  COUNTRY_NAME,
+  countryName,
   type CustomsConfig,
   type CustomsEstimate,
   findCountryRule,
   formatCurrency,
   formatKRW,
   formatPercent,
+  type Locale,
   toCurrency,
 } from '@snb/domain';
 
 import { cn } from '@/shared/lib';
+
+import type { CountryCode } from '@snb/domain';
 
 interface CustomsBreakdownProps {
   estimate: CustomsEstimate;
@@ -32,40 +37,51 @@ function Row({ term, value, strong }: { term: string; value: string; strong?: bo
 
 /** 출고지별 관세·부가세 예상액과 합계 */
 export function CustomsBreakdown({ estimate, config, showLocalCurrency = true, className }: CustomsBreakdownProps) {
+  const t = useTranslations('Customs');
+  const locale = useLocale() as Locale;
   const rule = findCountryRule(config, estimate.destination);
   const { totals } = estimate;
+  const won = (value: number) => formatKRW(value, locale);
 
   return (
     <div className={cn('grid gap-4', className)}>
       <ul className="grid gap-3">
         {estimate.shipments.map((shipment) => {
-          const route = `${COUNTRY_NAME[shipment.origin]} → ${COUNTRY_NAME[estimate.destination]}`;
           let status: string;
-          if (shipment.domestic) status = '국내 배송 · 관세 없음';
-          else if (shipment.dutyExempt && shipment.vatExempt) status = '면세 한도 이하 · 세금 없음';
-          else if (shipment.dutyExempt) status = '관세 면제 · 부가세 과세';
-          else status = `과세 · 관세 ${formatPercent(rule.dutyRate)}, 부가세 ${formatPercent(rule.vatRate)}`;
+          if (shipment.domestic) status = t('domestic');
+          else if (shipment.dutyExempt && shipment.vatExempt) status = t('exempt');
+          else if (shipment.dutyExempt) status = t('dutyExempt');
+          else
+            status = t('taxed', {
+              duty: formatPercent(rule.dutyRate, locale),
+              vat: formatPercent(rule.vatRate, locale),
+            });
 
           return (
             <li key={shipment.origin} className="rounded-sm border border-line bg-wall-raised/60 p-3">
               <p className="flex flex-wrap items-baseline justify-between gap-2">
-                <span>{route}</span>
+                <span>
+                  {t('route', {
+                    from: countryName(shipment.origin, locale),
+                    to: countryName(estimate.destination, locale),
+                  })}
+                </span>
                 <span className="text-sm text-ink-muted">{status}</span>
               </p>
               <dl className="mt-2 text-sm">
-                <Row term="물품가격" value={formatKRW(shipment.goods)} />
-                <Row term={shipment.domestic ? '국내 배송비' : '국제 배송비'} value={formatKRW(shipment.shipping)} />
+                <Row term={t('goods')} value={won(shipment.goods)} />
+                <Row
+                  term={shipment.domestic ? t('domesticShipping') : t('internationalShipping')}
+                  value={won(shipment.shipping)}
+                />
                 {!shipment.domestic ? (
                   <>
                     <Row
-                      term={`과세가격 (${rule.valuation === 'CIF' ? '물품가격+운임' : '물품가격'})`}
-                      value={formatKRW(shipment.dutiableValue)}
+                      term={t('dutiable', { basis: rule.valuation === 'CIF' ? t('basisCIF') : t('basisFOB') })}
+                      value={won(shipment.dutiableValue)}
                     />
-                    <Row term="관세" value={formatKRW(shipment.duty)} />
-                    <Row
-                      term={estimate.destination === 'KR' ? '부가세' : '부가세·소비세'}
-                      value={formatKRW(shipment.vat)}
-                    />
+                    <Row term={t('duty')} value={won(shipment.duty)} />
+                    <Row term={estimate.destination === 'KR' ? t('vat') : t('vatOther')} value={won(shipment.vat)} />
                   </>
                 ) : null}
               </dl>
@@ -75,29 +91,34 @@ export function CustomsBreakdown({ estimate, config, showLocalCurrency = true, c
       </ul>
 
       <dl>
-        <Row term="상품 합계" value={formatKRW(totals.goods)} />
-        <Row term="배송비" value={formatKRW(totals.shipping)} />
-        <Row term="관세 예상" value={formatKRW(totals.duty)} />
-        <Row term="부가세 예상" value={formatKRW(totals.vat)} />
-        <Row term="결제 예정 금액" value={formatKRW(totals.total)} strong />
+        <Row term={t('totalGoods')} value={won(totals.goods)} />
+        <Row term={t('totalShipping')} value={won(totals.shipping)} />
+        <Row term={t('totalDuty')} value={won(totals.duty)} />
+        <Row term={t('totalVat')} value={won(totals.vat)} />
+        <Row term={t('total')} value={won(totals.total)} strong />
       </dl>
       {showLocalCurrency && rule.currency !== 'KRW' ? (
         <p className="text-right text-sm text-ink-muted">
-          약 {formatCurrency(toCurrency(totals.total, rule.currency, config), rule.currency)} (환율 1{rule.currency} ={' '}
-          {formatKRW(config.exchangeRates[rule.currency])})
+          {t('approx', {
+            amount: formatCurrency(toCurrency(totals.total, rule.currency, config), rule.currency, locale),
+            currency: rule.currency,
+            rate: won(config.exchangeRates[rule.currency]),
+          })}
         </p>
       ) : null}
       <p className="text-sm text-ink-muted">
-        면세 한도 {formatCurrency(rule.dutyFreeLimit, rule.limitCurrency)}
+        {t('limit', { limit: formatCurrency(rule.dutyFreeLimit, rule.limitCurrency, locale) })}
         {rule.originLimits
           ? Object.entries(rule.originLimits)
-              .map(
-                ([origin, limit]) =>
-                  ` (${COUNTRY_NAME[origin as keyof typeof COUNTRY_NAME]}발 ${formatCurrency(limit, rule.limitCurrency)})`,
+              .map(([origin, limit]) =>
+                t('originLimit', {
+                  country: countryName(origin as CountryCode, locale),
+                  limit: formatCurrency(limit, rule.limitCurrency, locale),
+                }),
               )
               .join('')
           : null}
-        . 실제 세액은 통관 시점의 환율과 품목 분류에 따라 달라질 수 있는 예상액입니다.
+        {t('estimateNote')}
       </p>
     </div>
   );

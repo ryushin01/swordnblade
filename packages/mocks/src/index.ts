@@ -7,3 +7,4 @@ export {
   type HandlerOptions,
 } from './handlers';
 export { SEED_ORDERS, SEED_SWORDS } from './seed';
+export { SEED_TRANSLATIONS_EN } from './seed-en';
