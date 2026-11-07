@@ -86,7 +86,8 @@
     font-variant-numeric: lining-nums;
     /* 한글은 낱말 중간에서 줄을 바꾸지 않습니다. 아주 긴 낱말만 넘칠 때 끊습니다. */
     word-break: keep-all;
-    overflow-wrap: break-word;
+    /* anywhere여야 긴 이름이 그리드 최소 너비를 넓히지 않아 모바일에서 넘치지 않습니다. */
+    overflow-wrap: anywhere;
   }
   body {
     background: radial-gradient(120% 80% at 50% 0%, #e4e3de 0%, transparent 60%), var(--wall);

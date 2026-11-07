@@ -16,7 +16,8 @@ export const toSwordSort = (value: string | undefined): SwordSort =>
 
 /** 이름(한글·원어·영문), 시대, 분류 이름에서 찾고 정렬합니다. 대소문자와 띄어쓰기는 가리지 않습니다. */
 export function filterSwords(swords: Sword[], options: { q?: string; sort?: SwordSort }): Sword[] {
-  const normalize = (text: string) => text.toLowerCase().replace(/\s+/g, '');
+  // 맥 등에서 입력한 한글은 자모가 나뉜 NFD로 올 수 있어 NFC로 맞춘 뒤 비교합니다.
+  const normalize = (text: string) => text.normalize('NFC').toLowerCase().replace(/\s+/g, '');
   const q = normalize(options.q ?? '');
   const matched = q
     ? swords.filter((sword) =>

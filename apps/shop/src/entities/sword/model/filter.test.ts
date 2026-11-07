@@ -10,6 +10,10 @@ describe('filterSwords', () => {
     expect(filterSwords(SEED_SWORDS, { q: '바이킹소드' }).map((s) => s.slug)).toEqual(['viking-sword']);
   });
 
+  it('자모가 나뉜(NFD) 한글 검색어도 찾는다', () => {
+    expect(filterSwords(SEED_SWORDS, { q: '쌍수도'.normalize('NFD') }).map((s) => s.slug)).toEqual(['ssangsudo']);
+  });
+
   it('분류 이름으로도 찾는다', () => {
     expect(filterSwords(SEED_SWORDS, { q: '신화' })).toHaveLength(5);
   });

@@ -440,7 +440,20 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                         </Form.Item>
                       </Col>
                       <Col xs={24} md={15}>
-                        <Form.Item name={[field.name, 'text']} label={`이야기 ${index + 1}: 내용`}>
+                        <Form.Item
+                          name={[field.name, 'text']}
+                          label={`이야기 ${index + 1}: 내용`}
+                          dependencies={[['stories', field.name, 'when']]}
+                          rules={[
+                            ({ getFieldValue }) => ({
+                              // 때만 적고 내용을 비우면 쇼핑몰에 빈 항목이 보이므로 막습니다.
+                              validator: (_, value?: string) =>
+                                getFieldValue(['stories', field.name, 'when'])?.trim() && !value?.trim()
+                                  ? Promise.reject(new Error('내용을 입력하거나 이 이야기를 지워 주세요.'))
+                                  : Promise.resolve(),
+                            }),
+                          ]}
+                        >
                           <Input.TextArea autoSize={{ minRows: 1, maxRows: 4 }} />
                         </Form.Item>
                       </Col>

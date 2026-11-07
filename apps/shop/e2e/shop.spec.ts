@@ -139,3 +139,13 @@ test('서버가 상품 목록을 HTML로 먼저 그린다(자바스크립트 없
   await expect(page.getByRole('link', { name: /쌍수도/ })).toBeVisible();
   await context.close();
 });
+
+test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 넘치지 않는다', async ({ page }) => {
+  await page.goto('/admin/products/sw-005');
+  await page.getByLabel('이름', { exact: true }).fill('아주아주긴이름의와키자시짧은칼특별한정판재현품');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+  await page.goto('/swords/wakizashi');
+  await expect(page.getByRole('heading', { level: 1, name: /아주아주긴이름/ })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});

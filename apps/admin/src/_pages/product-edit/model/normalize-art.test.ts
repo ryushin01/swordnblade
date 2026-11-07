@@ -16,6 +16,12 @@ describe('normalizeArt', () => {
     expect(art.pommel).toEqual({ type: 'cap', color: '#000000' });
   });
 
+  it('비운 코등이 장식 색은 속성을 없앤다', () => {
+    const art = normalizeArt({ ...ssangsudo, guard: { ...ssangsudo.guard, accent: undefined } });
+    expect(art.guard).not.toHaveProperty('accent');
+    expect(normalizeArt(ssangsudo).guard.accent).toBe(ssangsudo.guard.accent);
+  });
+
   it('칼날 길이를 제원과 맞춘다', () => {
     expect(normalizeArt(ssangsudo, 1000).blade.length).toBe(1000);
   });
@@ -27,9 +33,9 @@ describe('normalizeArt', () => {
 });
 
 describe('normalizeStories', () => {
-  it('빈 줄은 버리고 공백을 지운다', () => {
-    expect(normalizeStories([{ when: ' 1790 ', text: ' 기록 ' }, { when: '', text: '' }, {}])).toEqual([
-      { when: '1790', text: '기록' },
-    ]);
+  it('내용이 빈 줄은 버리고 공백을 지운다', () => {
+    expect(
+      normalizeStories([{ when: ' 1790 ', text: ' 기록 ' }, { when: '', text: '' }, { when: '오늘', text: ' ' }, {}]),
+    ).toEqual([{ when: '1790', text: '기록' }]);
   });
 });
