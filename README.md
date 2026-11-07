@@ -1,7 +1,7 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.2.0-7a4a35)
+![version](https://img.shields.io/badge/version-0.3.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
@@ -36,7 +36,7 @@
 
 | 기능 | 내용 |
 |---|---|
-| 도검의 벽 | 동양 도검·서양 도검·신화·전설 16점. 같은 축척으로 그려 길이 차이가 보입니다. |
+| 도검의 벽 | 동양 도검·서양 도검·신화·전설 16점. 같은 축척으로 그려 길이 차이가 보입니다. 이름(한글·원어·영문)으로 찾고 가격·길이로 정렬합니다. |
 | 석고 부조 일러스트 | 칼날·코등이·손잡이 감기·끝장식·술을 매개변수로 그리고 SVG 조명 필터로 부조처럼 보이게 합니다. |
 | 관세 계산 | 출고지별로 묶어 계산합니다. 해외 → 한국(면세 150달러, 미국발 200달러, 관세 8%, 부가세 10%)과 한국 → 해외(국가별 CIF·FOB, 부가세)를 모두 지원합니다. |
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
@@ -49,7 +49,7 @@
 | 메뉴 | 내용 |
 |---|---|
 | 대시보드 | 상품·재고 부족·주문·허가 확인 대기·매출 통계 |
-| 상품 | 목록(정렬·필터), 등록·수정·삭제, 일러스트 실시간 미리보기 |
+| 상품 | 목록(정렬·필터), 등록·수정·삭제. 칼끝·홈·하몬·상감·손잡이 감기·술 색과 전해지는 이야기까지 고치고 일러스트를 바로 미리 봄 |
 | 주문 | 주문 상세 펼치기, 상태 변경 |
 | 관세·환율 설정 | 환율, 배송비, 국가별 관세율·부가세율·면세 한도 |
 
@@ -104,7 +104,7 @@ docs/          문서와 스크린샷
 
 | 문서 | 내용 |
 |---|---|
-| [개발 가이드](docs/development.md) | 구조, FSD 규칙, Mock API, 테스트, 접근성 점검 |
+| [개발 가이드](docs/development.md) | 구조, FSD 규칙, Mock API, 서버 렌더링, 성능, 테스트, 접근성 점검 |
 | [디자인](docs/design.md) | 참고 사이트, 석고 팔레트, 부조 일러스트 원리 |
 | [관세 계산](docs/customs.md) | 계산 규칙, 국가별 예시 값, 허가 안내 |
 | [CI · 배포](docs/ci-deploy.md) | GitHub Actions, Vercel, multi-zones, 배포 후 검사, Dependabot |
