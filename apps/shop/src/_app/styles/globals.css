@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+/* 석고 벽 팔레트. 텍스트 색은 모두 #dddcd7 바탕에서 4.5:1 이상입니다. */
+:root {
+  --wall: #dddcd7;
+  --wall-raised: #e6e4dd;
+  --wall-sunk: #d3d2cc;
+  --line: #c9c7c0;
+  --ink: #2f2e2a;
+  --ink-muted: #57554e;
+  --accent: #7a4a35;
+  --danger: #8f1d16;
+  --glow: #f4f0e6;
+
+  /* shadcn/ui 변수: 브랜드 색을 연결합니다. */
+  --background: var(--wall);
+  --foreground: var(--ink);
+  --card: var(--wall-raised);
+  --card-foreground: var(--ink);
+  --popover: var(--wall-raised);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: #f1efe9;
+  --secondary: var(--wall-raised);
+  --secondary-foreground: var(--ink);
+  --muted: var(--wall-sunk);
+  --muted-foreground: var(--ink-muted);
+  --accent-foreground: #f1efe9;
+  --destructive: var(--danger);
+  --border: var(--line);
+  --input: #a9a7a0;
+  --ring: var(--ink);
+  --radius: 0.125rem;
+}
+
+@theme inline {
+  --color-wall: var(--wall);
+  --color-wall-raised: var(--wall-raised);
+  --color-wall-sunk: var(--wall-sunk);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-glow: var(--glow);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 1px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+
+  --font-serif: var(--font-cormorant), var(--font-noto-serif-kr), 'Apple SD Gothic Neo', serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    /* tabular-nums 같은 유틸리티를 써도 Cormorant의 옛 숫자(old-style) 대신 가지런한 숫자를 씁니다. */
+    --tw-numeric-figure: lining-nums;
+  }
+  html {
+    background: var(--wall);
+    color: var(--ink);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: lining-nums;
+  }
+  body {
+    background:
+      radial-gradient(120% 80% at 50% 0%, #e4e3de 0%, transparent 60%),
+      var(--wall);
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: #c9b8a6;
+  }
+}
+
+@layer components {
+  /* 석고에 새긴 글자: 위는 그림자, 아래는 빛 */
+  .text-carved {
+    color: var(--ink);
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.65),
+      0 -1px 0 rgba(0, 0, 0, 0.08);
+  }
+  .small-caps {
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

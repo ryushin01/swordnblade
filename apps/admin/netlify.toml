@@ -1,0 +1,8 @@
+# Netlify 사이트 설정: Base directory를 apps/admin 으로 지정합니다.
+[build]
+  command = "cd ../.. && pnpm install --frozen-lockfile && pnpm turbo run build --filter=@snb/admin"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
