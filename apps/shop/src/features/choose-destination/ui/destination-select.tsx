@@ -1,14 +1,17 @@
 'use client';
 
 import { useId } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { type CountryCode, countryName, type CustomsConfig, type Locale } from '@snb/domain';
 
 import { useCartStore } from '@/entities/cart';
 import { cn } from '@/shared/lib';
 
-import type { CountryCode, CustomsConfig } from '@snb/domain';
-
 /** 배송 국가를 고르면 장바구니 전체의 관세 계산 기준이 바뀝니다. */
 export function DestinationSelect({ config, className }: { config: CustomsConfig; className?: string }) {
+  const t = useTranslations('Destination');
+  const locale = useLocale() as Locale;
   const id = useId();
   const destination = useCartStore((state) => state.destination);
   const setDestination = useCartStore((state) => state.setDestination);
@@ -16,7 +19,7 @@ export function DestinationSelect({ config, className }: { config: CustomsConfig
   return (
     <div className={cn('grid gap-1.5', className)}>
       <label htmlFor={id} className="text-sm">
-        배송 국가
+        {t('label')}
       </label>
       <select
         id={id}
@@ -27,12 +30,12 @@ export function DestinationSelect({ config, className }: { config: CustomsConfig
       >
         {config.countries.map((country) => (
           <option key={country.code} value={country.code}>
-            {country.name}
+            {countryName(country.code, locale)}
           </option>
         ))}
       </select>
       <p id={`${id}-hint`} className="text-sm text-ink-muted">
-        국가를 바꾸면 관세와 부가세 예상액이 바로 다시 계산됩니다.
+        {t('hint')}
       </p>
     </div>
   );

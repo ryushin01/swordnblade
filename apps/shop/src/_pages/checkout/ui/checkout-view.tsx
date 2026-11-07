@@ -1,26 +1,31 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
-  COUNTRY_NAME,
+  countryName,
   estimateCustoms,
   findCountryRule,
   formatKRW,
+  type Locale,
   type Order,
+  permitNote,
   requiresPossessionPermit,
 } from '@snb/domain';
 
 import { useCartHydrated, useCartStore } from '@/entities/cart';
-import { useSwords } from '@/entities/sword';
+import { localizeForLocale, useSwords } from '@/entities/sword';
 import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
+import { Link, useRouter } from '@/shared/i18n';
 import { OrnamentHeading } from '@/shared/ui';
 
 import { CheckoutForm } from './checkout-form';
 
 export function CheckoutView() {
+  const t = useTranslations('Checkout');
+  const common = useTranslations('Common');
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const hydrated = useCartHydrated();
   const lines = useCartStore((state) => state.lines);
@@ -33,7 +38,7 @@ export function CheckoutView() {
   if (placedId) {
     return (
       <p aria-live="polite" className="py-24 text-center">
-        주문 {placedId}을 접수했습니다. 주문 확인 화면으로 이동합니다.
+        {t('placed', { id: placedId })}
       </p>
     );
   }
@@ -41,29 +46,29 @@ export function CheckoutView() {
   if (!hydrated || swords.isPending || config.isPending) {
     return (
       <p aria-busy="true" className="py-24 text-center">
-        주문서를 준비하는 중입니다.
+        {t('preparing')}
       </p>
     );
   }
   if (swords.isError || config.isError) {
     return (
       <p role="alert" className="py-24 text-center">
-        주문 정보를 불러오지 못했습니다. 새로고침해 주세요.
+        {t('loadError')}
       </p>
     );
   }
 
   const items = lines.flatMap((line) => {
     const sword = swords.data.find((item) => item.id === line.swordId);
-    return sword ? [{ line, sword }] : [];
+    return sword ? [{ line, sword: localizeForLocale(sword, locale) }] : [];
   });
 
   if (items.length === 0) {
     return (
       <div className="grid justify-items-center gap-4 py-24 text-center">
-        <p className="text-lg">주문할 도검이 없습니다.</p>
+        <p className="text-lg">{t('empty')}</p>
         <Link href="/" className="underline underline-offset-4">
-          도검 둘러보기
+          {common('browse')}
         </Link>
       </div>
     );
@@ -87,31 +92,31 @@ export function CheckoutView() {
     <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_26rem]">
       <section aria-labelledby="checkout-form-title" className="grid content-start gap-6">
         <h2 id="checkout-form-title" className="sr-only">
-          주문서
+          {t('formTitle')}
         </h2>
         <p>
-          배송 국가: <strong className="font-semibold">{COUNTRY_NAME[destination]}</strong>{' '}
+          {t('destination')} <strong className="font-semibold">{countryName(destination, locale)}</strong>{' '}
           <Link href="/cart" className="text-sm underline underline-offset-4">
-            장바구니에서 바꾸기
+            {t('changeInCart')}
           </Link>
         </p>
         <CheckoutForm
           destination={destination}
           lines={items.map(({ line }) => ({ swordId: line.swordId, quantity: line.quantity }))}
           needsPermit={needsPermit}
-          permitNote={rule.permitNote}
+          permitNote={permitNote(rule, locale)}
           onPlaced={handlePlaced}
         />
       </section>
       <aside aria-labelledby="checkout-summary-title" className="grid content-start gap-5">
-        <OrnamentHeading id="checkout-summary-title">주문 요약</OrnamentHeading>
+        <OrnamentHeading id="checkout-summary-title">{t('summaryTitle')}</OrnamentHeading>
         <ul className="grid gap-2">
           {items.map(({ line, sword }) => (
             <li key={sword.id} className="flex justify-between gap-4">
               <span>
                 {sword.name} × {line.quantity}
               </span>
-              <span className="tabular-nums">{formatKRW(sword.price * line.quantity)}</span>
+              <span className="tabular-nums">{formatKRW(sword.price * line.quantity, locale)}</span>
             </li>
           ))}
         </ul>

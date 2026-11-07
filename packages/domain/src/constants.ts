@@ -66,6 +66,8 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       valuation: 'CIF',
       permitNote:
         '도검은 목록통관 대상이 아니며 경찰청 수입허가를 받아 일반 수입신고를 해야 합니다. 칼날 15cm 이상 진검은 관할 경찰서 소지허가가 필요합니다.',
+      permitNoteEn:
+        'Swords cannot use simplified list clearance; a formal import declaration with an import permit from the Korean National Police Agency is required. Sharp blades of 15 cm or longer need a possession permit from the local police station.',
     },
     {
       code: 'US',
@@ -78,6 +80,7 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'USD',
       valuation: 'FOB',
       permitNote: '소액 면세(de minimis)가 없는 것으로 가정했습니다. 주(州)마다 도검 소지 규정이 다릅니다.',
+      permitNoteEn: 'Assumes no de minimis exemption. Rules on owning swords differ by state.',
     },
     {
       code: 'JP',
@@ -90,6 +93,8 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'JPY',
       valuation: 'CIF',
       permitNote: '도검류는 도도부현 교육위원회 등록증 또는 소지허가가 필요합니다.',
+      permitNoteEn:
+        'Swords require a registration certificate from the prefectural board of education or a possession permit.',
     },
     {
       code: 'GB',
@@ -102,6 +107,8 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'GBP',
       valuation: 'CIF',
       permitNote: '만곡 도검 등 일부 품목은 수입이 제한됩니다. 18세 이상 연령 확인이 필요합니다.',
+      permitNoteEn:
+        'Some items, such as curved swords, are restricted from import. Age verification (18+) is required.',
     },
     {
       code: 'DE',
@@ -114,6 +121,7 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'EUR',
       valuation: 'CIF',
       permitNote: '무기법(WaffG)에 따라 공공장소 휴대가 제한됩니다.',
+      permitNoteEn: 'Carrying in public is restricted under the Weapons Act (WaffG).',
     },
     {
       code: 'FR',
@@ -126,6 +134,7 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'EUR',
       valuation: 'CIF',
       permitNote: '도검은 D 등급 무기로 분류되어 정당한 사유 없는 휴대가 금지됩니다.',
+      permitNoteEn: 'Swords are category D weapons; carrying them without a legitimate reason is prohibited.',
     },
     {
       code: 'AU',
@@ -138,6 +147,7 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'AUD',
       valuation: 'FOB',
       permitNote: '주에 따라 도검 수입 시 B709A 허가서가 필요할 수 있습니다.',
+      permitNoteEn: 'Depending on the state, a B709A permit may be required to import swords.',
     },
     {
       code: 'CA',
@@ -150,6 +160,7 @@ export const DEFAULT_CUSTOMS_CONFIG: CustomsConfig = {
       limitCurrency: 'CAD',
       valuation: 'FOB',
       permitNote: '일부 도검은 금지 무기로 분류될 수 있습니다.',
+      permitNoteEn: 'Some swords may be classified as prohibited weapons.',
     },
   ],
   updatedAt: '2026-11-01T00:00:00.000Z',

@@ -1,0 +1,79 @@
+import AxeBuilder from '@axe-core/playwright';
+import { expect, type Page, test } from '@playwright/test';
+
+async function expectNoA11yViolations(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+  expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+}
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+}
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem('__e2e_reset__')) {
+      localStorage.clear();
+      sessionStorage.setItem('__e2e_reset__', '1');
+    }
+  });
+});
+
+test('영어 화면: /en에서 영어로 보이고 lang이 en이다', async ({ page }) => {
+  await page.goto('/en');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('heading', { level: 1, name: 'The Wall of Blades' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Excalibur.*₩12,000,000/ })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '16 swords' })).toBeVisible();
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('언어 전환: 주소와 검색 조건을 그대로 두고 언어만 바꾼다', async ({ page }) => {
+  await page.goto('/?category=legend');
+  const languages = page.getByRole('navigation', { name: '언어' });
+  await expect(languages.getByRole('link', { name: '한국어' })).toHaveAttribute('aria-current', 'true');
+  await languages.getByRole('link', { name: 'English' }).click();
+  await expect(page).toHaveURL(/\/en\?category=legend$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Myth & Legend' })).toBeVisible();
+
+  await page.getByRole('navigation', { name: 'Language' }).getByRole('link', { name: '한국어' }).click();
+  await expect(page).toHaveURL(/\/\?category=legend$/);
+  await expect(page.getByRole('heading', { level: 1, name: '신화·전설' })).toBeVisible();
+});
+
+test('영어 상세와 구매 흐름: 번역된 이야기, 영어 관세 안내, 영어 오류 안내', async ({ page }) => {
+  await page.goto('/en/swords/ssangsudo');
+  await expect(page.getByRole('heading', { level: 1, name: 'Ssangsudo' })).toBeVisible();
+  await expect(page.getByText('Permit required')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Stories told' }).getByText(/Muyedobotongji/)).toBeVisible();
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+
+  await page.getByRole('button', { name: 'Add to cart' }).click();
+  await expect(page.getByText('Added 1 × Ssangsudo to your cart.')).toBeVisible();
+
+  await page.goto('/en/cart');
+  await page.getByLabel('Ship to').selectOption('US');
+  await expect(page.getByText('South Korea → United States')).toBeVisible();
+  await expect(page.getByText(/Assumes no de minimis exemption/)).toBeVisible();
+
+  await page.getByRole('link', { name: 'Go to checkout' }).click();
+  await expect(page).toHaveURL(/\/en\/checkout$/);
+  await page.getByRole('button', { name: 'Pay now' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'Please check your details.' })).toBeFocused();
+  await expect(page.getByRole('link', { name: /Recipient: Enter the recipient’s name\./ })).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test('영어 404와 검색', async ({ page }) => {
+  await page.goto('/en/no-such-page');
+  await expect(page.getByRole('heading', { level: 1, name: 'Nothing is carved in this spot' })).toBeVisible();
+  await page.goto('/en?q=legend');
+  await expect(page.getByRole('status').filter({ hasText: '5 results for “legend”' })).toBeVisible();
+});

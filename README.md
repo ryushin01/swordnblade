@@ -1,12 +1,12 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.3.0-7a4a35)
+![version](https://img.shields.io/badge/version-0.4.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
 
-**[쇼핑몰 보기](https://swordnblade.vercel.app/)** · **[어드민 보기](https://swordnblade.vercel.app/admin)** · **[Storybook](https://swordnblade.vercel.app/storybook)** · 로그인 없이 바로 쓸 수 있습니다. 어드민에서 바꾼 가격·재고·관세율은 같은 브라우저의 쇼핑몰에 바로 반영됩니다.
+**[쇼핑몰 보기](https://swordnblade.vercel.app/)** · **[English](https://swordnblade.vercel.app/en)** · **[어드민 보기](https://swordnblade.vercel.app/admin)** · **[Storybook](https://swordnblade.vercel.app/storybook)** · 로그인 없이 바로 쓸 수 있습니다. 어드민에서 바꾼 가격·재고·관세율은 같은 브라우저의 쇼핑몰에 바로 반영됩니다.
 
 > **프로젝트 상태:** 실제로 판매하지 않는 **포트폴리오 프로젝트**입니다. 백엔드 없이 Mock API(MSW)로 동작하며, 상품·공방·가격·주문은 모두 가상 데이터입니다. 세율과 환율은 예시 값입니다.
 
@@ -26,6 +26,10 @@
 |---|---|
 | ![판매 상품, 재고 부족, 주문, 허가 확인 대기, 매출 통계와 최근 주문 표](docs/images/admin-dashboard.jpg) | ![상품 정보·제원·일러스트 입력 폼과 오른쪽 부조 미리보기](docs/images/admin-product-edit.jpg) |
 
+| 영어 상세 | 영어 모바일 |
+|---|---|
+| ![영어 화면의 엑스칼리버 상세, 영어 제원과 장식용 재현품 안내](docs/images/shop-en-detail.jpg) | <img src="docs/images/shop-en-mobile.jpg" alt="모바일 영어 화면의 언어 전환, 검색, 도검 벽" width="240"> |
+
 | 모바일 신화·전설 | 모바일 상세 |
 |---|---|
 | <img src="docs/images/shop-mobile-legend.jpg" alt="모바일 2열 벽에 엑스칼리버, 뒤랑달, 그람, 하르페" width="240"> | <img src="docs/images/shop-mobile-detail.jpg" alt="모바일에서 남색 끈 손잡이의 우치가타나 부조와 이름" width="240"> |
@@ -39,6 +43,7 @@
 | 도검의 벽 | 동양 도검·서양 도검·신화·전설 16점. 같은 축척으로 그려 길이 차이가 보입니다. 이름(한글·원어·영문)으로 찾고 가격·길이로 정렬합니다. |
 | 석고 부조 일러스트 | 칼날·코등이·손잡이 감기·끝장식·술을 매개변수로 그리고 SVG 조명 필터로 부조처럼 보이게 합니다. |
 | 관세 계산 | 출고지별로 묶어 계산합니다. 해외 → 한국(면세 150달러, 미국발 200달러, 관세 8%, 부가세 10%)과 한국 → 해외(국가별 CIF·FOB, 부가세)를 모두 지원합니다. |
+| 한국어·영어 | 한국어는 `/`, 영어는 `/en`. 화면 글, 도검 16점의 설명과 이야기, 국가별 허가 안내를 영어로 옮겼고, 머리글에서 언어를 바꿉니다. 어드민은 한국어만 제공합니다. |
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
 | 주문 | 오류 요약과 칸별 안내, 중복 제출 방지. 금액은 Mock 서버가 다시 계산합니다. |
 
@@ -63,7 +68,7 @@
 | 프레임워크 | Next.js 16 (App Router, multi-zones), React 19, TypeScript 6 |
 | 쇼핑몰 UI | Tailwind CSS 4, shadcn/ui(Button, Sonner), lucide-react, Cormorant Garamond(영문), 운영체제 명조체(한글) |
 | 어드민 UI | Ant Design 6, @ant-design/icons |
-| 상태·데이터 | TanStack Query 5, Zustand 5, MSW 3 (Mock API) |
+| 상태·데이터 | TanStack Query 5, Zustand 5, MSW 3 (Mock API), next-intl 4 (한국어·영어) |
 | 품질 | ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged, Vitest 5 + Testing Library, Storybook 10 스토리 테스트(실제 브라우저 + axe), Playwright + axe(프로덕션 빌드·배포 사이트 E2E) |
 | 배포 | Vercel(앱별 프로젝트, Git 연동), GitHub Actions, Dependabot |
 

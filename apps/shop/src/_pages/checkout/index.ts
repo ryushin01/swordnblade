@@ -1,1 +1,1 @@
-export { CheckoutPage } from './ui/checkout-page';
+export { CheckoutPage, generateCheckoutMetadata } from './ui/checkout-page';

@@ -1,1 +1,1 @@
-export { renderWithQuery } from './render';
+export { renderWithProviders } from './render';

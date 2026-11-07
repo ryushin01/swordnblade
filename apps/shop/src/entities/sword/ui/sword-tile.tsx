@@ -1,15 +1,18 @@
-import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatKRW, type Sword } from '@snb/domain';
+import { formatKRW, type Locale, type Sword } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
+import { Link } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
 
 /**
  * 석고 벽의 한 칸. 부조는 장식이고, 이름과 가격 글자가 링크 이름이 됩니다.
- * 마우스를 올리거나 초점을 받으면 따뜻한 빛이 번집니다.
+ * 마우스를 올리거나 초점을 받으면 따뜻한 빛이 번집니다. sword는 화면 언어로 바꾼 값을 받습니다.
  */
 export function SwordTile({ sword, className }: { sword: Sword; className?: string }) {
+  const t = useTranslations('Tile');
+  const locale = useLocale() as Locale;
   const soldOut = sword.stock <= 0;
   return (
     <Link
@@ -30,10 +33,14 @@ export function SwordTile({ sword, className }: { sword: Sword; className?: stri
       />
       <span className="relative grid justify-items-center gap-0.5 text-center">
         <span className="text-carved text-sm sm:text-base">{sword.name}</span>
-        <span lang="en" className="small-caps hidden text-xs text-ink-muted sm:block">
-          {sword.nameEn}
-        </span>
-        <span className="text-sm tabular-nums text-ink">{soldOut ? '품절' : formatKRW(sword.price)}</span>
+        {locale === 'ko' ? (
+          <span lang="en" className="small-caps hidden text-xs text-ink-muted sm:block">
+            {sword.nameEn}
+          </span>
+        ) : (
+          <span className="small-caps hidden text-xs text-ink-muted sm:block">{sword.nameOriginal}</span>
+        )}
+        <span className="text-sm tabular-nums text-ink">{soldOut ? t('soldOut') : formatKRW(sword.price, locale)}</span>
       </span>
     </Link>
   );

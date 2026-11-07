@@ -1,4 +1,8 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
 import type { NextConfig } from 'next';
+
+const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
 
 /**
  * 어드민 앱 주소. /admin 요청을 이 주소로 넘겨 같은 출처에서 어드민을 엽니다(Next.js multi-zones).
@@ -24,4 +28,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

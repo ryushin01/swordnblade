@@ -1,9 +1,26 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+
+import { type AppLocale, languageAlternates } from '@/shared/i18n';
+
 import { CartView } from './cart-view';
 
-export function CartPage() {
+import type { Metadata } from 'next';
+
+type Params = Promise<{ locale: string }>;
+
+export async function generateCartMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Meta' });
+  return { title: t('cart'), alternates: languageAlternates('/cart', locale as AppLocale) };
+}
+
+export async function CartPage({ params }: { params: Params }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('Cart');
   return (
     <div className="mx-auto grid max-w-[90rem] gap-8 px-4 py-12 sm:px-8">
-      <h1 className="text-carved text-3xl">장바구니</h1>
+      <h1 className="text-carved text-3xl">{t('title')}</h1>
       <CartView />
     </div>
   );

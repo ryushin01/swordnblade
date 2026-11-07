@@ -1,3 +1,5 @@
+import { SEED_TRANSLATIONS_EN } from './seed-en';
+
 import type { Order, Sword } from '@snb/domain';
 
 const BRASS = '#a8823a';
@@ -9,7 +11,7 @@ const IRON = '#3a3532';
  * 가상 상품 데이터입니다. 제작 공방과 가격은 모두 지어낸 것입니다.
  * 전승은 널리 알려진 이야기를 짧게 옮긴 것이며, 역사적 사실과 전설을 구분해 적었습니다.
  */
-export const SEED_SWORDS: Sword[] = [
+const SWORDS_KO: Sword[] = [
   {
     id: 'sw-001',
     slug: 'ssangsudo',
@@ -466,6 +468,12 @@ export const SEED_SWORDS: Sword[] = [
     },
   },
 ];
+
+/** 영어 번역을 붙인 시드 도검 */
+export const SEED_SWORDS: Sword[] = SWORDS_KO.map((sword) => {
+  const en = SEED_TRANSLATIONS_EN[sword.id];
+  return en ? { ...sword, translations: { en } } : sword;
+});
 
 export const SEED_ORDERS: Order[] = [
   {

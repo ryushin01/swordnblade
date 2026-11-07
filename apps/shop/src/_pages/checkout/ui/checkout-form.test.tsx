@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { createMockServer } from '@snb/mocks/node';
 
-import { renderWithQuery } from '@/shared/lib/test';
+import { renderWithProviders } from '@/shared/lib/test';
 
 import { CheckoutForm } from './checkout-form';
 
@@ -30,7 +30,7 @@ afterAll(() => {
 });
 
 const setup = (onPlaced = vi.fn()) => {
-  renderWithQuery(
+  renderWithProviders(
     <CheckoutForm
       destination="KR"
       lines={[{ swordId: 'sw-001', quantity: 1 }]}

@@ -1,6 +1,7 @@
 'use client';
 
 import { type FormEvent, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { useCreateOrder } from '@/entities/order';
 import { ApiRequestError } from '@/shared/api';
@@ -10,16 +11,6 @@ import { Button, TextField } from '@/shared/ui';
 import { type CheckoutErrors, type CheckoutValues, FIELD_ORDER, validateCheckout } from '../model/validate';
 
 import type { CountryCode, Order } from '@snb/domain';
-
-const FIELD_LABEL: Record<keyof CheckoutValues, string> = {
-  name: '받는 분',
-  email: '이메일',
-  phone: '연락처',
-  postalCode: '우편번호',
-  address: '주소',
-  paymentMethod: '결제 수단',
-  permitConfirmed: '허가 안내 확인',
-};
 
 const fieldId = (field: keyof CheckoutValues) => `checkout-${field}`;
 
@@ -42,6 +33,9 @@ const INITIAL: CheckoutValues = {
 };
 
 export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPlaced }: CheckoutFormProps) {
+  const t = useTranslations('Checkout');
+  const common = useTranslations('Common');
+  const errorText = (field: keyof CheckoutValues) => (errors[field] ? t(`errors.${field}`) : undefined);
   const [values, setValues] = useState<CheckoutValues>(INITIAL);
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [message, setMessage] = useState<string | null>(null);
@@ -67,7 +61,7 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
 
     const nextErrors = validateCheckout(values, needsPermit);
     if (Object.keys(nextErrors).length > 0) {
-      showErrors(nextErrors, '입력 내용을 확인해 주세요.');
+      showErrors(nextErrors, t('checkError'));
       return;
     }
 
@@ -93,10 +87,12 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
         onSuccess: onPlaced,
         onError: (error) => {
           submittingRef.current = false;
-          if (error instanceof ApiRequestError) {
-            showErrors(error.fields as CheckoutErrors, error.message);
+          if (error instanceof ApiRequestError && Object.keys(error.fields).length > 0) {
+            // 서버가 알려 준 칸만 표시하고, 안내 문구는 화면 언어로 씁니다.
+            const fields = FIELD_ORDER.filter((field) => field in error.fields);
+            showErrors(Object.fromEntries(fields.map((field) => [field, true])), t('checkError'));
           } else {
-            showErrors({}, '결제를 처리하지 못했습니다. 잠시 뒤 다시 시도해 주세요.');
+            showErrors({}, t('genericError'));
           }
         },
       },
@@ -125,7 +121,7 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
               {errorList.map((field) => (
                 <li key={field}>
                   <a href={`#${fieldId(field)}`} className="inline-block min-h-6 py-0.5 underline underline-offset-4">
-                    {FIELD_LABEL[field]}: {errors[field]}
+                    {t(`fields.${field}`)}: {errorText(field)}
                   </a>
                 </li>
               ))}
@@ -135,63 +131,63 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
       ) : null}
 
       <fieldset className="grid gap-4">
-        <legend className="mb-2 text-lg text-carved">받는 분 정보</legend>
+        <legend className="mb-2 text-lg text-carved">{t('recipient')}</legend>
         <TextField
           id={fieldId('name')}
-          label="받는 분"
+          label={t('fields.name')}
           name="name"
           autoComplete="name"
           required
           value={values.name}
-          error={errors.name}
+          error={errorText('name')}
           onChange={(event) => update('name', event.target.value)}
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             id={fieldId('email')}
-            label="이메일"
+            label={t('fields.email')}
             name="email"
             type="email"
             autoComplete="email"
             required
-            hint="주문 확인 메일을 보내 드립니다."
+            hint={t('emailHint')}
             value={values.email}
-            error={errors.email}
+            error={errorText('email')}
             onChange={(event) => update('email', event.target.value)}
           />
           <TextField
             id={fieldId('phone')}
-            label="연락처"
+            label={t('fields.phone')}
             name="phone"
             type="tel"
             autoComplete="tel"
             inputMode="tel"
             required
-            hint="예: 010-1234-5678"
+            hint={t('phoneHint')}
             value={values.phone}
-            error={errors.phone}
+            error={errorText('phone')}
             onChange={(event) => update('phone', event.target.value)}
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-[10rem_1fr]">
           <TextField
             id={fieldId('postalCode')}
-            label="우편번호"
+            label={t('fields.postalCode')}
             name="postalCode"
             autoComplete="postal-code"
             required
             value={values.postalCode}
-            error={errors.postalCode}
+            error={errorText('postalCode')}
             onChange={(event) => update('postalCode', event.target.value)}
           />
           <TextField
             id={fieldId('address')}
-            label="주소"
+            label={t('fields.address')}
             name="address"
             autoComplete="street-address"
             required
             value={values.address}
-            error={errors.address}
+            error={errorText('address')}
             onChange={(event) => update('address', event.target.value)}
           />
         </div>
@@ -199,12 +195,12 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
 
       <fieldset className="grid gap-2" aria-describedby={paymentErrorId}>
         <legend className="mb-2 text-lg text-carved">
-          결제 수단 <span className="text-base text-danger">(필수)</span>
+          {t('payment')} <span className="text-base text-danger">{common('required')}</span>
         </legend>
         {(
           [
-            ['card', '신용카드 (모의 결제)'],
-            ['transfer', '계좌이체 (모의 결제)'],
+            ['card', t('card')],
+            ['transfer', t('transfer')],
           ] as const
         ).map(([value, label], index) => (
           <label key={value} className="flex min-h-11 items-center gap-3">
@@ -222,15 +218,15 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
         ))}
         {errors.paymentMethod ? (
           <p id={paymentErrorId} className="text-sm text-danger">
-            {errors.paymentMethod}
+            {errorText('paymentMethod')}
           </p>
         ) : null}
-        <p className="text-sm text-ink-muted">실제 결제는 일어나지 않습니다.</p>
+        <p className="text-sm text-ink-muted">{t('mockNote')}</p>
       </fieldset>
 
       {needsPermit ? (
         <fieldset className="grid gap-3 rounded-sm border border-line bg-wall-raised/60 p-4">
-          <legend className="px-1 text-lg text-carved">도검 허가 안내</legend>
+          <legend className="px-1 text-lg text-carved">{t('permitLegend')}</legend>
           <p id="permit-note" className="text-sm leading-relaxed">
             {permitNote}
           </p>
@@ -245,13 +241,12 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
               className="mt-1 size-5 shrink-0 accent-[var(--ink)]"
             />
             <span>
-              위 안내를 읽었으며, 필요한 소지·수입 허가를 받았거나 받을 예정입니다.{' '}
-              <span className="text-danger">(필수)</span>
+              {t('permitConfirm')} <span className="text-danger">{common('required')}</span>
             </span>
           </label>
           {errors.permitConfirmed ? (
             <p id={permitErrorId} className="text-sm text-danger">
-              {errors.permitConfirmed}
+              {errorText('permitConfirmed')}
             </p>
           ) : null}
         </fieldset>
@@ -263,7 +258,7 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
         disabled={createOrder.isPending}
         className={cn('h-12 rounded-sm text-base small-caps', createOrder.isPending && 'cursor-progress')}
       >
-        {createOrder.isPending ? '결제 처리 중…' : '결제하기'}
+        {createOrder.isPending ? t('submitting') : t('submit')}
       </Button>
     </form>
   );
