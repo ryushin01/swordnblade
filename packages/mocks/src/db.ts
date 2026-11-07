@@ -28,18 +28,25 @@ const seedState = (): DbState => ({
 export function createDb(options: { storageKey?: string } = {}): Db {
   const { storageKey } = options;
 
-  const load = (): DbState => {
-    if (!storageKey) return seedState();
+  /** 저장된 값이 없거나 저장소를 못 쓰면 null */
+  const loadStored = (): DbState | null => {
+    if (!storageKey) return null;
     try {
       const raw = globalThis.localStorage?.getItem(storageKey);
       if (raw) return JSON.parse(raw) as DbState;
     } catch {
-      // 저장소를 못 쓰면 시드로 시작합니다.
+      // 저장소를 못 쓰면 메모리 상태를 씁니다.
     }
-    return seedState();
+    return null;
   };
 
-  let state = load();
+  let state = loadStored() ?? seedState();
+
+  /** 저장된 값이 있을 때만 메모리 상태를 바꿉니다. 없으면 지금 상태를 유지합니다. */
+  const refresh = () => {
+    const stored = loadStored();
+    if (stored) state = stored;
+  };
 
   const persist = () => {
     if (!storageKey) return;
@@ -51,8 +58,13 @@ export function createDb(options: { storageKey?: string } = {}): Db {
   };
 
   return {
-    read: () => state,
+    // 같은 출처의 다른 앱(쇼핑몰·어드민)이 바꾼 내용을 보도록 읽을 때마다 저장소에서 다시 불러옵니다.
+    read: () => {
+      refresh();
+      return state;
+    },
     write: (update) => {
+      refresh();
       state = update(clone(state));
       persist();
       return state;

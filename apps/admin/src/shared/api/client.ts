@@ -16,14 +16,30 @@ export class ApiRequestError extends Error {
 let mockReady: Promise<unknown> | null = null;
 
 /**
+ * 쇼핑몰 주소의 /admin에서 열렸으면 쇼핑몰과 같은 워커(/mockServiceWorker.js)를 함께 씁니다.
+ * 어드민만 따로 열렸으면(로컬 개발, 단독 주소) 루트에 워커가 없으므로 basePath 아래 워커를 씁니다.
+ */
+async function findServiceWorker(): Promise<{ serviceWorkerUrl: string; serviceWorkerScope?: string }> {
+  const shared = '/mockServiceWorker.js';
+  try {
+    const response = await fetch(shared, { method: 'HEAD' });
+    if (response.ok) return { serviceWorkerUrl: shared };
+  } catch {
+    // 네트워크 오류면 아래 경로를 씁니다.
+  }
+  // 범위를 /admin으로 넓혀 끝 슬래시 없는 /admin(대시보드)도 맡게 합니다(Service-Worker-Allowed 헤더 필요).
+  return { serviceWorkerUrl: `${SITE.basePath}/mockServiceWorker.js`, serviceWorkerScope: SITE.basePath };
+}
+
+/**
  * 브라우저에서는 첫 요청 전에 Mock API(MSW)를 켭니다.
  * 테스트처럼 Node용 Mock 서버를 따로 쓰는 환경에서는 NEXT_PUBLIC_API_MOCKING=off로 끕니다.
  */
 async function ensureMockApi() {
   if (typeof window === 'undefined' || process.env.NEXT_PUBLIC_API_MOCKING === 'off') return;
   if (!mockReady) {
-    mockReady = import('@snb/mocks/browser').then(({ startMockApi }) =>
-      startMockApi({ storageKey: SITE.mockStorageKey }),
+    mockReady = Promise.all([import('@snb/mocks/browser'), findServiceWorker()]).then(([{ startMockApi }, worker]) =>
+      startMockApi({ storageKey: SITE.mockStorageKey, ...worker }),
     );
   }
   await mockReady;

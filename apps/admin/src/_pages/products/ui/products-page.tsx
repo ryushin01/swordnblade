@@ -6,6 +6,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { CATEGORY_LABEL, COUNTRY_NAME, formatKRW, requiresPossessionPermit, type Sword } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 import { useDeleteSword, useSwords } from '@/entities/sword';
+import { SITE } from '@/shared/config';
 import { ScrollRegion } from '@/shared/ui';
 
 export function ProductsPage() {
@@ -19,7 +20,7 @@ export function ProductsPage() {
           상품
         </Typography.Title>
         {/* href를 주면 antd Button이 a 요소로 렌더됩니다(버튼 안에 링크를 넣지 않음). */}
-        <Button type="primary" href="/products/new" icon={<PlusOutlined aria-hidden />}>
+        <Button type="primary" href={`${SITE.basePath}/products/new`} icon={<PlusOutlined aria-hidden />}>
           상품 등록
         </Button>
       </Flex>

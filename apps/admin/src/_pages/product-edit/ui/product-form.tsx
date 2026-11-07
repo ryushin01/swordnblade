@@ -6,6 +6,7 @@ import type { Color } from 'antd/es/color-picker';
 import { CATEGORY_LABEL, COUNTRY_NAME, type CountryCode, type Sword, type SwordArt } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 import { useSaveSword, useSwords, type SwordInput } from '@/entities/sword';
+import { SITE } from '@/shared/config';
 
 const ORIGINS = Object.keys(COUNTRY_NAME) as CountryCode[];
 
@@ -296,7 +297,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
         <Button type="primary" htmlType="submit" loading={save.isPending}>
           {initial ? '변경 저장' : '상품 등록'}
         </Button>
-        <Button href="/products">목록으로</Button>
+        <Button href={`${SITE.basePath}/products`}>목록으로</Button>
       </Flex>
     </Form>
   );
