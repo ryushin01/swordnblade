@@ -12,7 +12,6 @@ export function SiteFooter() {
         <p>{t('customs')}</p>
         <p>
           {/* 어드민은 다른 앱(zone)이라 언어 경로 없이 일반 링크로 이동합니다. */}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- 어드민은 다른 앱(zone)이라 전체 페이지 이동이 맞습니다. */}
           <a
             href="/admin"
             hrefLang="ko"

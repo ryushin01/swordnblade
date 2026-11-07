@@ -24,6 +24,11 @@ const eslintConfig = [
   {
     // Next.js 앱이 apps/ 아래에 있음을 알려 줍니다.
     settings: { next: { rootDir: ['apps/*/'] } },
+    rules: {
+      // Pages Router용 규칙입니다. 두 앱은 App Router만 쓰고, 쇼핑몰↔어드민(다른 zone) 이동은 일부러 a를 씁니다.
+      // 실행 위치(루트·앱 폴더)에 따라 pages 폴더를 찾거나 못 찾아 결과가 달라지므로 끕니다.
+      '@next/next/no-html-link-for-pages': 'off',
+    },
   },
   {
     // import 순서: react → next → 외부 패키지 → 워크스페이스(@snb) → 앱 내부(@/) → 상대 경로 → import type → 사이드 이펙트(CSS)
