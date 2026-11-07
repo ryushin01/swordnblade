@@ -15,7 +15,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     // 어드민 단독 주소로 들어오면 /admin으로 보냅니다.
-    return [{ source: '/', destination: '/admin', basePath: false, permanent: false }];
+    return [
+      { source: '/', destination: '/admin', basePath: false, permanent: false },
+      // public/storybook 폴더 주소(/admin/storybook)로 들어오면 Storybook 첫 화면으로 보냅니다(상대 경로 파일 때문).
+      { source: '/storybook', destination: '/storybook/index.html', permanent: false },
+    ];
   },
 };
 

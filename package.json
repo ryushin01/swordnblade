@@ -14,7 +14,8 @@
     "e2e": "turbo run e2e --concurrency=1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "test:storybook": "turbo run test:storybook"
   },
   "devDependencies": {
     "eslint": "^9.39.5",

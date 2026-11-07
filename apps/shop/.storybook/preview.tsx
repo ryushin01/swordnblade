@@ -11,6 +11,8 @@ const preview: Preview = {
     layout: 'centered',
     backgrounds: { default: 'wall', values: [{ name: 'wall', value: '#dddcd7' }] },
     nextjs: { appDirectory: true },
+    // 접근성 위반이 있으면 스토리 테스트를 실패로 처리합니다.
+    a11y: { test: 'error' },
   },
   decorators: [
     (Story) => (

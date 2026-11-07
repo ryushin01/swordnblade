@@ -1,0 +1,58 @@
+name: Live check
+
+# 배포는 Vercel이 main 푸시를 받아 직접 합니다. 여기서는 그 배포가 끝나기를 기다렸다가 실제 사이트를 검사합니다.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # 어드민은 쇼핑몰 주소의 /admin에서 열리므로 주소 하나로 두 앱을 검사합니다.
+  LIVE_URL: https://swordnblade.vercel.app
+
+jobs:
+  verify:
+    name: 배포된 사이트 검사
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 이 커밋의 Vercel 배포 기다리기 (쇼핑몰·어드민)
+        run: |
+          for _ in $(seq 1 60); do
+            shop=$(curl -fsS --max-time 10 "$LIVE_URL/version.txt?sha=$GITHUB_SHA" || true)
+            admin=$(curl -fsS --max-time 10 "$LIVE_URL/admin/version.txt?sha=$GITHUB_SHA" || true)
+            if [ "$shop" = "$GITHUB_SHA" ] && [ "$admin" = "$GITHUB_SHA" ]; then
+              echo "배포 확인: $GITHUB_SHA"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "10분 안에 $GITHUB_SHA 커밋이 배포되지 않았습니다. 쇼핑몰: $shop, 어드민: $admin" >&2
+          exit 1
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @snb/shop exec playwright install --with-deps chromium
+      - run: pnpm --filter @snb/shop e2e
+        env:
+          E2E_BASE_URL: ${{ env.LIVE_URL }}
+      - run: pnpm --filter @snb/admin e2e
+        env:
+          E2E_BASE_URL: ${{ env.LIVE_URL }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: live-results
+          path: apps/*/test-results/
+          retention-days: 7

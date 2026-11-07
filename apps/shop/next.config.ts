@@ -11,6 +11,11 @@ const ADMIN_ORIGIN =
 const nextConfig: NextConfig = {
   transpilePackages: ['@snb/domain', '@snb/mocks', '@snb/sword-art'],
   reactStrictMode: true,
+  async redirects() {
+    // public/storybook 폴더 주소로 들어오면 Storybook 첫 화면으로 보냅니다.
+    // 재작성(rewrite)하면 주소가 /storybook으로 남아 Storybook의 상대 경로 파일을 못 찾으므로 주소를 바꿉니다.
+    return [{ source: '/storybook', destination: '/storybook/index.html', permanent: false }];
+  },
   async rewrites() {
     return [
       { source: '/admin', destination: `${ADMIN_ORIGIN}/admin` },

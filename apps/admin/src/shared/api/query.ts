@@ -20,8 +20,10 @@ export function useSaveMutation<TData, TResult>(options: {
   return useMutation({
     mutationFn: options.mutationFn,
     onSuccess: async (result) => {
-      await Promise.all(options.invalidate.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
+      // 저장은 끝났으므로 결과를 먼저 알립니다. 목록 새로 받기는 그 뒤에 기다려,
+      // 새 값이 올 때까지 isPending을 유지해 옛 값이 잠깐 다시 보이지 않게 합니다.
       void message.success(options.successMessage);
+      await Promise.all(options.invalidate.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
       options.onSuccess?.(result);
     },
     onError: (error) => {

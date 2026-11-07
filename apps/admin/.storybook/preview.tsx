@@ -4,7 +4,8 @@ import koKR from 'antd/locale/ko_KR';
 import type { Preview } from '@storybook/nextjs-vite';
 
 const preview: Preview = {
-  parameters: { layout: 'centered', nextjs: { appDirectory: true } },
+  // 접근성 위반이 있으면 스토리 테스트를 실패로 처리합니다.
+  parameters: { layout: 'centered', nextjs: { appDirectory: true }, a11y: { test: 'error' } },
   decorators: [
     (Story) => (
       <ConfigProvider
