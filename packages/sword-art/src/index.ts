@@ -1,3 +1,3 @@
-export { SwordRelief, type SwordReliefProps } from './SwordRelief';
+export { CATALOG_SIDE, hiltLayout, localBounds, squareViewBox } from './geometry';
 export { BladeMark, type BladeMarkProps } from './Logo';
-export { squareViewBox, hiltLayout, localBounds, CATALOG_SIDE } from './geometry';
+export { SwordRelief, type SwordReliefProps } from './SwordRelief';

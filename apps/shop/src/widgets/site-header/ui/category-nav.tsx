@@ -1,5 +1,7 @@
 import Link from 'next/link';
+
 import { CATEGORY_LABEL, type SwordCategory } from '@snb/domain';
+
 import { cn } from '@/shared/lib';
 
 const ITEMS: Array<{ value?: SwordCategory; label: string }> = [

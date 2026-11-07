@@ -1,17 +1,19 @@
-import { useId, type ReactNode } from 'react';
-import type { SwordArt } from '@snb/domain';
+import { type ReactNode, useId } from 'react';
+
 import {
   bladeOutline,
   bladeStrip,
   bladeWidthAt,
   hamonPath,
+  type HiltLayout,
   hiltLayout,
   pointsToPath,
   ROTATION_DEG,
   sickleHookPath,
   squareViewBox,
-  type HiltLayout,
 } from './geometry';
+
+import type { SwordArt } from '@snb/domain';
 
 type Layer = 'height' | 'pigment';
 
@@ -60,7 +62,13 @@ export function SwordRelief({ art, label, frame = 'fit', pigment = 0.8, depth = 
         <filter id={id('relief')} x="-15%" y="-15%" width="130%" height="130%" colorInterpolationFilters="sRGB">
           <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="height" />
           <feGaussianBlur in="height" stdDeviation={blur} result="soft" />
-          <feDiffuseLighting in="soft" surfaceScale={11 * depth} diffuseConstant={1.32} lightingColor="#efeee9" result="diffuse">
+          <feDiffuseLighting
+            in="soft"
+            surfaceScale={11 * depth}
+            diffuseConstant={1.32}
+            lightingColor="#efeee9"
+            result="diffuse"
+          >
             <feDistantLight azimuth={225} elevation={42} />
           </feDiffuseLighting>
           <feSpecularLighting
@@ -147,7 +155,9 @@ function Blade({ art, fill, opacity, layer }: { art: SwordArt; fill: string; opa
   return (
     <g>
       <path d={outline} fill={fill} fillOpacity={opacity} />
-      {blade.tip === 'sickle' ? <path d={sickleHookPath(art)} fill={isHeight ? H.mid : STEEL} fillOpacity={opacity} /> : null}
+      {blade.tip === 'sickle' ? (
+        <path d={sickleHookPath(art)} fill={isHeight ? H.mid : STEEL} fillOpacity={opacity} />
+      ) : null}
 
       {blade.fuller ? (
         <path
@@ -226,7 +236,13 @@ function Stars({ art, layer }: { art: SwordArt; layer: Layer }) {
 function Runes({ art, layer }: { art: SwordArt; layer: Layer }) {
   const stroke = layer === 'height' ? H.top : GOLD;
   const { length } = art.blade;
-  const glyphs = ['M0 -6 L0 6 M0 -6 L4 -2 M0 -1 L4 3', 'M-3 -6 L0 6 L3 -6', 'M0 -6 L0 6 M-3 -2 L3 2', 'M0 -6 L0 6 M0 0 L4 -4 M0 0 L4 4', 'M-3 6 L0 -6 L3 6 M-2 1 L2 1'];
+  const glyphs = [
+    'M0 -6 L0 6 M0 -6 L4 -2 M0 -1 L4 3',
+    'M-3 -6 L0 6 L3 -6',
+    'M0 -6 L0 6 M-3 -2 L3 2',
+    'M0 -6 L0 6 M0 0 L4 -4 M0 0 L4 4',
+    'M-3 6 L0 -6 L3 6 M-2 1 L2 1',
+  ];
   const items = Array.from({ length: 9 }, (_, index) => index);
   return (
     <g stroke={stroke} strokeWidth={art.blade.width * 0.035} fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -314,7 +330,12 @@ function Guard({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; laye
             d={`M${-half} ${cy + 2} Q${-half * 0.5} ${cy - 10} 0 ${cy - t * 0.62} Q${half * 0.5} ${cy - 10} ${half} ${cy + 2} Q${half * 0.35} ${cy + t * 0.5} 0 ${cy + t * 0.55} Q${-half * 0.35} ${cy + t * 0.5} ${-half} ${cy + 2} Z`}
             fill={fill}
           />
-          <path d={`M${-half * 0.55} ${cy} Q0 ${cy - 12} ${half * 0.55} ${cy}`} fill="none" stroke={accent} strokeWidth={3} />
+          <path
+            d={`M${-half * 0.55} ${cy} Q0 ${cy - 12} ${half * 0.55} ${cy}`}
+            fill="none"
+            stroke={accent}
+            strokeWidth={3}
+          />
         </g>
       );
     case 'block':
@@ -346,8 +367,14 @@ function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayou
         const y = y0 + index * step;
         return (
           <g key={index}>
-            <path d={`M${-half} ${y} L${half} ${y + step * 0.5} L${half} ${y + step * 0.5 + w * 0.34} L${-half} ${y + w * 0.34} Z`} fill={wrapFill} />
-            <path d={`M${half} ${y} L${-half} ${y + step * 0.5} L${-half} ${y + step * 0.5 + w * 0.34} L${half} ${y + w * 0.34} Z`} fill={wrapFill} />
+            <path
+              d={`M${-half} ${y} L${half} ${y + step * 0.5} L${half} ${y + step * 0.5 + w * 0.34} L${-half} ${y + w * 0.34} Z`}
+              fill={wrapFill}
+            />
+            <path
+              d={`M${half} ${y} L${-half} ${y + step * 0.5} L${-half} ${y + step * 0.5 + w * 0.34} L${half} ${y + w * 0.34} Z`}
+              fill={wrapFill}
+            />
             <path
               d={`M0 ${y + step * 0.25 + w * 0.17 - 3} L0 ${y + step * 0.25 + w * 0.17 + 3}`}
               stroke={isHeight ? H.low : '#00000040'}
@@ -363,7 +390,13 @@ function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayou
       const count = Math.ceil(length / step) + 2;
       wrap = Array.from({ length: count }, (_, index) => {
         const y = y0 - step + index * step;
-        return <path key={index} d={`M${-half} ${y} L${half} ${y + 7} L${half} ${y + 15} L${-half} ${y + 8} Z`} fill={wrapFill} />;
+        return (
+          <path
+            key={index}
+            d={`M${-half} ${y} L${half} ${y + 7} L${half} ${y + 15} L${-half} ${y + 8} Z`}
+            fill={wrapFill}
+          />
+        );
       });
       break;
     }
@@ -375,7 +408,13 @@ function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayou
           {Array.from({ length: count }, (_, index) => {
             const y = y0 - step + index * step;
             return (
-              <path key={index} d={`M${-half} ${y} L${half} ${y + 3}`} stroke={wrapFill} strokeWidth={2.4} strokeLinecap="round" />
+              <path
+                key={index}
+                d={`M${-half} ${y} L${half} ${y + 3}`}
+                stroke={wrapFill}
+                strokeWidth={2.4}
+                strokeLinecap="round"
+              />
             );
           })}
           <rect x={-half} y={y0} width={half * 2} height={7} fill={isHeight ? H.top : wrapFill} />
@@ -423,8 +462,15 @@ function Pommel({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; lay
     case 'cap':
       return (
         <g>
-          <path d={`M${-w / 2 - 3} ${y - 4} L${w / 2 + 3} ${y - 4} L${w / 2 + 1} ${y + 14} Q0 ${y + 22} ${-w / 2 - 1} ${y + 14} Z`} fill={fill} />
-          <path d={`M${-w / 2 + 2} ${y + 4} L${w / 2 - 2} ${y + 4}`} stroke={isHeight ? H.top : '#00000030'} strokeWidth={2} />
+          <path
+            d={`M${-w / 2 - 3} ${y - 4} L${w / 2 + 3} ${y - 4} L${w / 2 + 1} ${y + 14} Q0 ${y + 22} ${-w / 2 - 1} ${y + 14} Z`}
+            fill={fill}
+          />
+          <path
+            d={`M${-w / 2 + 2} ${y + 4} L${w / 2 - 2} ${y + 4}`}
+            stroke={isHeight ? H.top : '#00000030'}
+            strokeWidth={2}
+          />
         </g>
       );
     case 'wheel':
@@ -433,8 +479,17 @@ function Pommel({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; lay
         <g>
           <rect x={-w / 2 + 2} y={y - 2} width={w - 4} height={10} rx={3} fill={fill} />
           <circle cx={0} cy={y + 30} r={26} fill={fill} />
-          <circle cx={0} cy={y + 30} r={16} fill={isHeight ? H.top : '#ffffff00'} stroke={isHeight ? H.mid : '#00000026'} strokeWidth={3} />
-          {pommel.type === 'gem' ? <circle cx={0} cy={y + 30} r={10} fill={isHeight ? '#f5f5f5' : (pommel.gem ?? '#3b5f8f')} /> : null}
+          <circle
+            cx={0}
+            cy={y + 30}
+            r={16}
+            fill={isHeight ? H.top : '#ffffff00'}
+            stroke={isHeight ? H.mid : '#00000026'}
+            strokeWidth={3}
+          />
+          {pommel.type === 'gem' ? (
+            <circle cx={0} cy={y + 30} r={10} fill={isHeight ? '#f5f5f5' : (pommel.gem ?? '#3b5f8f')} />
+          ) : null}
         </g>
       );
     case 'lobed':
@@ -465,8 +520,16 @@ function Pommel({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; lay
     case 'jian':
       return (
         <g>
-          <path d={`M${-w / 2 - 2} ${y - 2} L${w / 2 + 2} ${y - 2} L${w / 2 + 12} ${y + 26} Q0 ${y + 36} ${-w / 2 - 12} ${y + 26} Z`} fill={fill} />
-          <path d={`M${-w / 2 + 2} ${y + 12} Q0 ${y + 4} ${w / 2 - 2} ${y + 12}`} fill="none" stroke={hi} strokeWidth={3} />
+          <path
+            d={`M${-w / 2 - 2} ${y - 2} L${w / 2 + 2} ${y - 2} L${w / 2 + 12} ${y + 26} Q0 ${y + 36} ${-w / 2 - 12} ${y + 26} Z`}
+            fill={fill}
+          />
+          <path
+            d={`M${-w / 2 + 2} ${y + 12} Q0 ${y + 4} ${w / 2 - 2} ${y + 12}`}
+            fill="none"
+            stroke={hi}
+            strokeWidth={3}
+          />
         </g>
       );
   }
@@ -482,7 +545,13 @@ function Tassel({ color, layout, layer }: { color: string; layout: HiltLayout; l
   const strands = Array.from({ length: 9 }, (_, index) => index - 4);
   return (
     <g>
-      <path d={`M0 ${y - 6} Q8 ${y + 26} ${knotX} ${knotY}`} fill="none" stroke={fill} strokeWidth={4} strokeLinecap="round" />
+      <path
+        d={`M0 ${y - 6} Q8 ${y + 26} ${knotX} ${knotY}`}
+        fill="none"
+        stroke={fill}
+        strokeWidth={4}
+        strokeLinecap="round"
+      />
       <circle cx={knotX} cy={knotY} r={8} fill={isHeight ? H.raised : color} />
       {strands.map((s) => (
         <path

@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Badge, Button, Flex, Popconfirm, Table, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Badge, Button, Flex, Popconfirm, Table, Typography } from 'antd';
+
 import { CATEGORY_LABEL, COUNTRY_NAME, formatKRW, requiresPossessionPermit, type Sword } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
+
 import { useDeleteSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
 import { ScrollRegion } from '@/shared/ui';
@@ -29,7 +31,7 @@ export function ProductsPage() {
           rowKey="id"
           loading={isPending}
           dataSource={data}
-          
+
           pagination={{ pageSize: 10, showSizeChanger: false }}
           columns={[
             {
@@ -61,7 +63,11 @@ export function ProductsPage() {
               title: '허가',
               key: 'permit',
               render: (_, sword) =>
-                requiresPossessionPermit(sword.specs) ? <Badge color="#ad6800" text="소지허가 대상" /> : <Badge color="#8c8c8c" text="장식용" />,
+                requiresPossessionPermit(sword.specs) ? (
+                  <Badge color="#ad6800" text="소지허가 대상" />
+                ) : (
+                  <Badge color="#8c8c8c" text="장식용" />
+                ),
             },
             {
               title: '가격',
@@ -75,7 +81,8 @@ export function ProductsPage() {
               dataIndex: 'stock',
               align: 'right',
               sorter: (a, b) => a.stock - b.stock,
-              render: (stock: number) => (stock <= 2 ? <Badge color="#a8071a" text={`${stock}점 (부족)`} /> : `${stock}점`),
+              render: (stock: number) =>
+                stock <= 2 ? <Badge color="#a8071a" text={`${stock}점 (부족)`} /> : `${stock}점`,
             },
             {
               title: '관리',

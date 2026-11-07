@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+
 import { MAX_QUANTITY, selectItemCount, useCartStore } from './store';
 
 describe('cart store', () => {

@@ -1,12 +1,15 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
-import type { CountryCode, Order } from '@snb/domain';
+import { type FormEvent, useRef, useState } from 'react';
+
 import { useCreateOrder } from '@/entities/order';
 import { ApiRequestError } from '@/shared/api';
 import { cn } from '@/shared/lib';
 import { Button, TextField } from '@/shared/ui';
-import { FIELD_ORDER, validateCheckout, type CheckoutErrors, type CheckoutValues } from '../model/validate';
+
+import { type CheckoutErrors, type CheckoutValues, FIELD_ORDER, validateCheckout } from '../model/validate';
+
+import type { CountryCode, Order } from '@snb/domain';
 
 const FIELD_LABEL: Record<keyof CheckoutValues, string> = {
   name: '받는 분',
@@ -212,7 +215,6 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
               id={index === 0 ? fieldId('paymentMethod') : undefined}
               checked={values.paymentMethod === value}
               onChange={() => update('paymentMethod', value)}
-              aria-invalid={errors.paymentMethod ? true : undefined}
               className="size-5 accent-[var(--ink)]"
             />
             {label}
@@ -243,7 +245,8 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
               className="mt-1 size-5 shrink-0 accent-[var(--ink)]"
             />
             <span>
-              위 안내를 읽었으며, 필요한 소지·수입 허가를 받았거나 받을 예정입니다. <span className="text-danger">(필수)</span>
+              위 안내를 읽었으며, 필요한 소지·수입 허가를 받았거나 받을 예정입니다.{' '}
+              <span className="text-danger">(필수)</span>
             </span>
           </label>
           {errors.permitConfirmed ? (

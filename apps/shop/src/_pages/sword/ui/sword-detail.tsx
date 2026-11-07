@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+
 import {
   CATEGORY_LABEL,
   COUNTRY_NAME,
@@ -12,13 +13,15 @@ import {
   type Sword,
 } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
+
 import { useCartStore } from '@/entities/cart';
-import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { useSword } from '@/entities/sword';
-import { AddToCart } from './add-to-cart';
+import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { DestinationSelect } from '@/features/choose-destination';
-import { LiveTotal, OrnamentHeading } from '@/shared/ui';
 import { ApiRequestError } from '@/shared/api';
+import { LiveTotal, OrnamentHeading } from '@/shared/ui';
+
+import { AddToCart } from './add-to-cart';
 
 export function SwordDetail({ slug }: { slug: string }) {
   const { data: sword, isPending, error } = useSword(slug);
@@ -27,7 +30,9 @@ export function SwordDetail({ slug }: { slug: string }) {
     const notFound = error instanceof ApiRequestError && error.status === 404;
     return (
       <div className="grid justify-items-center gap-4 px-4 py-32 text-center">
-        <h1 className="text-2xl text-carved">{notFound ? '찾는 도검이 벽에 없습니다' : '도검 정보를 불러오지 못했습니다'}</h1>
+        <h1 className="text-2xl text-carved">
+          {notFound ? '찾는 도검이 벽에 없습니다' : '도검 정보를 불러오지 못했습니다'}
+        </h1>
         <Link href="/" className="underline underline-offset-4">
           도검 벽으로 돌아가기
         </Link>
@@ -101,13 +106,13 @@ function SwordDetailView({ sword }: { sword: Sword }) {
           <p className="rounded-sm border border-line bg-wall-raised/60 p-3 text-sm">
             {permit ? (
               <>
-                <strong className="font-semibold text-accent">소지허가 대상</strong> · 칼날 15cm 이상 진검입니다. 국내에서 가지려면 관할
-                경찰서의 소지허가가 필요합니다.
+                <strong className="font-semibold text-accent">소지허가 대상</strong> · 칼날 15cm 이상 진검입니다.
+                국내에서 가지려면 관할 경찰서의 소지허가가 필요합니다.
               </>
             ) : (
               <>
-                <strong className="font-semibold text-accent">장식용 재현품</strong> · 날을 세우지 않았습니다. 배송 국가의 규정은 결제 전에
-                한 번 더 안내합니다.
+                <strong className="font-semibold text-accent">장식용 재현품</strong> · 날을 세우지 않았습니다. 배송
+                국가의 규정은 결제 전에 한 번 더 안내합니다.
               </>
             )}
           </p>
@@ -130,7 +135,10 @@ function SwordDetailView({ sword }: { sword: Sword }) {
             <ol className="grid gap-5 border-l border-line pl-5">
               {sword.stories.map((story) => (
                 <li key={story.when + story.text} className="relative grid gap-1">
-                  <span aria-hidden="true" className="absolute -left-[1.6rem] top-2 size-2 rounded-full bg-line ring-4 ring-wall" />
+                  <span
+                    aria-hidden="true"
+                    className="absolute -left-[1.6rem] top-2 size-2 rounded-full bg-line ring-4 ring-wall"
+                  />
                   <span className="text-sm small-caps text-accent">{story.when}</span>
                   <p className="leading-relaxed">{story.text}</p>
                 </li>
@@ -154,9 +162,18 @@ function ItemCustoms({ sword }: { sword: Sword }) {
       {config ? (
         <>
           <DestinationSelect config={config} />
-          <LiveTotal total={estimateCustoms([{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }], destination, config).totals.total} />
+          <LiveTotal
+            total={
+              estimateCustoms([{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }], destination, config)
+                .totals.total
+            }
+          />
           <CustomsBreakdown
-            estimate={estimateCustoms([{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }], destination, config)}
+            estimate={estimateCustoms(
+              [{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }],
+              destination,
+              config,
+            )}
             config={config}
           />
         </>

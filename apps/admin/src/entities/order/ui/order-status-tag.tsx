@@ -1,4 +1,5 @@
 import { Badge } from 'antd';
+
 import { ORDER_STATUS_LABEL, type OrderStatus } from '@snb/domain';
 
 /** 색 점은 보조 표시이고 상태는 글자로 읽힙니다. */

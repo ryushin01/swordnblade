@@ -18,7 +18,8 @@ export const formatPercent = (rate: number): string =>
   `${(rate * 100).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}%`;
 
 /** mm → "71 cm" */
-export const formatLength = (mm: number): string => `${(mm / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 })} cm`;
+export const formatLength = (mm: number): string =>
+  `${(mm / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 })} cm`;
 
 /** g → "1.2 kg" */
 export const formatWeight = (g: number): string =>

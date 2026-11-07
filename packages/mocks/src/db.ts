@@ -1,4 +1,5 @@
-import { DEFAULT_CUSTOMS_CONFIG, type CustomsConfig, type Order, type Sword } from '@snb/domain';
+import { type CustomsConfig, DEFAULT_CUSTOMS_CONFIG, type Order, type Sword } from '@snb/domain';
+
 import { SEED_ORDERS, SEED_SWORDS } from './seed';
 
 export interface DbState {

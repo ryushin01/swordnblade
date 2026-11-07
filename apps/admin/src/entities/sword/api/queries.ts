@@ -1,8 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { Sword } from '@snb/domain';
+
 import { apiFetch, useSaveMutation } from '@/shared/api';
+
+import type { Sword } from '@snb/domain';
 
 export const swordKeys = { all: ['swords'] as const, detail: (id: string) => ['swords', id] as const };
 

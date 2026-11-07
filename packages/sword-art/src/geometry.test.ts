@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+
 import { SEED_SWORDS } from '@snb/mocks';
+
 import { bladeOutline, CATALOG_SIDE, hiltLayout, localBounds, squareViewBox } from './geometry';
 
 describe('sword geometry', () => {

@@ -1,11 +1,15 @@
-import type { Metadata, Viewport } from 'next';
-import type { ReactNode } from 'react';
 import { Cormorant_Garamond, Noto_Serif_KR } from 'next/font/google';
-import { SiteFooter } from '@/widgets/site-footer';
-import { SiteHeader } from '@/widgets/site-header';
+
 import { SITE } from '@/shared/config';
 import { Toaster } from '@/shared/ui';
+import { SiteFooter } from '@/widgets/site-footer';
+import { SiteHeader } from '@/widgets/site-header';
+
 import { Providers } from '../query-client/providers';
+
+import type { Metadata, Viewport } from 'next';
+import type { ReactNode } from 'react';
+
 import '../styles/globals.css';
 
 const cormorant = Cormorant_Garamond({

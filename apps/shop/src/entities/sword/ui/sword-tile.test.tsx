@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
+
 import { SEED_SWORDS } from '@snb/mocks';
+
 import { SwordTile } from './sword-tile';
 
 const sword = SEED_SWORDS[0]!;

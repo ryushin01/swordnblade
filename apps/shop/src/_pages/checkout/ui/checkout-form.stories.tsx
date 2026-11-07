@@ -1,12 +1,20 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
+
 import { CheckoutForm } from './checkout-form';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'pages/checkout/CheckoutForm',
   component: CheckoutForm,
   parameters: { layout: 'padded' },
-  decorators: [(Story) => <div style={{ maxWidth: 640 }}><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 640 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     destination: 'KR',
     lines: [{ swordId: 'sw-001', quantity: 1 }],

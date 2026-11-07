@@ -2,8 +2,10 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { CartLine, CountryCode } from '@snb/domain';
+
 import { SITE } from '@/shared/config';
+
+import type { CartLine, CountryCode } from '@snb/domain';
 
 export const MAX_QUANTITY = 5;
 

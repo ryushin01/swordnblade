@@ -1,12 +1,15 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Layout, Menu, Typography } from 'antd';
 import { DashboardOutlined, SettingOutlined, ShoppingOutlined, TagsOutlined } from '@ant-design/icons';
+import { Layout, Menu, Typography } from 'antd';
+
 import { BladeMark } from '@snb/sword-art';
+
 import { SITE } from '@/shared/config';
+
+import type { ReactNode } from 'react';
 
 const { Sider, Header, Content } = Layout;
 
@@ -31,7 +34,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         본문 바로가기
       </a>
       <Sider breakpoint="lg" collapsedWidth={0} theme="light" width={220} style={{ borderRight: '1px solid #f0f0f0' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 24px', color: 'inherit' }}>
+        <Link
+          href="/"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 24px', color: 'inherit' }}
+        >
           <BladeMark className="admin-mark" />
           <Typography.Text strong>Sword &amp; Blade</Typography.Text>
         </Link>

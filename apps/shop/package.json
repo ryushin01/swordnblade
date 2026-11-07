@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
-    "lint": "steiger ./src",
+    "lint": "eslint . --max-warnings 0 && steiger ./src",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
@@ -48,7 +48,7 @@
     "steiger": "^0.9.0",
     "storybook": "^10.6.6",
     "tailwindcss": "^4.3.4",
-    "typescript": "^7.0.2",
+    "typescript": "~6.0.3",
     "vite": "^8.3.6",
     "vitest": "^5.1.0"
   },

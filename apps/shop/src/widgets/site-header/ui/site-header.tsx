@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { CategoryNav } from './category-nav';
+
 import { Wordmark } from '@/shared/ui';
+
 import { CartLink } from './cart-link';
+import { CategoryNav } from './category-nav';
 import { HeaderNav } from './header-nav';
 
 export function SiteHeader() {

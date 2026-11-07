@@ -29,8 +29,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      # FSD 규칙(Steiger)
+      # ESLint(Next.js 규칙, import 정렬) + FSD 규칙(Steiger)
       - run: pnpm lint
+      - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build

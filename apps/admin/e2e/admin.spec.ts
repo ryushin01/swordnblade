@@ -1,8 +1,10 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 async function expectNoA11yViolations(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze();
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
 }
 
@@ -59,7 +61,12 @@ test('주문: 상태를 바꾼다', async ({ page }) => {
   // 화면에 보이는 드롭다운 항목을 누릅니다(접근성용 숨은 listbox와 구분).
   await page.locator('.ant-select-dropdown').getByText('출고 준비', { exact: true }).click();
   await expect(page.getByText('주문 상태를 바꿨습니다.')).toBeVisible();
-  await expect(page.getByRole('row', { name: /SNB-20261103-0002/ }).getByText('출고 준비').first()).toBeVisible();
+  await expect(
+    page
+      .getByRole('row', { name: /SNB-20261103-0002/ })
+      .getByText('출고 준비')
+      .first(),
+  ).toBeVisible();
 });
 
 test('설정: 관세율을 바꿔 저장한다', async ({ page }) => {

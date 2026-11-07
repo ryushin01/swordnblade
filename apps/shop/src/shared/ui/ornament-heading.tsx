@@ -1,5 +1,6 @@
-import type { ElementType, ReactNode } from 'react';
 import { cn } from '@/shared/lib/utils';
+
+import type { ElementType, ReactNode } from 'react';
 
 /** 양옆에 선과 점을 둔 작은 제목: ── • 공방에서 • ── */
 export function OrnamentHeading({

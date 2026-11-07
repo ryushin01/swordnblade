@@ -1,10 +1,13 @@
 'use client';
 
 import { Alert, Button, Card, Col, Form, InputNumber, Row, Table, Typography } from 'antd';
-import type { CurrencyCode } from '@snb/domain';
-import { fromForm, toForm, type SettingsForm } from '../model/convert';
-import { useCustomsConfig, useSaveCustomsConfig } from '../api/customs-config';
+
 import { ScrollRegion } from '@/shared/ui';
+
+import { useCustomsConfig, useSaveCustomsConfig } from '../api/customs-config';
+import { fromForm, type SettingsForm, toForm } from '../model/convert';
+
+import type { CurrencyCode } from '@snb/domain';
 
 const CURRENCIES: CurrencyCode[] = ['USD', 'JPY', 'CNY', 'GBP', 'EUR', 'AUD', 'CAD'];
 
@@ -56,10 +59,17 @@ export function SettingsPage() {
               </Card>
             </Col>
             <Col xs={24} xl={12}>
-              <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>배송비 (출고지 한 곳당, 원)</h2>} style={{ marginBottom: 16 }}>
+              <Card
+                title={<h2 style={{ margin: 0, fontSize: 16 }}>배송비 (출고지 한 곳당, 원)</h2>}
+                style={{ marginBottom: 16 }}
+              >
                 <Row gutter={16}>
                   <Col xs={12}>
-                    <Form.Item name={['shipping', 'domestic']} label="국내" rules={[{ required: true, message: '국내 배송비를 입력해 주세요.' }]}>
+                    <Form.Item
+                      name={['shipping', 'domestic']}
+                      label="국내"
+                      rules={[{ required: true, message: '국내 배송비를 입력해 주세요.' }]}
+                    >
                       <InputNumber min={0} step={1000} style={{ width: '100%' }} />
                     </Form.Item>
                   </Col>
@@ -85,7 +95,7 @@ export function SettingsPage() {
                     rowKey="key"
                     dataSource={fields}
                     pagination={false}
-                    
+
                     columns={[
                       {
                         title: '배송 국가',

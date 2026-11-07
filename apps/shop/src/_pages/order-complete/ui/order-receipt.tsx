@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+
 import { COUNTRY_NAME, formatKRW, ORDER_STATUS_LABEL } from '@snb/domain';
+
 import { useOrder } from '@/entities/order';
 import { OrnamentHeading } from '@/shared/ui';
 
@@ -34,10 +36,13 @@ export function OrderReceipt({ id }: { id: string }) {
         </OrnamentHeading>
         <h1 className="text-3xl text-carved">주문이 벽에 새겨졌습니다</h1>
         <p className="text-ink-muted">
-          주문번호 <strong className="font-semibold tabular-nums text-ink">{order.id}</strong> · {ORDER_STATUS_LABEL[order.status]}
+          주문번호 <strong className="font-semibold tabular-nums text-ink">{order.id}</strong> ·{' '}
+          {ORDER_STATUS_LABEL[order.status]}
         </p>
         {order.status === 'permit-review' ? (
-          <p className="text-sm text-ink-muted">진검이 포함되어 허가 서류를 확인한 뒤 출고합니다. 안내 메일을 보내 드립니다.</p>
+          <p className="text-sm text-ink-muted">
+            진검이 포함되어 허가 서류를 확인한 뒤 출고합니다. 안내 메일을 보내 드립니다.
+          </p>
         ) : null}
       </header>
 
@@ -47,7 +52,8 @@ export function OrderReceipt({ id }: { id: string }) {
           {order.lines.map((line) => (
             <li key={line.swordId} className="flex justify-between gap-4">
               <span>
-                {line.name} × {line.quantity} <span className="text-sm text-ink-muted">({COUNTRY_NAME[line.origin]} 출고)</span>
+                {line.name} × {line.quantity}{' '}
+                <span className="text-sm text-ink-muted">({COUNTRY_NAME[line.origin]} 출고)</span>
               </span>
               <span className="tabular-nums">{formatKRW(line.unitPrice * line.quantity)}</span>
             </li>

@@ -1,4 +1,5 @@
 import { DEFAULT_CUSTOMS_CONFIG } from '@snb/domain';
+
 import { fromForm, toForm } from './convert';
 
 describe('관세 설정 폼 변환', () => {

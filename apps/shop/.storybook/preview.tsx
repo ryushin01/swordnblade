@@ -1,5 +1,7 @@
-import type { Preview } from '@storybook/nextjs-vite';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import type { Preview } from '@storybook/nextjs-vite';
+
 import '../src/_app/styles/globals.css';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });

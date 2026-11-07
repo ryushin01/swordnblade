@@ -23,11 +23,20 @@ export const SEED_SWORDS: Sword[] = [
     description:
       '무예도보통지에 실린 쌍수도를 바탕으로 재현했습니다. 칼날은 완만하게 휘고, 검은 옻칠 위에 붉은 견사 끈을 마름모로 엇갈려 감아 손이 미끄러지지 않게 했습니다. 코등이와 칼집 고리는 황동으로 두드려 만들었고, 손잡이 끝에는 붉은 술을 달았습니다.',
     stories: [
-      { when: '16세기 말', text: '임진왜란을 겪으며 긴 칼을 두 손으로 다루는 장도(長刀) 기법이 조선 군영에 들어옵니다.' },
+      {
+        when: '16세기 말',
+        text: '임진왜란을 겪으며 긴 칼을 두 손으로 다루는 장도(長刀) 기법이 조선 군영에 들어옵니다.',
+      },
       { when: '1790', text: '정조 때 편찬된 무예도보통지에 쌍수도 항목이 정리되어 자세와 동작이 그림으로 남습니다.' },
       { when: '오늘', text: '기록 속 비례에 맞춰 칼날을 다시 두드리고, 손잡이에 붉은 끈 열네 매듭을 감았습니다.' },
     ],
-    specs: { bladeLength: 960, totalLength: 1310, weight: 2100, material: '고탄소강, 황동 장식, 홍색 견사 끈', edge: 'sharp' },
+    specs: {
+      bladeLength: 960,
+      totalLength: 1310,
+      weight: 2100,
+      material: '고탄소강, 황동 장식, 홍색 견사 끈',
+      edge: 'sharp',
+    },
     price: 6_800_000,
     stock: 3,
     art: {
@@ -83,7 +92,13 @@ export const SEED_SWORDS: Sword[] = [
       { when: '조선', text: '나쁜 기운을 물리친다는 뜻을 담아 왕실에서 만들어 신하에게 내리기도 했습니다.' },
       { when: '오늘', text: '칼날 양면에 별자리를 새기고 금선을 두드려 넣는 데만 두 달이 걸립니다.' },
     ],
-    specs: { bladeLength: 640, totalLength: 830, weight: 980, material: '접쇠 강철, 금 상감, 흑칠 손잡이', edge: 'sharp' },
+    specs: {
+      bladeLength: 640,
+      totalLength: 830,
+      weight: 980,
+      material: '접쇠 강철, 금 상감, 흑칠 손잡이',
+      edge: 'sharp',
+    },
     price: 9_800_000,
     stock: 1,
     art: {
@@ -111,7 +126,13 @@ export const SEED_SWORDS: Sword[] = [
       { when: '15세기', text: '말 위에서 쓰던 긴 다치 대신, 걸어 다니며 빨리 뽑기 좋은 우치가타나가 퍼집니다.' },
       { when: '에도 시대', text: '무사가 길고 짧은 칼 두 자루를 함께 차는 다이쇼(大小)가 격식으로 굳어집니다.' },
     ],
-    specs: { bladeLength: 710, totalLength: 1010, weight: 1150, material: '옥강(타마하가네), 상어 가죽, 견사 끈', edge: 'sharp' },
+    specs: {
+      bladeLength: 710,
+      totalLength: 1010,
+      weight: 1150,
+      material: '옥강(타마하가네), 상어 가죽, 견사 끈',
+      edge: 'sharp',
+    },
     price: 4_500_000,
     stock: 4,
     art: {
@@ -158,7 +179,12 @@ export const SEED_SWORDS: Sword[] = [
     summary: '어린 벼 싹처럼 가늘고 긴 중국의 두 손 칼.',
     description:
       '칼날이 가늘고 길어 벼의 싹(苗)을 닮았다는 이름입니다. 손잡이가 길어 두 손으로 크게 휘두릅니다. 쑤저우의 가상 공방에서 출고합니다.',
-    stories: [{ when: '명 말기', text: '척계광의 군대가 왜구의 긴 칼에 맞서려 긴 칼 기법을 정리한 것이 뿌리로 알려져 있습니다.' }],
+    stories: [
+      {
+        when: '명 말기',
+        text: '척계광의 군대가 왜구의 긴 칼에 맞서려 긴 칼 기법을 정리한 것이 뿌리로 알려져 있습니다.',
+      },
+    ],
     specs: { bladeLength: 900, totalLength: 1280, weight: 1650, material: '스프링강, 황동 장식, 면 끈', edge: 'sharp' },
     price: 3_900_000,
     stock: 3,
@@ -299,10 +325,19 @@ export const SEED_SWORDS: Sword[] = [
     description:
       '아서왕 전설 속 검을 상상해 만든 장식용 재현품입니다. 날은 세우지 않았습니다. 홈을 따라 금빛 문양을 새기고, 칼끝 쪽으로 말려 올라간 금빛 코등이와 푸른 보석 끝장식을 달았습니다.',
     stories: [
-      { when: '전설', text: '바위에 꽂힌 검을 뽑은 소년이 왕이 되었다는 이야기와 호수에서 받았다는 이야기가 함께 전합니다.' },
+      {
+        when: '전설',
+        text: '바위에 꽂힌 검을 뽑은 소년이 왕이 되었다는 이야기와 호수에서 받았다는 이야기가 함께 전합니다.',
+      },
       { when: '전설', text: '왕이 죽음을 앞두고 검을 호수에 돌려보내자 물속에서 손이 나와 받아 갔다고 합니다.' },
     ],
-    specs: { bladeLength: 860, totalLength: 1140, weight: 1600, material: '스테인리스강(날 없음), 금도금 황동, 유리 보석', edge: 'blunt' },
+    specs: {
+      bladeLength: 860,
+      totalLength: 1140,
+      weight: 1600,
+      material: '스테인리스강(날 없음), 금도금 황동, 유리 보석',
+      edge: 'blunt',
+    },
     price: 12_000_000,
     stock: 2,
     art: {
@@ -325,9 +360,18 @@ export const SEED_SWORDS: Sword[] = [
     description:
       '롤랑의 노래 속 검을 상상해 만든 장식용 재현품입니다. 날은 세우지 않았습니다. 금빛 십자 코등이에 붉은 보석 끝장식을 달았습니다.',
     stories: [
-      { when: '전설', text: '롤랑이 적에게 넘기지 않으려 바위에 내려쳤으나 칼은 부러지지 않고 바위가 갈라졌다고 합니다.' },
+      {
+        when: '전설',
+        text: '롤랑이 적에게 넘기지 않으려 바위에 내려쳤으나 칼은 부러지지 않고 바위가 갈라졌다고 합니다.',
+      },
     ],
-    specs: { bladeLength: 880, totalLength: 1120, weight: 1550, material: '스테인리스강(날 없음), 금도금 황동, 유리 보석', edge: 'blunt' },
+    specs: {
+      bladeLength: 880,
+      totalLength: 1120,
+      weight: 1550,
+      material: '스테인리스강(날 없음), 금도금 황동, 유리 보석',
+      edge: 'blunt',
+    },
     price: 11_000_000,
     stock: 2,
     art: {
@@ -350,10 +394,19 @@ export const SEED_SWORDS: Sword[] = [
     description:
       '북유럽 영웅 전설 속 검을 상상해 만든 장식용 재현품입니다. 날은 세우지 않았습니다. 미국의 가상 공방에서 출고하며, 홈을 따라 룬 같은 문양을 새겼습니다.',
     stories: [
-      { when: '전설', text: '오딘이 나무에 꽂아 둔 검을 시그문드만 뽑았고, 훗날 부러진 조각을 아들 시구르드가 다시 벼렸습니다.' },
+      {
+        when: '전설',
+        text: '오딘이 나무에 꽂아 둔 검을 시그문드만 뽑았고, 훗날 부러진 조각을 아들 시구르드가 다시 벼렸습니다.',
+      },
       { when: '전설', text: '시구르드는 이 검으로 용 파프니르를 베었다고 전합니다.' },
     ],
-    specs: { bladeLength: 900, totalLength: 1080, weight: 1500, material: '패턴 용접 강철(날 없음), 청동, 금선', edge: 'blunt' },
+    specs: {
+      bladeLength: 900,
+      totalLength: 1080,
+      weight: 1500,
+      material: '패턴 용접 강철(날 없음), 청동, 금선',
+      edge: 'blunt',
+    },
     price: 9_500_000,
     stock: 3,
     art: {
@@ -420,7 +473,13 @@ export const SEED_ORDERS: Order[] = [
     createdAt: '2026-10-28T09:12:00.000Z',
     status: 'delivered',
     destination: 'KR',
-    customer: { name: '김가상', email: 'buyer1@example.com', phone: '010-0000-0001', postalCode: '03000', address: '서울특별시 종로구 가상로 1' },
+    customer: {
+      name: '김가상',
+      email: 'buyer1@example.com',
+      phone: '010-0000-0001',
+      postalCode: '03000',
+      address: '서울특별시 종로구 가상로 1',
+    },
     lines: [{ swordId: 'sw-004', name: '우치가타나', origin: 'JP', unitPrice: 4_500_000, quantity: 1 }],
     paymentMethod: 'card',
     permitConfirmed: true,
@@ -431,7 +490,13 @@ export const SEED_ORDERS: Order[] = [
     createdAt: '2026-11-03T14:40:00.000Z',
     status: 'permit-review',
     destination: 'US',
-    customer: { name: 'Alex Sample', email: 'buyer2@example.com', phone: '+1-555-0100', postalCode: '10001', address: '1 Example Ave, New York' },
+    customer: {
+      name: 'Alex Sample',
+      email: 'buyer2@example.com',
+      phone: '+1-555-0100',
+      postalCode: '10001',
+      address: '1 Example Ave, New York',
+    },
     lines: [{ swordId: 'sw-001', name: '쌍수도', origin: 'KR', unitPrice: 6_800_000, quantity: 1 }],
     paymentMethod: 'card',
     permitConfirmed: true,

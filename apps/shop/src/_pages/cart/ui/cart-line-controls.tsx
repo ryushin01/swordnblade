@@ -1,9 +1,20 @@
 'use client';
 
 import { useId } from 'react';
+
 import { MAX_QUANTITY, useCartStore } from '@/entities/cart';
 
-export function QuantitySelect({ swordId, name, quantity, stock }: { swordId: string; name: string; quantity: number; stock: number }) {
+export function QuantitySelect({
+  swordId,
+  name,
+  quantity,
+  stock,
+}: {
+  swordId: string;
+  name: string;
+  quantity: number;
+  stock: number;
+}) {
   const id = useId();
   const setQuantity = useCartStore((state) => state.setQuantity);
   const max = Math.max(1, Math.min(stock, MAX_QUANTITY));

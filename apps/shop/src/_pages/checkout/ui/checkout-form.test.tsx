@@ -1,7 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { createMockServer } from '@snb/mocks/node';
+
 import { renderWithQuery } from '@/shared/lib/test';
+
 import { CheckoutForm } from './checkout-form';
 
 const { server, db } = createMockServer();
@@ -46,7 +49,10 @@ describe('CheckoutForm', () => {
 
     const alert = await screen.findByRole('alert');
     await waitFor(() => expect(alert).toHaveFocus());
-    expect(screen.getByRole('link', { name: /받는 분: 받는 분 이름을 입력해 주세요/ })).toHaveAttribute('href', '#checkout-name');
+    expect(screen.getByRole('link', { name: /받는 분: 받는 분 이름을 입력해 주세요/ })).toHaveAttribute(
+      'href',
+      '#checkout-name',
+    );
     expect(screen.getByLabelText(/받는 분/, { selector: 'input' })).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('checkbox')).toHaveAccessibleDescription(/허가 안내 문구/);
   });

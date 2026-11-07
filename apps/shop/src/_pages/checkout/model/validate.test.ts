@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateCheckout, type CheckoutValues } from './validate';
+
+import { type CheckoutValues, validateCheckout } from './validate';
 
 const valid: CheckoutValues = {
   name: '홍길동',
