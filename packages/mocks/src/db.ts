@@ -29,14 +29,21 @@ const seedState = (): DbState => ({
 export function createDb(options: { storageKey?: string } = {}): Db {
   const { storageKey } = options;
 
-  /** 저장된 값이 없거나 저장소를 못 쓰면 null */
+  /**
+   * 저장된 값이 없거나, 저장소를 못 쓰거나, 모양이 맞지 않으면 null.
+   * 읽을 때마다 다시 불러오므로 깨진 값 하나가 모든 요청을 막지 않게 모양을 확인합니다.
+   */
   const loadStored = (): DbState | null => {
     if (!storageKey) return null;
     try {
       const raw = globalThis.localStorage?.getItem(storageKey);
-      if (raw) return JSON.parse(raw) as DbState;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Partial<DbState> | null;
+      if (parsed && Array.isArray(parsed.swords) && Array.isArray(parsed.orders) && parsed.customs) {
+        return parsed as DbState;
+      }
     } catch {
-      // 저장소를 못 쓰면 메모리 상태를 씁니다.
+      // 저장소를 못 쓰거나 JSON이 깨졌으면 메모리 상태를 씁니다.
     }
     return null;
   };

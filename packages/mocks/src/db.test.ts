@@ -19,6 +19,16 @@ describe('createDb (localStorage 공유)', () => {
     expect(shop.read().swords[0]?.price).toBe(7_000_000);
   });
 
+  it.each([
+    ['모양이 다른 JSON', '{}'],
+    ['깨진 JSON', '{"swords":'],
+  ])('저장된 값이 %s이면 무시하고 메모리 상태를 쓴다', (_, raw) => {
+    const db = createDb({ storageKey: 'test-db' });
+    localStorage.setItem('test-db', raw);
+    expect(db.read().swords).toHaveLength(16);
+    expect(createDb({ storageKey: 'test-db' }).read().swords).toHaveLength(16);
+  });
+
   it('저장된 값이 없으면 지금 메모리 상태를 유지한다(시드로 되돌리지 않음)', () => {
     const db = createDb({ storageKey: 'test-db' });
     db.write((state) => ({ ...state, orders: [] }));
