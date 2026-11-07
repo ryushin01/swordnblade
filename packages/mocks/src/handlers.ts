@@ -1,15 +1,17 @@
 import { delay, http, HttpResponse } from 'msw';
+
 import {
-  estimateCustoms,
-  requiresPossessionPermit,
   type CountryCode,
-  type CustomsConfig,
   type Customer,
+  type CustomsConfig,
+  estimateCustoms,
   type Order,
   type OrderStatus,
+  requiresPossessionPermit,
   type Sword,
   type SwordCategory,
 } from '@snb/domain';
+
 import type { Db } from './db';
 
 export interface CreateOrderBody {
@@ -48,7 +50,8 @@ function nextOrderId(orders: Order[], now: Date): string {
 function validateCustomer(customer: Partial<Customer> | undefined): Record<string, string> {
   const fields: Record<string, string> = {};
   if (!customer?.name?.trim()) fields.name = '받는 분 이름을 입력해 주세요.';
-  if (!customer?.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) fields.email = '이메일 형식을 확인해 주세요.';
+  if (!customer?.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email))
+    fields.email = '이메일 형식을 확인해 주세요.';
   if (!customer?.phone || customer.phone.replace(/\D/g, '').length < 7) fields.phone = '연락처를 확인해 주세요.';
   if (!customer?.postalCode?.trim()) fields.postalCode = '우편번호를 입력해 주세요.';
   if (!customer?.address?.trim()) fields.address = '주소를 입력해 주세요.';
@@ -83,7 +86,10 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       const body = (await request.json()) as Omit<Sword, 'id'>;
       if (!body.slug || !body.name) return error(400, { message: '이름과 주소(slug)는 필수입니다.' });
       if (db.read().swords.some((sword) => sword.slug === body.slug)) {
-        return error(409, { message: '같은 주소(slug)의 상품이 있습니다.', fields: { slug: '다른 값을 입력해 주세요.' } });
+        return error(409, {
+          message: '같은 주소(slug)의 상품이 있습니다.',
+          fields: { slug: '다른 값을 입력해 주세요.' },
+        });
       }
       const id = `sw-${pad(db.read().swords.length + 1, 3)}-${Date.now().toString(36)}`;
       const created: Sword = { ...body, id };
@@ -97,7 +103,10 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       const exists = db.read().swords.some((sword) => sword.id === params.id);
       if (!exists) return error(404, { message: '상품을 찾을 수 없습니다.' });
       const updated: Sword = { ...body, id: params.id };
-      db.write((state) => ({ ...state, swords: state.swords.map((sword) => (sword.id === params.id ? updated : sword)) }));
+      db.write((state) => ({
+        ...state,
+        swords: state.swords.map((sword) => (sword.id === params.id ? updated : sword)),
+      }));
       return HttpResponse.json(updated);
     }),
 
@@ -146,7 +155,10 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       if (!body.paymentMethod) fields.paymentMethod = '결제 수단을 선택해 주세요.';
       if (!body.lines?.length) return error(400, { message: '장바구니가 비어 있습니다.' });
 
-      const lines = body.lines.map((line) => ({ line, sword: state.swords.find((sword) => sword.id === line.swordId) }));
+      const lines = body.lines.map((line) => ({
+        line,
+        sword: state.swords.find((sword) => sword.id === line.swordId),
+      }));
       const missing = lines.find(({ sword }) => !sword);
       if (missing) return error(409, { message: '판매가 끝난 상품이 장바구니에 있습니다.' });
 

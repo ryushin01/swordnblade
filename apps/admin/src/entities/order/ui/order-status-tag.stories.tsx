@@ -1,11 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Flex } from 'antd';
+
 import { ORDER_STATUS_LABEL, type OrderStatus } from '@snb/domain';
+
 import { OrderStatusTag } from './order-status-tag';
 
-const meta = { title: 'entities/order/OrderStatusTag', component: OrderStatusTag, args: { status: 'paid' } } satisfies Meta<
-  typeof OrderStatusTag
->;
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+
+const meta = {
+  title: 'entities/order/OrderStatusTag',
+  component: OrderStatusTag,
+  args: { status: 'paid' },
+} satisfies Meta<typeof OrderStatusTag>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

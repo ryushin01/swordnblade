@@ -1,6 +1,8 @@
-import type { Metadata } from 'next';
 import { SEED_SWORDS } from '@snb/mocks';
+
 import { SwordDetail } from './sword-detail';
+
+import type { Metadata } from 'next';
 
 type Params = Promise<{ slug: string }>;
 

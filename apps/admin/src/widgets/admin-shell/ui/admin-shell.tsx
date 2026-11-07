@@ -1,11 +1,15 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Layout, Menu, Typography } from 'antd';
 import { DashboardOutlined, SettingOutlined, ShoppingOutlined, TagsOutlined } from '@ant-design/icons';
+import { Layout, Menu, Typography } from 'antd';
+
 import { BladeMark } from '@snb/sword-art';
+
+import { SITE } from '@/shared/config';
+
+import type { ReactNode } from 'react';
 
 const { Sider, Header, Content } = Layout;
 
@@ -30,7 +34,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         본문 바로가기
       </a>
       <Sider breakpoint="lg" collapsedWidth={0} theme="light" width={220} style={{ borderRight: '1px solid #f0f0f0' }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 24px', color: 'inherit' }}>
+        <Link
+          href="/"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 24px', color: 'inherit' }}
+        >
           <BladeMark className="admin-mark" />
           <Typography.Text strong>Sword &amp; Blade</Typography.Text>
         </Link>
@@ -39,8 +46,20 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </nav>
       </Sider>
       <Layout>
-        <Header style={{ background: '#fff', paddingInline: 24, borderBottom: '1px solid #f0f0f0' }}>
+        <Header
+          style={{
+            background: '#fff',
+            paddingInline: 24,
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 16,
+          }}
+        >
           <Typography.Text type="secondary">포트폴리오용 가상 쇼핑몰 관리 화면 · Mock API</Typography.Text>
+          {/* 쇼핑몰은 다른 앱(zone)이라 Next Link가 아닌 일반 링크로 이동합니다. */}
+          <a href={SITE.shopUrl}>쇼핑몰 보기</a>
         </Header>
         <Content id="main" tabIndex={-1} style={{ padding: 24, outline: 'none' }}>
           {children}

@@ -1,8 +1,10 @@
 'use client';
 
-import { Alert, Breadcrumb, Card, Typography } from 'antd';
 import Link from 'next/link';
+import { Alert, Breadcrumb, Card, Typography } from 'antd';
+
 import { useSword } from '@/entities/sword';
+
 import { ProductForm } from './product-form';
 
 function Heading({ title }: { title: string }) {

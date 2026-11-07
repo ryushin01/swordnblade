@@ -1,5 +1,6 @@
-import type { ApiError } from '@snb/mocks';
 import { SITE } from '../config';
+
+import type { ApiError } from '@snb/mocks';
 
 export class ApiRequestError extends Error {
   readonly status: number;

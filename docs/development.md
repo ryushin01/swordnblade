@@ -8,9 +8,16 @@
 | `@snb/mocks` | 16점 시드 데이터, 메모리 DB(`createDb`), MSW 핸들러, 브라우저(`/browser`)·Node(`/node`) 진입점 |
 | `@snb/sword-art` | 도검 부조 `SwordRelief`, 칼날 로고 `BladeMark` |
 | `@snb/shop` | 쇼핑몰 (포트 3000) |
-| `@snb/admin` | 어드민 (포트 3001) |
+| `@snb/admin` | 어드민 (포트 3001, `basePath: '/admin'`) |
 
 패키지는 빌드하지 않고 TypeScript 소스를 그대로 내보냅니다. 두 앱은 `next.config.ts`의 `transpilePackages`로 읽습니다.
+
+## 쇼핑몰과 어드민을 한 주소로 (multi-zones)
+
+- 어드민은 `basePath: '/admin'`으로 빌드하고, 쇼핑몰이 `/admin` 요청을 어드민 앱으로 넘깁니다(`apps/shop/next.config.ts`의 rewrites). 그래서 두 앱이 **같은 출처(origin)** 에서 열립니다.
+- 넘길 주소는 빌드할 때 `ADMIN_ORIGIN`으로 정합니다. 기본값은 개발 `http://localhost:3001`, 프로덕션 `https://swordnblade-admin.vercel.app`입니다.
+- `pnpm dev`로 두 앱을 함께 띄우고 `http://localhost:3000/admin`으로 엽니다. 어드민만 따로 열려면 `http://localhost:3001/admin`입니다.
+- 쇼핑몰과 어드민 사이의 이동은 다른 앱으로 넘어가므로 `next/link`가 아닌 일반 `a` 링크를 씁니다.
 
 ## FSD 구조
 
@@ -23,9 +30,10 @@
 
 ## Mock API
 
-- 브라우저: 첫 API 요청 전에 `startMockApi`가 MSW 워커를 켭니다(`shared/api/client.ts`). 데이터는 앱마다 다른 localStorage 키(`snb-shop-db-v1`, `snb-admin-db-v1`)에 저장되어 새로고침해도 남습니다. 저장소를 못 쓰는 환경에서는 메모리로만 동작합니다.
+- 브라우저: 첫 API 요청 전에 `startMockApi`가 MSW 워커를 켭니다(`shared/api/client.ts`). 두 앱이 같은 워커(`/mockServiceWorker.js`)와 같은 localStorage 키(`snb-db-v1`)를 써서 데이터를 함께 씁니다. 새로고침해도 남고, 저장소를 못 쓰는 환경에서는 메모리로만 동작합니다.
+- Mock DB는 읽고 쓸 때마다 저장소를 다시 읽어, 다른 앱이 바꾼 값을 바로 봅니다. 저장된 값이 없으면 지금 메모리 상태를 유지합니다(시드로 되돌리지 않음).
+- 어드민만 따로 열리면 루트에 워커가 없으므로 `/admin/mockServiceWorker.js`를 `/admin` 범위로 등록합니다(`Service-Worker-Allowed` 헤더). 이때는 데이터가 쇼핑몰과 공유되지 않습니다.
 - 테스트: `NEXT_PUBLIC_API_MOCKING=off`로 브라우저 워커를 끄고 `createMockServer()`(MSW Node)를 씁니다.
-- 쇼핑몰과 어드민은 다른 주소로 배포되므로 **한쪽에서 바꾼 데이터가 다른 쪽에 보이지 않습니다.** 두 앱은 같은 시드에서 시작합니다.
 - 주문 금액은 클라이언트가 보낸 값을 쓰지 않고 Mock 서버가 `estimateCustoms`로 다시 계산합니다. 재고 부족(409), 입력 오류(422)도 서버에서 판단합니다.
 
 | 메서드 | 경로 | 설명 |
@@ -44,10 +52,19 @@
 |---|---|---|
 | 단위 | `packages/*/src/*.test.ts` | `pnpm test` |
 | 컴포넌트 | 컴포넌트 옆 `*.test.tsx` | `pnpm test` |
-| 스토리 | 컴포넌트 옆 `*.stories.tsx` | `pnpm --filter @snb/shop storybook` |
+| 스토리 | 컴포넌트 옆 `*.stories.tsx` | `pnpm test:storybook` (보기: `pnpm --filter @snb/shop storybook`) |
 | E2E | `apps/*/e2e` | `pnpm build` 후 `pnpm --filter @snb/shop e2e` |
 
-E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel 7) 두 화면에서 실행합니다. 쇼핑몰은 3101, 어드민은 3102 포트를 씁니다(`E2E_PORT`로 바꿀 수 있음). `E2E_BASE_URL`을 주면 로컬 서버를 띄우지 않고 그 주소(배포된 사이트)를 검사합니다. 매 페이지에서 axe(WCAG 2.2 AA 태그)를 돌리고, 쇼핑몰은 가로 넘침도 검사합니다.
+E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel 7) 두 화면에서 실행합니다. 쇼핑몰은 3101, 어드민은 3102 포트를 씁니다(`E2E_PORT`로 바꿀 수 있음). `E2E_BASE_URL`을 주면 로컬 서버를 띄우지 않고 그 주소(배포된 사이트)를 검사합니다. 매 페이지에서 axe(WCAG 2.2 AA 태그)를 돌리고, 쇼핑몰은 가로 넘침도 검사합니다. 쇼핑몰 E2E는 어드민 서버도 함께 띄워 두 앱의 데이터 공유를 검사하므로, 쇼핑몰을 `ADMIN_ORIGIN=http://localhost:3102`로 빌드해야 합니다.
+
+스토리 테스트는 모든 스토리를 실제 브라우저(Chromium)에서 렌더링하고 axe를 돌립니다. 접근성 위반이 하나라도 있으면 실패합니다(`a11y: { test: 'error' }`).
+
+## 코드 스타일
+
+- ESLint(`eslint.config.mjs`): Next.js 권장 규칙(Core Web Vitals, TypeScript, jsx-a11y, React Hooks)과 import 정렬. 순서는 react → next → 외부 패키지 → `@snb/` → `@/` → 상대 경로 → `import type` → CSS입니다. `pnpm lint`는 ESLint와 Steiger를 함께 돌립니다.
+- Prettier(`.prettierrc.json`): 작은따옴표, 한 줄 120자. 문서(`*.md`)는 표를 손으로 맞춰 두어 제외합니다.
+- husky: 커밋 전에 바뀐 파일에 ESLint·Prettier(lint-staged), 전체 타입 검사, 단위 테스트를 실행합니다.
+- TypeScript는 6.0으로 고정합니다. typescript-eslint가 아직 7.0을 지원하지 않습니다.
 
 ## 접근성 점검 (KWCAG 2.2)
 

@@ -1,11 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEFAULT_CUSTOMS_CONFIG, estimateCustoms } from '@snb/domain';
+
 import { CustomsBreakdown } from './customs-breakdown';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'entities/tariff/CustomsBreakdown',
   component: CustomsBreakdown,
-  decorators: [(Story) => <div style={{ width: 420 }}><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div style={{ width: 420 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     config: DEFAULT_CUSTOMS_CONFIG,
     estimate: estimateCustoms(

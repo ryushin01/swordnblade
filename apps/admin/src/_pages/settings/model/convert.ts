@@ -24,4 +24,3 @@ export const fromForm = (values: SettingsForm, base: CustomsConfig): CustomsConf
     };
   }),
 });
-

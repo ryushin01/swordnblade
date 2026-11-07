@@ -1,1 +1,1 @@
-export { SwordPage, generateSwordMetadata } from './ui/sword-page';
+export { generateSwordMetadata, SwordPage } from './ui/sword-page';

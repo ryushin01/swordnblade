@@ -1,8 +1,9 @@
 'use client';
 
-import type { SwordCategory } from '@snb/domain';
 import { SwordTile, useSwords } from '@/entities/sword';
 import { Button } from '@/shared/ui';
+
+import type { SwordCategory } from '@snb/domain';
 
 const GRID = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4';
 const CELL = 'border-b border-r border-line';

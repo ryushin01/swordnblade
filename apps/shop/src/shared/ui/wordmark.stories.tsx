@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { OrnamentHeading } from './ornament-heading';
 import { Wordmark } from './wordmark';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = { title: 'shared/ui/Wordmark', component: Wordmark } satisfies Meta<typeof Wordmark>;
 export default meta;

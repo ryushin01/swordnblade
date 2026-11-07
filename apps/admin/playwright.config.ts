@@ -19,7 +19,7 @@ export default defineConfig({
     ? undefined
     : {
         command: `next start -p ${PORT}`,
-        url: `http://localhost:${PORT}`,
+        url: `http://localhost:${PORT}/admin`,
         reuseExistingServer: !process.env.CI,
         timeout: 60_000,
       },

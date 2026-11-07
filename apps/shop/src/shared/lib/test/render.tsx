@@ -1,6 +1,7 @@
-import type { ReactElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
+
+import type { ReactElement } from 'react';
 
 /** 테스트마다 새 QueryClient로 감싸 렌더합니다. */
 export function renderWithQuery(ui: ReactElement) {

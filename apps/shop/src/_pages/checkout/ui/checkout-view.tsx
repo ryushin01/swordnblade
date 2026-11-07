@@ -3,12 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { COUNTRY_NAME, estimateCustoms, findCountryRule, formatKRW, requiresPossessionPermit, type Order } from '@snb/domain';
+
+import {
+  COUNTRY_NAME,
+  estimateCustoms,
+  findCountryRule,
+  formatKRW,
+  type Order,
+  requiresPossessionPermit,
+} from '@snb/domain';
+
 import { useCartHydrated, useCartStore } from '@/entities/cart';
-import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { useSwords } from '@/entities/sword';
-import { CheckoutForm } from './checkout-form';
+import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { OrnamentHeading } from '@/shared/ui';
+
+import { CheckoutForm } from './checkout-form';
 
 export function CheckoutView() {
   const router = useRouter();

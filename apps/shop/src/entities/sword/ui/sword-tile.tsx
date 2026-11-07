@@ -1,6 +1,8 @@
 import Link from 'next/link';
+
 import { formatKRW, type Sword } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
+
 import { cn } from '@/shared/lib';
 
 /**
@@ -28,7 +30,9 @@ export function SwordTile({ sword, className }: { sword: Sword; className?: stri
       />
       <span className="relative grid justify-items-center gap-0.5 text-center">
         <span className="text-carved text-sm sm:text-base">{sword.name}</span>
-        <span lang="en" className="small-caps hidden text-xs text-ink-muted sm:block">{sword.nameEn}</span>
+        <span lang="en" className="small-caps hidden text-xs text-ink-muted sm:block">
+          {sword.nameEn}
+        </span>
         <span className="text-sm tabular-nums text-ink">{soldOut ? '품절' : formatKRW(sword.price)}</span>
       </span>
     </Link>

@@ -1,11 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Table } from 'antd';
+
 import { ScrollRegion } from './scroll-region';
+
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 const meta = {
   title: 'shared/ui/ScrollRegion',
   component: ScrollRegion,
-  decorators: [(Story) => <div style={{ width: 320 }}><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div style={{ width: 320 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     label: '예시 표',
     children: (

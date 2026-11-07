@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 /** 배포된 사이트를 검사할 때는 E2E_BASE_URL을 주면 로컬 서버를 띄우지 않습니다. */
 const BASE_URL = process.env.E2E_BASE_URL;
 const PORT = Number(process.env.E2E_PORT ?? 3101);
+const ADMIN_PORT = Number(process.env.E2E_ADMIN_PORT ?? 3102);
 
 /** 프로덕션 빌드(next start)를 띄워 검사합니다. 먼저 `pnpm build`가 필요합니다. */
 export default defineConfig({
@@ -15,12 +16,21 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
+  // 쇼핑몰과 어드민(/admin)을 함께 띄웁니다. 쇼핑몰은 ADMIN_ORIGIN=http://localhost:3102로 빌드해야 합니다.
   webServer: BASE_URL
     ? undefined
-    : {
-        command: `next start -p ${PORT}`,
-        url: `http://localhost:${PORT}`,
-        reuseExistingServer: !process.env.CI,
-        timeout: 60_000,
-      },
+    : [
+        {
+          command: `next start -p ${PORT}`,
+          url: `http://localhost:${PORT}`,
+          reuseExistingServer: !process.env.CI,
+          timeout: 60_000,
+        },
+        {
+          command: `pnpm --dir ../admin exec next start -p ${ADMIN_PORT}`,
+          url: `http://localhost:${ADMIN_PORT}/admin`,
+          reuseExistingServer: !process.env.CI,
+          timeout: 60_000,
+        },
+      ],
 });

@@ -1,9 +1,11 @@
 'use client';
 
 import { useId } from 'react';
-import type { CountryCode, CustomsConfig } from '@snb/domain';
+
 import { useCartStore } from '@/entities/cart';
 import { cn } from '@/shared/lib';
+
+import type { CountryCode, CustomsConfig } from '@snb/domain';
 
 /** 배송 국가를 고르면 장바구니 전체의 관세 계산 기준이 바뀝니다. */
 export function DestinationSelect({ config, className }: { config: CustomsConfig; className?: string }) {

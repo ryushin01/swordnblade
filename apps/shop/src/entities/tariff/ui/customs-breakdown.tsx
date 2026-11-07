@@ -1,13 +1,14 @@
 import {
   COUNTRY_NAME,
+  type CustomsConfig,
+  type CustomsEstimate,
   findCountryRule,
   formatCurrency,
   formatKRW,
   formatPercent,
   toCurrency,
-  type CustomsConfig,
-  type CustomsEstimate,
 } from '@snb/domain';
+
 import { cn } from '@/shared/lib';
 
 interface CustomsBreakdownProps {
@@ -20,7 +21,9 @@ interface CustomsBreakdownProps {
 
 function Row({ term, value, strong }: { term: string; value: string; strong?: boolean }) {
   return (
-    <div className={cn('flex items-baseline justify-between gap-4 py-1', strong && 'border-t border-line pt-2 text-lg')}>
+    <div
+      className={cn('flex items-baseline justify-between gap-4 py-1', strong && 'border-t border-line pt-2 text-lg')}
+    >
       <dt className={strong ? 'text-ink' : 'text-ink-muted'}>{term}</dt>
       <dd className="tabular-nums">{value}</dd>
     </div>
@@ -59,7 +62,10 @@ export function CustomsBreakdown({ estimate, config, showLocalCurrency = true, c
                       value={formatKRW(shipment.dutiableValue)}
                     />
                     <Row term="관세" value={formatKRW(shipment.duty)} />
-                    <Row term={estimate.destination === 'KR' ? '부가세' : '부가세·소비세'} value={formatKRW(shipment.vat)} />
+                    <Row
+                      term={estimate.destination === 'KR' ? '부가세' : '부가세·소비세'}
+                      value={formatKRW(shipment.vat)}
+                    />
                   </>
                 ) : null}
               </dl>
@@ -85,7 +91,10 @@ export function CustomsBreakdown({ estimate, config, showLocalCurrency = true, c
         면세 한도 {formatCurrency(rule.dutyFreeLimit, rule.limitCurrency)}
         {rule.originLimits
           ? Object.entries(rule.originLimits)
-              .map(([origin, limit]) => ` (${COUNTRY_NAME[origin as keyof typeof COUNTRY_NAME]}발 ${formatCurrency(limit, rule.limitCurrency)})`)
+              .map(
+                ([origin, limit]) =>
+                  ` (${COUNTRY_NAME[origin as keyof typeof COUNTRY_NAME]}발 ${formatCurrency(limit, rule.limitCurrency)})`,
+              )
               .join('')
           : null}
         . 실제 세액은 통관 시점의 환율과 품목 분류에 따라 달라질 수 있는 예상액입니다.

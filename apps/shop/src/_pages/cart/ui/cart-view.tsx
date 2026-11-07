@@ -1,15 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+
 import { COUNTRY_NAME, estimateCustoms, findCountryRule, formatKRW, requiresPossessionPermit } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
+
 import { useCartHydrated, useCartStore } from '@/entities/cart';
-import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { useSwords } from '@/entities/sword';
+import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { DestinationSelect } from '@/features/choose-destination';
-import { QuantitySelect, RemoveLineButton } from './cart-line-controls';
-import { buttonVariants, LiveTotal, OrnamentHeading } from '@/shared/ui';
 import { cn } from '@/shared/lib';
+import { buttonVariants, LiveTotal, OrnamentHeading } from '@/shared/ui';
+
+import { QuantitySelect, RemoveLineButton } from './cart-line-controls';
 
 export function CartView() {
   const hydrated = useCartHydrated();
@@ -124,10 +127,7 @@ export function CartView() {
         <DestinationSelect config={config.data} />
         <LiveTotal total={estimate.totals.total} />
         <CustomsBreakdown estimate={estimate} config={config.data} />
-        <Link
-          href="/checkout"
-          className={cn(buttonVariants({ size: 'lg' }), 'h-12 rounded-sm text-base small-caps')}
-        >
+        <Link href="/checkout" className={cn(buttonVariants({ size: 'lg' }), 'h-12 rounded-sm text-base small-caps')}>
           주문서 작성하기
         </Link>
       </section>

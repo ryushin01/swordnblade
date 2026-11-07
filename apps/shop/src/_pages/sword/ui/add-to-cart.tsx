@@ -4,9 +4,11 @@ import { useId, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import type { Sword } from '@snb/domain';
+
 import { MAX_QUANTITY, useCartStore } from '@/entities/cart';
 import { Button } from '@/shared/ui';
+
+import type { Sword } from '@snb/domain';
 
 export function AddToCart({ sword }: { sword: Sword }) {
   const add = useCartStore((state) => state.add);

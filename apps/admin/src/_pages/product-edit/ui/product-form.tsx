@@ -2,10 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { Button, Card, Col, ColorPicker, Flex, Form, Input, InputNumber, Radio, Row, Select, Typography } from 'antd';
-import type { Color } from 'antd/es/color-picker';
+
 import { CATEGORY_LABEL, COUNTRY_NAME, type CountryCode, type Sword, type SwordArt } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
-import { useSaveSword, useSwords, type SwordInput } from '@/entities/sword';
+
+import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
+import { SITE } from '@/shared/config';
+
+import type { Color } from 'antd/es/color-picker';
 
 const ORIGINS = Object.keys(COUNTRY_NAME) as CountryCode[];
 
@@ -51,7 +55,10 @@ function ColorInput({ id, value, onChange, ...aria }: ColorInputProps) {
   return (
     <ColorPicker value={value} disabledAlpha format="hex" onChange={(color: Color) => onChange?.(color.toHexString())}>
       <Button id={id} aria-invalid={aria['aria-invalid']} aria-describedby={aria['aria-describedby']}>
-        <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: 2, background: value, border: '1px solid #d9d9d9' }} />
+        <span
+          aria-hidden="true"
+          style={{ width: 16, height: 16, borderRadius: 2, background: value, border: '1px solid #d9d9d9' }}
+        />
         {value?.toUpperCase()}
       </Button>
     </ColorPicker>
@@ -75,20 +82,31 @@ export function ProductForm({ initial }: { initial?: Sword }) {
   const watched = Form.useWatch([], { form, preserve: true }) as SwordInput | undefined;
 
   const template = initial ?? swords.data?.[0];
-  const initialValues: Partial<SwordInput> | undefined = initial ?? (template
-    ? {
-        category: 'east',
-        origin: 'KR',
-        price: 1_000_000,
-        stock: 1,
-        stories: [],
-        specs: { bladeLength: template.art.blade.length, totalLength: 1000, weight: 1000, material: '', edge: 'sharp' },
-        art: template.art,
-      }
-    : undefined);
+  const initialValues: Partial<SwordInput> | undefined =
+    initial ??
+    (template
+      ? {
+          category: 'east',
+          origin: 'KR',
+          price: 1_000_000,
+          stock: 1,
+          stories: [],
+          specs: {
+            bladeLength: template.art.blade.length,
+            totalLength: 1000,
+            weight: 1000,
+            material: '',
+            edge: 'sharp',
+          },
+          art: template.art,
+        }
+      : undefined);
 
   const previewArt: SwordArt | undefined = watched?.art?.blade
-    ? { ...watched.art, blade: { ...watched.art.blade, length: watched.specs?.bladeLength || watched.art.blade.length } }
+    ? {
+        ...watched.art,
+        blade: { ...watched.art.blade, length: watched.specs?.bladeLength || watched.art.blade.length },
+      }
     : initialValues?.art;
 
   if (!initialValues) return <Card loading />;
@@ -122,12 +140,20 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Form.Item>
               </Col>
               <Col xs={24} md={8}>
-                <Form.Item name="nameOriginal" label="원어 이름" rules={[{ required: true, message: '원어 이름을 입력해 주세요.' }]}>
+                <Form.Item
+                  name="nameOriginal"
+                  label="원어 이름"
+                  rules={[{ required: true, message: '원어 이름을 입력해 주세요.' }]}
+                >
                   <Input autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col xs={24} md={8}>
-                <Form.Item name="nameEn" label="영문 이름" rules={[{ required: true, message: '영문 이름을 입력해 주세요.' }]}>
+                <Form.Item
+                  name="nameEn"
+                  label="영문 이름"
+                  rules={[{ required: true, message: '영문 이름을 입력해 주세요.' }]}
+                >
                   <Input autoComplete="off" lang="en" />
                 </Form.Item>
               </Col>
@@ -146,11 +172,21 @@ export function ProductForm({ initial }: { initial?: Sword }) {
               </Col>
               <Col xs={12} md={8}>
                 <Form.Item name="category" label="분류" rules={[{ required: true }]}>
-                  <Select options={(['east', 'west', 'legend'] as const).map((value) => ({ value, label: CATEGORY_LABEL[value] }))} />
+                  <Select
+                    options={(['east', 'west', 'legend'] as const).map((value) => ({
+                      value,
+                      label: CATEGORY_LABEL[value],
+                    }))}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={12} md={8}>
-                <Form.Item name="origin" label="출고지" extra="관세 계산의 출발 국가입니다." rules={[{ required: true }]}>
+                <Form.Item
+                  name="origin"
+                  label="출고지"
+                  extra="관세 계산의 출발 국가입니다."
+                  rules={[{ required: true }]}
+                >
                   <Select options={ORIGINS.map((value) => ({ value, label: COUNTRY_NAME[value] }))} />
                 </Form.Item>
               </Col>
@@ -160,12 +196,20 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Form.Item>
               </Col>
               <Col span={24}>
-                <Form.Item name="summary" label="한 줄 소개" rules={[{ required: true, message: '한 줄 소개를 입력해 주세요.' }]}>
+                <Form.Item
+                  name="summary"
+                  label="한 줄 소개"
+                  rules={[{ required: true, message: '한 줄 소개를 입력해 주세요.' }]}
+                >
                   <Input maxLength={80} showCount />
                 </Form.Item>
               </Col>
               <Col span={24}>
-                <Form.Item name="description" label="설명" rules={[{ required: true, message: '설명을 입력해 주세요.' }]}>
+                <Form.Item
+                  name="description"
+                  label="설명"
+                  rules={[{ required: true, message: '설명을 입력해 주세요.' }]}
+                >
                   <Input.TextArea rows={4} />
                 </Form.Item>
               </Col>
@@ -176,7 +220,12 @@ export function ProductForm({ initial }: { initial?: Sword }) {
             <Row gutter={16}>
               <Col xs={12} md={6}>
                 <Form.Item name="price" label="가격(원)" rules={[{ required: true, message: '가격을 입력해 주세요.' }]}>
-                  <InputNumber min={0} step={10000} style={{ width: '100%' }} formatter={(v) => `${v ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
+                  <InputNumber
+                    min={0}
+                    step={10000}
+                    style={{ width: '100%' }}
+                    formatter={(v) => `${v ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={12} md={6}>
@@ -185,22 +234,38 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Form.Item>
               </Col>
               <Col xs={12} md={6}>
-                <Form.Item name={['specs', 'bladeLength']} label="칼날 길이(mm)" rules={[{ required: true, message: '칼날 길이를 입력해 주세요.' }]}>
+                <Form.Item
+                  name={['specs', 'bladeLength']}
+                  label="칼날 길이(mm)"
+                  rules={[{ required: true, message: '칼날 길이를 입력해 주세요.' }]}
+                >
                   <InputNumber min={50} max={1500} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col xs={12} md={6}>
-                <Form.Item name={['specs', 'totalLength']} label="전체 길이(mm)" rules={[{ required: true, message: '전체 길이를 입력해 주세요.' }]}>
+                <Form.Item
+                  name={['specs', 'totalLength']}
+                  label="전체 길이(mm)"
+                  rules={[{ required: true, message: '전체 길이를 입력해 주세요.' }]}
+                >
                   <InputNumber min={50} max={2200} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col xs={12} md={6}>
-                <Form.Item name={['specs', 'weight']} label="무게(g)" rules={[{ required: true, message: '무게를 입력해 주세요.' }]}>
+                <Form.Item
+                  name={['specs', 'weight']}
+                  label="무게(g)"
+                  rules={[{ required: true, message: '무게를 입력해 주세요.' }]}
+                >
                   <InputNumber min={50} max={6000} style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
-                <Form.Item name={['specs', 'material']} label="소재" rules={[{ required: true, message: '소재를 입력해 주세요.' }]}>
+                <Form.Item
+                  name={['specs', 'material']}
+                  label="소재"
+                  rules={[{ required: true, message: '소재를 입력해 주세요.' }]}
+                >
                   <Input />
                 </Form.Item>
               </Col>
@@ -247,7 +312,12 @@ export function ProductForm({ initial }: { initial?: Sword }) {
               </Col>
               <Col xs={12} md={6}>
                 <Form.Item name={['art', 'blade', 'edge']} label="칼날 형태" rules={[{ required: true }]}>
-                  <Select options={[{ value: 'single', label: '외날' }, { value: 'double', label: '양날' }]} />
+                  <Select
+                    options={[
+                      { value: 'single', label: '외날' },
+                      { value: 'double', label: '양날' },
+                    ]}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={12} md={6}>
@@ -281,9 +351,17 @@ export function ProductForm({ initial }: { initial?: Sword }) {
         </Col>
 
         <Col xs={24} xl={8}>
-          <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>미리보기</h2>} style={{ position: 'sticky', top: 16, background: '#dddcd7' }}>
+          <Card
+            title={<h2 style={{ margin: 0, fontSize: 16 }}>미리보기</h2>}
+            style={{ position: 'sticky', top: 16, background: '#dddcd7' }}
+          >
             {previewArt ? (
-              <SwordRelief art={previewArt} pigment={0.85} label={`${watched?.name || '새 상품'} 일러스트 미리보기`} className="admin-preview" />
+              <SwordRelief
+                art={previewArt}
+                pigment={0.85}
+                label={`${watched?.name || '새 상품'} 일러스트 미리보기`}
+                className="admin-preview"
+              />
             ) : null}
             <Typography.Paragraph type="secondary" style={{ marginTop: 12, marginBottom: 0, color: '#3a3934' }}>
               쇼핑몰 상세 화면과 같은 석고 부조로 그립니다.
@@ -296,7 +374,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
         <Button type="primary" htmlType="submit" loading={save.isPending}>
           {initial ? '변경 저장' : '상품 등록'}
         </Button>
-        <Button href="/products">목록으로</Button>
+        <Button href={`${SITE.basePath}/products`}>목록으로</Button>
       </Flex>
     </Form>
   );

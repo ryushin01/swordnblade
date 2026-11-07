@@ -11,11 +11,29 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "e2e": "turbo run e2e --concurrency=1"
+    "e2e": "turbo run e2e --concurrency=1",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky || true",
+    "test:storybook": "turbo run test:storybook"
   },
   "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.4.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
     "turbo": "^2.11.10",
-    "typescript": "^7.0.2",
+    "typescript": "~6.0.3",
     "vitest": "^5.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,mts,js,mjs}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{css,json,yml,yaml}": "prettier --write"
   }
 }

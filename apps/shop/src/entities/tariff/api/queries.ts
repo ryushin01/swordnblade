@@ -1,8 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { CustomsConfig } from '@snb/domain';
+
 import { apiFetch } from '@/shared/api';
+
+import type { CustomsConfig } from '@snb/domain';
 
 export function useCustomsConfig() {
   return useQuery({

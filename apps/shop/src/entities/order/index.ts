@@ -1,1 +1,1 @@
-export { useOrder, useCreateOrder, type CreateOrderBody } from './api/queries';
+export { type CreateOrderBody, useCreateOrder, useOrder } from './api/queries';
