@@ -1,5 +1,14 @@
 # 버전 기록
 
+## 0.2.0 - 2026-11-07
+
+- 어드민을 쇼핑몰 주소의 `/admin`에 붙임(Next.js multi-zones). 두 앱이 같은 MSW 워커와 저장 키를 써서, 어드민에서 바꾼 내용이 쇼핑몰에, 쇼핑몰 주문이 어드민에 보임
+- 코드 스타일: ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged. typescript-eslint 지원 범위에 맞춰 TypeScript 6.0으로 고정
+- 스토리 테스트: 모든 스토리를 실제 브라우저에서 렌더링하고 axe로 검사
+- Storybook 배포: `/storybook`, `/admin/storybook`
+- 배포 후 검사(live-check), Dependabot, 배포 커밋을 알려 주는 `/version.txt`, 어드민 404 화면
+- 고침: 장바구니 복원 훅을 `useSyncExternalStore`로 바꿈, 저장 성공 메시지를 목록 새로 받기보다 먼저 보여 줌
+
 ## 0.1.1 - 2026-11-07
 
 - 배포: Vercel에 쇼핑몰(https://swordnblade.vercel.app/)과 어드민(https://swordnblade-admin.vercel.app/)을 Git 연동으로 배포. 쓰지 않게 된 Netlify 설정 파일 삭제

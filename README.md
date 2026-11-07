@@ -1,12 +1,12 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.1.1-7a4a35)
+![version](https://img.shields.io/badge/version-0.2.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
 
-**[쇼핑몰 보기](https://swordnblade.vercel.app/)** · **[어드민 보기](https://swordnblade-admin.vercel.app/)** · 로그인 없이 바로 쓸 수 있습니다. 데이터는 브라우저마다 따로 저장됩니다.
+**[쇼핑몰 보기](https://swordnblade.vercel.app/)** · **[어드민 보기](https://swordnblade.vercel.app/admin)** · **[Storybook](https://swordnblade.vercel.app/storybook)** · 로그인 없이 바로 쓸 수 있습니다. 어드민에서 바꾼 가격·재고·관세율은 같은 브라우저의 쇼핑몰에 바로 반영됩니다.
 
 > **프로젝트 상태:** 실제로 판매하지 않는 **포트폴리오 프로젝트**입니다. 백엔드 없이 Mock API(MSW)로 동작하며, 상품·공방·가격·주문은 모두 가상 데이터입니다. 세율과 환율은 예시 값입니다.
 
@@ -42,7 +42,9 @@
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
 | 주문 | 오류 요약과 칸별 안내, 중복 제출 방지. 금액은 Mock 서버가 다시 계산합니다. |
 
-**어드민** (`apps/admin`, Ant Design)
+**어드민** (`apps/admin`, Ant Design, 쇼핑몰 주소의 `/admin`)
+
+어드민은 쇼핑몰과 같은 주소에서 열려(Next.js multi-zones) Mock 데이터를 함께 씁니다. 어드민에서 바꾼 내용이 쇼핑몰에, 쇼핑몰 주문이 어드민에 보입니다.
 
 | 메뉴 | 내용 |
 |---|---|
@@ -58,12 +60,12 @@
 | 구분 | 사용 기술 |
 |---|---|
 | 구성 | pnpm 워크스페이스, Turborepo, Feature-Sliced Design v2.1 (Steiger로 검사) |
-| 프레임워크 | Next.js 16 (App Router), React 19, TypeScript 7 |
+| 프레임워크 | Next.js 16 (App Router, multi-zones), React 19, TypeScript 6 |
 | 쇼핑몰 UI | Tailwind CSS 4, shadcn/ui(Button, Sonner), lucide-react, Cormorant Garamond·Noto Serif KR |
 | 어드민 UI | Ant Design 6, @ant-design/icons |
 | 상태·데이터 | TanStack Query 5, Zustand 5, MSW 3 (Mock API) |
-| 품질 | Vitest 5 + Testing Library, Playwright + axe(프로덕션 빌드 E2E), Storybook 10 |
-| 배포 | Vercel(앱별 프로젝트, Git 연동), GitHub Actions |
+| 품질 | ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged, Vitest 5 + Testing Library, Storybook 10 스토리 테스트(실제 브라우저 + axe), Playwright + axe(프로덕션 빌드·배포 사이트 E2E) |
+| 배포 | Vercel(앱별 프로젝트, Git 연동), GitHub Actions, Dependabot |
 
 ## 시작하기
 
@@ -72,14 +74,16 @@ Node.js 22 이상(`.nvmrc`)과 pnpm 12가 필요합니다.
 ```bash
 corepack enable pnpm
 pnpm install
-pnpm dev    # 쇼핑몰 http://localhost:3000 · 어드민 http://localhost:3001
+pnpm dev    # 쇼핑몰 http://localhost:3000 · 어드민 http://localhost:3000/admin
 ```
 
 | 명령 | 설명 |
 |---|---|
 | `pnpm build` | 두 앱 프로덕션 빌드 |
 | `pnpm test` | 단위·컴포넌트 테스트 (도메인, Mock API, 일러스트, 두 앱) |
-| `pnpm typecheck` / `pnpm lint` | 타입 검사 / FSD 규칙 검사(Steiger) |
+| `pnpm test:storybook` | 모든 스토리를 실제 브라우저에서 렌더링하고 접근성 검사 |
+| `pnpm typecheck` / `pnpm lint` | 타입 검사 / ESLint와 FSD 규칙 검사(Steiger) |
+| `pnpm format` | Prettier로 서식 정리 (커밋할 때 바뀐 파일은 자동 정리) |
 | `pnpm --filter @snb/shop e2e` | 쇼핑몰 프로덕션 빌드 E2E (먼저 `build` 필요, `E2E_BASE_URL`을 주면 배포된 사이트 검사) |
 | `pnpm --filter @snb/shop storybook` | 쇼핑몰 Storybook (`http://localhost:6006`) |
 
@@ -103,5 +107,5 @@ docs/          문서와 스크린샷
 | [개발 가이드](docs/development.md) | 구조, FSD 규칙, Mock API, 테스트, 접근성 점검 |
 | [디자인](docs/design.md) | 참고 사이트, 석고 팔레트, 부조 일러스트 원리 |
 | [관세 계산](docs/customs.md) | 계산 규칙, 국가별 예시 값, 허가 안내 |
-| [CI · 배포](docs/ci-deploy.md) | GitHub Actions, Vercel, 배포 후 검사 |
+| [CI · 배포](docs/ci-deploy.md) | GitHub Actions, Vercel, multi-zones, 배포 후 검사, Dependabot |
 | [버전 기록](CHANGELOG.md) | 버전별 변경 내용 |
