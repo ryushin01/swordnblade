@@ -51,6 +51,18 @@ export function AccountView() {
     );
   }
 
+  // 토큰은 있는데 네트워크·서버 오류로 못 불러온 경우입니다. 로그아웃 상태로 안내하지 않습니다.
+  if (token && me.isError) {
+    return (
+      <div role="alert" className="grid justify-items-center gap-4 text-center">
+        <p>{t('loadError')}</p>
+        <Button type="button" variant="outline" className="min-h-11 rounded-sm" onClick={() => void me.refetch()}>
+          {t('retry')}
+        </Button>
+      </div>
+    );
+  }
+
   if (!token || !me.data) {
     return (
       <div className="grid justify-items-center gap-4 text-center">

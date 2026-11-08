@@ -256,6 +256,8 @@
     "noOrders": "No orders yet.",
     "orderLink": "View order {id}",
     "orderSummary": "{date} · {items} · {total}",
-    "itemsCount": "{name} and {rest} more"
+    "itemsCount": "{name} and {rest} more",
+    "loadError": "We could not load your account.",
+    "retry": "Try again"
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { isValidEmail } from '@snb/domain';
@@ -20,11 +20,17 @@ export function LoginForm({ next }: { next: string }) {
   const [message, setMessage] = useState<string | null>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
   const lockRef = useRef(false);
+  const [focusTick, setFocusTick] = useState(0);
+
+  // 오류 요약이 화면에 그려진 뒤에 초점을 옮깁니다. 같은 오류가 반복돼도 다시 옮기도록 횟수로 구분합니다.
+  useEffect(() => {
+    if (focusTick > 0) summaryRef.current?.focus();
+  }, [focusTick]);
 
   const show = (nextErrors: Partial<Record<Field, string>>, nextMessage: string) => {
     setErrors(nextErrors);
     setMessage(nextMessage);
-    requestAnimationFrame(() => summaryRef.current?.focus());
+    setFocusTick((tick) => tick + 1);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
