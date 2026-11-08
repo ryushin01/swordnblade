@@ -27,7 +27,15 @@ export type CountryCode =
   | 'CH'
   | 'RU'
   | 'MX'
-  | 'AT';
+  | 'AT'
+  | 'RO'
+  | 'HU'
+  | 'IE'
+  | 'VN'
+  | 'CZ'
+  | 'DK'
+  | 'RW'
+  | 'IQ';
 
 export type CurrencyCode = 'KRW' | 'USD' | 'JPY' | 'CNY' | 'GBP' | 'EUR' | 'AUD' | 'CAD';
 
@@ -49,8 +57,8 @@ export interface SwordArt {
     /** 휘어짐(sori), mm. 0이면 직검, 음수면 날 쪽으로 휨(쿠크리·팔카타) */
     curve: number;
     edge: 'single' | 'double';
-    /** kissaki 휜 칼끝, spear 뾰족, round 둥긂, sickle 낫, square 사각(처형검), clip 클립 포인트, hook 갈고리(구), needle 바늘(찌르기 검) */
-    tip: 'kissaki' | 'spear' | 'round' | 'sickle' | 'square' | 'clip' | 'hook' | 'needle';
+    /** kissaki 휜 칼끝, spear 뾰족, round 둥긂, sickle 낫, square 사각(처형검), clip 클립 포인트, hook 갈고리(구), needle 바늘(찌르기 검), fork 두 갈래(줄피카르) */
+    tip: 'kissaki' | 'spear' | 'round' | 'sickle' | 'square' | 'clip' | 'hook' | 'needle' | 'fork';
     fuller?: boolean;
     ridge?: boolean;
     hamon?: boolean;

@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createDb } from './db';
+import { SEED_SWORDS } from './seed';
 
 describe('createDb (localStorage 공유)', () => {
   beforeEach(() => localStorage.clear());
@@ -25,8 +26,8 @@ describe('createDb (localStorage 공유)', () => {
   ])('저장된 값이 %s이면 무시하고 메모리 상태를 쓴다', (_, raw) => {
     const db = createDb({ storageKey: 'test-db' });
     localStorage.setItem('test-db', raw);
-    expect(db.read().swords).toHaveLength(16);
-    expect(createDb({ storageKey: 'test-db' }).read().swords).toHaveLength(16);
+    expect(db.read().swords).toHaveLength(SEED_SWORDS.length);
+    expect(createDb({ storageKey: 'test-db' }).read().swords).toHaveLength(SEED_SWORDS.length);
   });
 
   it('저장된 값이 없으면 지금 메모리 상태를 유지한다(시드로 되돌리지 않음)', () => {

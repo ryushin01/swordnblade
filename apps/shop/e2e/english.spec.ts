@@ -29,7 +29,7 @@ test('영어 화면: /en에서 영어로 보이고 lang이 en이다', async ({ p
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'The Wall of Blades' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Excalibur.*₩12,000,000/ })).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: '16 swords' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '1–24 of 208 swords' })).toBeVisible();
   await expectNoA11yViolations(page);
   await expectNoHorizontalOverflow(page);
 });
@@ -75,7 +75,7 @@ test('영어 404와 검색', async ({ page }) => {
   await page.goto('/en/no-such-page');
   await expect(page.getByRole('heading', { level: 1, name: 'Nothing is carved in this spot' })).toBeVisible();
   await page.goto('/en?q=legend');
-  await expect(page.getByRole('status').filter({ hasText: '5 results for “legend”' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '1–24 of 112 results for “legend”' })).toBeVisible();
 });
 
 test('언어별 대체 주소(hreflang)를 절대 주소로 알린다', async ({ page }) => {

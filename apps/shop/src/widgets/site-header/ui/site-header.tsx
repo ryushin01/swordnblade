@@ -5,8 +5,6 @@ import { Wordmark } from '@/shared/ui';
 
 import { AccountLink } from './account-link';
 import { CartLink } from './cart-link';
-import { CategoryNav } from './category-nav';
-import { HeaderNav } from './header-nav';
 import { LocaleSwitch } from './locale-switch';
 
 export function SiteHeader() {
@@ -16,12 +14,7 @@ export function SiteHeader() {
         <Link href="/" className="inline-flex min-h-11 items-center">
           <Wordmark />
         </Link>
-        <div className="order-3 w-full sm:order-2 sm:w-auto">
-          <Suspense fallback={<CategoryNav />}>
-            <HeaderNav />
-          </Suspense>
-        </div>
-        <div className="order-2 flex items-center gap-1 sm:order-3 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Suspense fallback={null}>
             <LocaleSwitch />
           </Suspense>

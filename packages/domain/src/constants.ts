@@ -68,6 +68,14 @@ export const COUNTRY_NAME: Record<CountryCode, string> = {
   RU: '러시아',
   MX: '멕시코',
   AT: '오스트리아',
+  RO: '루마니아',
+  HU: '헝가리',
+  IE: '아일랜드',
+  VN: '베트남',
+  CZ: '체코',
+  DK: '덴마크',
+  RW: '르완다',
+  IQ: '이라크',
 };
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {

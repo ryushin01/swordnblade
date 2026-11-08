@@ -2,11 +2,13 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { filterSwords, localizeForLocale, type SwordSort, SwordTile, useSwords } from '@/entities/sword';
+import { filterSwords, localizeForLocale, paginate, type SwordSort, SwordTile, useSwords } from '@/entities/sword';
 import { Link } from '@/shared/i18n';
 import { Button } from '@/shared/ui';
 
-import type { Locale, Sword, SwordCategory } from '@snb/domain';
+import { Pagination } from './pagination';
+
+import type { Locale, Sword, SwordCategory, SwordKind } from '@snb/domain';
 
 const GRID = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4';
 const CELL = 'border-b border-r border-line';
@@ -16,12 +18,15 @@ interface SwordWallProps {
   category?: SwordCategory;
   q: string;
   sort: SwordSort;
+  kind?: SwordKind;
+  /** 1부터 시작하는 쪽 번호 */
+  page: number;
   /** 서버가 시드로 먼저 그린 목록 */
   initialSwords?: Sword[];
   labelledBy: string;
 }
 
-export function SwordWall({ category, q, sort, initialSwords, labelledBy }: SwordWallProps) {
+export function SwordWall({ category, q, sort, kind, page, initialSwords, labelledBy }: SwordWallProps) {
   const t = useTranslations('Home');
   const locale = useLocale() as Locale;
   const { data, isPending, isError, refetch } = useSwords(category, initialSwords);
@@ -50,14 +55,25 @@ export function SwordWall({ category, q, sort, initialSwords, labelledBy }: Swor
 
   const swords = filterSwords(
     data.map((sword) => localizeForLocale(sword, locale)),
-    { q, sort },
+    { q, sort, kind },
   );
-  const resetHref = category ? { pathname: '/', query: { category } } : '/';
+  const shown = paginate(swords, page);
+  // 쪽 링크와 검색어 지우기에 지금 조건을 그대로 넘깁니다(기본값은 주소에 남기지 않음).
+  const withoutQuery: Record<string, string> = {
+    ...(category ? { category } : {}),
+    ...(kind ? { kind } : {}),
+    ...(sort !== 'recommended' ? { sort } : {}),
+  };
+  const query = q ? { ...withoutQuery, q } : withoutQuery;
+  const resetHref = { pathname: '/' as const, query: withoutQuery };
+  const counts = { q, count: swords.length, from: shown.from, to: shown.to };
+  const status =
+    shown.pages > 1 ? t(q ? 'resultPageStatus' : 'pageStatus', counts) : t(q ? 'resultCount' : 'count', counts);
 
   return (
     <>
       <p role="status" className="mx-auto max-w-[90rem] px-4 pb-3 text-sm text-ink-muted sm:px-8">
-        {q ? t('resultCount', { q, count: swords.length }) : t('count', { count: swords.length })}
+        {status}
         {q ? (
           <>
             {' · '}
@@ -71,13 +87,14 @@ export function SwordWall({ category, q, sort, initialSwords, labelledBy }: Swor
         <p className="px-4 py-24 text-center">{q ? t('emptyQuery', { q }) : t('emptyCategory')}</p>
       ) : (
         <ul aria-labelledby={labelledBy} className={`${GRID} border-l border-t border-line`}>
-          {swords.map((sword) => (
+          {shown.items.map((sword) => (
             <li key={sword.id} className={CELL}>
               <SwordTile sword={sword} />
             </li>
           ))}
         </ul>
       )}
+      <Pagination page={shown.page} pages={shown.pages} query={query} />
     </>
   );
 }

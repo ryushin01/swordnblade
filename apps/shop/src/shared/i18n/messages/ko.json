@@ -20,8 +20,6 @@
     "showPassword": "비밀번호 보기"
   },
   "Header": {
-    "categoryNav": "도검 분류",
-    "all": "전체",
     "cart": "장바구니",
     "cartCount": "{count}점",
     "languageNav": "언어",
@@ -40,10 +38,10 @@
   "Home": {
     "eyebrow": "Carved in plaster, forged in steel",
     "title": "도검의 벽",
-    "intro": "조선의 쌍수도부터 호수의 여인이 건넨 검까지. 벽에 새긴 도검을 골라 이야기를 읽고, 배송 국가의 관세까지 미리 계산해 보세요.",
+    "intro": "조선의 쌍수도부터 호수의 여인이 건넨 검까지, 동서양 도검과 신화·전설의 검 208점. 벽에 새긴 도검을 골라 이야기를 읽고, 배송 국가의 관세까지 미리 계산해 보세요.",
     "searchLabel": "도검 찾기",
     "queryLabel": "이름으로 찾기",
-    "queryPlaceholder": "예: 쌍수도, Excalibur, 신화",
+    "queryPlaceholder": "예: 쌍수도, Excalibur, 단검",
     "sortLabel": "정렬",
     "submit": "찾기",
     "sort": {
@@ -59,7 +57,18 @@
     "emptyCategory": "이 분류에는 아직 도검이 없습니다.",
     "loading": "도검 목록을 불러오는 중입니다.",
     "loadError": "도검 목록을 불러오지 못했습니다.",
-    "retry": "다시 불러오기"
+    "retry": "다시 불러오기",
+    "categoryNav": "도검 분류",
+    "all": "전체",
+    "kindLabel": "형태",
+    "kindAll": "모든 형태",
+    "pagination": "목록 쪽 이동",
+    "prevPage": "이전 쪽",
+    "nextPage": "다음 쪽",
+    "pageStatus": "{count}점 가운데 {from}–{to}번째",
+    "resultPageStatus": "‘{q}’ 검색 결과 {count}점 가운데 {from}–{to}번째",
+    "pagePrefix": "",
+    "pageSuffix": "쪽"
   },
   "Tile": {
     "soldOut": "품절"
