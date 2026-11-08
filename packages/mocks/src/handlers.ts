@@ -12,9 +12,11 @@ import {
   type SwordCategory,
 } from '@snb/domain';
 
+import { createAdminHandlers, isAdmin } from './admin-handlers';
 import { createAuthHandlers, findSessionUser } from './auth-handlers';
 import { createMemoryImageStore, type ImageStore } from './image-store';
 import { cancelOrderInState, reviveOrderInState, reviveShortage } from './order-stock';
+import { createReviewHandlers } from './review-handlers';
 
 import type { Db } from './db';
 
@@ -67,6 +69,8 @@ export interface HandlerOptions {
   latency?: number;
   /** 상품 사진 저장소. 기본은 메모리 */
   images?: ImageStore;
+  /** 어드민 API에 어드민 로그인을 요구합니다. 브라우저에서 켜고, 단위 테스트는 끄고 씁니다. */
+  requireAdmin?: boolean;
 }
 
 /** 올릴 수 있는 사진 크기(어드민이 미리 줄여 보내므로 넉넉히) */
@@ -76,12 +80,20 @@ export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export function createHandlers(db: Db, options: HandlerOptions = {}) {
   const wait = () => (options.latency ? delay(options.latency) : Promise.resolve());
   const images = options.images ?? createMemoryImageStore();
+  const requireAdmin = options.requireAdmin ?? false;
+  const adminDenied = (request: Request) =>
+    requireAdmin && !isAdmin(db, request) ? error(401, { message: '어드민 로그인이 필요합니다.' }) : null;
 
   return [
-    ...createAuthHandlers(db, wait),
+    ...createAuthHandlers(db, wait, requireAdmin),
+    ...createAdminHandlers(db, wait),
+    ...createReviewHandlers(db, wait),
 
     http.post('*/api/images', async ({ request }) => {
       await wait();
+      if (requireAdmin && !isAdmin(db, request) && !findSessionUser(db, request)) {
+        return error(401, { message: '로그인이 필요합니다.' });
+      }
       const form = await request.formData().catch(() => null);
       const file = form?.get('file');
       if (!(file instanceof Blob)) return error(400, { message: '사진 파일이 없습니다.' });
@@ -119,6 +131,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
     }),
 
     http.post('*/api/swords', async ({ request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const body = (await request.json()) as Omit<Sword, 'id'>;
       if (!body.slug || !body.name) return error(400, { message: '이름과 주소(slug)는 필수입니다.' });
@@ -135,6 +149,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
     }),
 
     http.put<{ id: string }>('*/api/swords/:id', async ({ params, request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const body = (await request.json()) as Sword;
       const exists = db.read().swords.some((sword) => sword.id === params.id);
@@ -147,7 +163,9 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       return HttpResponse.json(updated);
     }),
 
-    http.delete<{ id: string }>('*/api/swords/:id', async ({ params }) => {
+    http.delete<{ id: string }>('*/api/swords/:id', async ({ params, request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       db.write((state) => ({ ...state, swords: state.swords.filter((sword) => sword.id !== params.id) }));
       return new HttpResponse(null, { status: 204 });
@@ -159,6 +177,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
     }),
 
     http.put('*/api/customs-config', async ({ request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const body = (await request.json()) as CustomsConfig;
       const invalid = Object.entries(body.exchangeRates).find(([, rate]) => !(rate > 0));
@@ -168,7 +188,9 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       return HttpResponse.json(next);
     }),
 
-    http.get('*/api/orders', async () => {
+    http.get('*/api/orders', async ({ request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const orders = [...db.read().orders].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
       return HttpResponse.json(orders);
@@ -246,6 +268,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
     }),
 
     http.patch<{ id: string }>('*/api/orders/:id', async ({ params, request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const { status } = (await request.json()) as { status: OrderStatus };
       if (!ORDER_STATUSES.includes(status)) return error(400, { message: '알 수 없는 주문 상태입니다.' });
@@ -266,7 +290,9 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       return HttpResponse.json(next.orders.find((item) => item.id === params.id));
     }),
 
-    http.get('*/api/stats', async () => {
+    http.get('*/api/stats', async ({ request }) => {
+      const denied = adminDenied(request);
+      if (denied) return denied;
       await wait();
       const { swords, orders } = db.read();
       const active = orders.filter((order) => order.status !== 'cancelled');

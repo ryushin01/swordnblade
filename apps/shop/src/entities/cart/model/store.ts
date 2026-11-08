@@ -22,6 +22,14 @@ interface CartState {
 
 const clamp = (value: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.round(value)));
 
+export const toValidLines = (value: unknown): CartLine[] =>
+  Array.isArray(value)
+    ? value.filter(
+        (line): line is CartLine =>
+          typeof line?.swordId === 'string' && Number.isFinite(line?.quantity) && line.quantity > 0,
+      )
+    : [];
+
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
@@ -47,7 +55,20 @@ export const useCartStore = create<CartState>()(
       setDestination: (destination) => set({ destination }),
       clear: () => set({ lines: [] }),
     }),
-    { name: SITE.cartStorageKey, storage: safeJsonStorage, skipHydration: true },
+    {
+      name: SITE.cartStorageKey,
+      storage: safeJsonStorage,
+      skipHydration: true,
+      // 저장값 형태가 어긋나도 머리글(모든 화면)이 멈추지 않게 맞는 줄만 받습니다.
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<CartState> | undefined;
+        return {
+          ...current,
+          lines: toValidLines(saved?.lines),
+          destination: typeof saved?.destination === 'string' ? saved.destination : current.destination,
+        };
+      },
+    },
   ),
 );
 

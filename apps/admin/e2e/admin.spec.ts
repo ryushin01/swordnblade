@@ -8,6 +8,12 @@ async function expectNoA11yViolations(page: Page) {
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
 }
 
+async function loginAdmin(page: Page) {
+  await page.goto('/admin/login');
+  await page.getByRole('button', { name: '데모 계정으로 로그인' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
+}
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('__e2e_reset__')) {
@@ -15,6 +21,7 @@ test.beforeEach(async ({ page }) => {
       sessionStorage.setItem('__e2e_reset__', '1');
     }
   });
+  await loginAdmin(page);
 });
 
 test('대시보드: 통계와 최근 주문을 보여 준다', async ({ page }) => {
@@ -111,4 +118,18 @@ test('상품: 이름으로 찾으면 목록과 개수가 바뀐다', async ({ pa
   await expect(page.getByRole('link', { name: '엑스칼리버 수정' })).toBeVisible();
   await expect(page.getByRole('link', { name: '환도 수정' })).toHaveCount(0);
   await expectNoA11yViolations(page);
+});
+
+test('로그인: 로그인하지 않으면 어드민을 볼 수 없고, 틀린 비밀번호는 알린다', async ({ page }) => {
+  await page.getByRole('button', { name: '로그아웃' }).click();
+  await expect(page).toHaveURL(/\/admin\/login$/);
+  await page.goto('/admin/orders');
+  await expect(page).toHaveURL(/\/admin\/login$/);
+  await expect(page.getByRole('heading', { level: 1, name: '어드민 로그인' })).toBeVisible();
+  await expectNoA11yViolations(page);
+
+  await page.getByLabel('이메일').fill('admin@example.com');
+  await page.getByLabel('비밀번호').fill('wrong');
+  await page.getByRole('button', { name: '로그인', exact: true }).click();
+  await expect(page.getByRole('alert').filter({ hasText: '이메일 또는 비밀번호가 맞지 않습니다.' })).toBeVisible();
 });

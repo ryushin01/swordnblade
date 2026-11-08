@@ -168,6 +168,9 @@ test('서버가 상품 목록을 HTML로 먼저 그린다(자바스크립트 없
 });
 
 test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 넘치지 않는다', async ({ page }) => {
+  await page.goto('/admin/login');
+  await page.getByRole('button', { name: '데모 계정으로 로그인' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
   await page.goto('/admin/products/sw-005');
   await page.getByLabel('이름', { exact: true }).fill('아주아주긴이름의와키자시짧은칼특별한정판재현품');
   await page.getByRole('button', { name: '변경 저장' }).click();
@@ -253,10 +256,33 @@ test('검색 엔진: sitemap, robots, 공유 정보, 상품 구조화 데이터'
   await page.goto('/swords/ssangsudo');
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', '쌍수도');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/swords\/ssangsudo\.jpg/);
-  const product = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}') as {
-    '@type': string;
-    offers: { price: number };
-  };
+  const product = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  ) as Record<string, unknown>;
   expect(product['@type']).toBe('Product');
-  expect(product.offers.price).toBeGreaterThan(0);
+  expect(product).not.toHaveProperty('offers');
+});
+
+test('도검 연표: 시대와 지역 표로 역사 도검을 본다', async ({ page }) => {
+  await page.goto('/timeline');
+  await expect(page.getByRole('heading', { level: 1, name: '도검 연표' })).toBeVisible();
+  const table = page.getByRole('table', { name: '시대와 지역별 역사 도검' });
+  await expect(table.getByRole('rowheader', { name: '18~19세기' })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: '동양 도검' })).toBeVisible();
+  await table.getByRole('link', { name: '쌍수도' }).click();
+  await expect(page).toHaveURL(/\/swords\/ssangsudo$/);
+  await page.goto('/timeline');
+  await expect(page).toHaveTitle(/도검 연표/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('최근 본 도검: 앞서 본 도검을 상세 아래에 보여 준다', async ({ page }) => {
+  await page.goto('/swords/hwando');
+  await expect(page.getByRole('heading', { name: '최근 본 도검' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1, name: '환도' })).toBeVisible();
+  await page.goto('/swords/ssangsudo');
+  const recent = page.getByRole('list', { name: '최근 본 도검' });
+  await expect(recent.getByRole('link', { name: /환도/ })).toBeVisible();
+  await expect(recent.getByRole('link', { name: /쌍수도/ })).toHaveCount(0);
 });

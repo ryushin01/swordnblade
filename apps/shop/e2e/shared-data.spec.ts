@@ -1,4 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
+
+async function loginAdmin(page: Page) {
+  await page.goto('/admin/login');
+  await page.getByRole('button', { name: '데모 계정으로 로그인' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
+}
 
 /**
  * 어드민은 쇼핑몰 주소의 /admin 아래에서 열려 같은 Mock 데이터를 씁니다.
@@ -11,6 +17,7 @@ test.beforeEach(async ({ page }) => {
       sessionStorage.setItem('__e2e_reset__', '1');
     }
   });
+  await loginAdmin(page);
 });
 
 test('어드민에서 바꾼 가격이 쇼핑몰에 보인다', async ({ page }) => {

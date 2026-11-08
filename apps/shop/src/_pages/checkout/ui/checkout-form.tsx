@@ -1,13 +1,13 @@
 'use client';
 
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useCreateOrder } from '@/entities/order';
 import { useMe } from '@/entities/session';
 import { ApiRequestError } from '@/shared/api';
 import { cn } from '@/shared/lib';
-import { Button, TextField } from '@/shared/ui';
+import { Button, ErrorSummary, TextField, useErrorFocus } from '@/shared/ui';
 
 import { type CheckoutErrors, type CheckoutValues, FIELD_ORDER, validateCheckout } from '../model/validate';
 
@@ -40,14 +40,8 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
   const [values, setValues] = useState<CheckoutValues>(INITIAL);
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [message, setMessage] = useState<string | null>(null);
-  const summaryRef = useRef<HTMLDivElement>(null);
+  const { ref: summaryRef, moveFocus } = useErrorFocus();
   const submittingRef = useRef(false);
-  const [focusTick, setFocusTick] = useState(0);
-
-  // 오류 요약이 화면에 그려진 뒤에 초점을 옮깁니다. 같은 오류가 반복돼도 다시 옮기도록 횟수로 구분합니다.
-  useEffect(() => {
-    if (focusTick > 0) summaryRef.current?.focus();
-  }, [focusTick]);
   const createOrder = useCreateOrder();
   const me = useMe();
   const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
@@ -69,7 +63,7 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
   const showErrors = (next: CheckoutErrors, nextMessage: string) => {
     setErrors(next);
     setMessage(nextMessage);
-    setFocusTick((tick) => tick + 1);
+    moveFocus();
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -125,28 +119,15 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
   return (
     <form noValidate onSubmit={handleSubmit} className="grid gap-8" aria-busy={createOrder.isPending}>
       {message ? (
-        <div
-          ref={summaryRef}
-          tabIndex={-1}
-          role="alert"
-          className="rounded-sm border-2 border-danger bg-wall-raised p-4 text-danger"
-          aria-labelledby="checkout-error-title"
-        >
-          <h2 id="checkout-error-title" className="text-base">
-            {message}
-          </h2>
-          {errorList.length > 0 ? (
-            <ul className="mt-2 grid list-disc gap-1 pl-5 text-sm">
-              {errorList.map((field) => (
-                <li key={field}>
-                  <a href={`#${fieldId(field)}`} className="inline-block min-h-6 py-0.5 underline underline-offset-4">
-                    {t(`fields.${field}`)}: {errorText(field)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+        <ErrorSummary
+          id="checkout-error-title"
+          summaryRef={summaryRef}
+          message={message}
+          items={errorList.map((field) => ({
+            fieldId: fieldId(field),
+            text: `${t(`fields.${field}`)}: ${errorText(field)}`,
+          }))}
+        />
       ) : null}
 
       <fieldset className="grid gap-4">

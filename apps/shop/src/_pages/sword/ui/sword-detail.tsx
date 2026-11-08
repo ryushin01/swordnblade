@@ -23,7 +23,9 @@ import { Link } from '@/shared/i18n';
 import { LiveTotal, OrnamentHeading } from '@/shared/ui';
 
 import { AddToCart } from './add-to-cart';
+import { RecentSwords } from './recent-swords';
 import { RelatedSwords } from './related-swords';
+import { Reviews } from './reviews';
 import { SwordGallery } from './sword-gallery';
 import { WishlistButton } from './wishlist-button';
 
@@ -158,7 +160,9 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
           ) : null}
         </div>
       </article>
+      <Reviews slug={source.slug} swordId={source.id} />
       <RelatedSwords sword={sword} />
+      <RecentSwords swordId={source.id} />
     </>
   );
 }

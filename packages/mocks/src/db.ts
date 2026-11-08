@@ -12,12 +12,25 @@ export interface DbState {
   users?: StoredUser[];
   /** 로그인 세션 */
   sessions?: Session[];
+  /** 어드민 데모 로그인 토큰 */
+  adminSessions?: string[];
+  /** 구매한 회원의 후기 */
+  reviews?: StoredReview[];
 }
 
 export interface StoredUser extends User {
   passwordHash: string;
   /** 찜한 도검 id */
   wishlist?: string[];
+}
+
+export interface StoredReview {
+  id: string;
+  swordId: string;
+  userId: string;
+  rating: number;
+  text: string;
+  createdAt: string;
 }
 
 export interface Session {

@@ -11,7 +11,8 @@
     "signup": "Sign up",
     "account": "My account",
     "wishlist": "Wishlist",
-    "compare": "Compare swords"
+    "compare": "Compare swords",
+    "timeline": "Sword timeline"
   },
   "Common": {
     "skipToContent": "Skip to content",
@@ -281,7 +282,13 @@
     "cancelConfirm": "Yes, cancel",
     "cancelBack": "Keep order",
     "cancelDone": "Your order has been cancelled.",
-    "cancelFailed": "We could not cancel this order. It may have shipped, so please check its status."
+    "cancelFailed": "We could not cancel this order. It may have shipped, so please check its status.",
+    "avatarLabel": "Profile photo",
+    "avatarHint": "Shown in a circle on your reviews. Choose an image file.",
+    "avatarChange": "Choose photo",
+    "avatarRemove": "Remove photo",
+    "avatarSaved": "Your profile photo was updated.",
+    "avatarFailed": "We could not upload the photo. Please try again."
   },
   "Wishlist": {
     "title": "Wishlist",
@@ -323,6 +330,48 @@
     "link": "Compare with other swords",
     "navLink": "Compare swords",
     "loadError": "We could not load the swords.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "timelineLink": "Sword timeline"
+  },
+  "Reviews": {
+    "title": "Customer reviews",
+    "count": "{count, plural, one {# review} other {# reviews}}",
+    "empty": "No reviews yet.",
+    "needLogin": "Only members who bought this sword can write a review.",
+    "login": "Log in",
+    "needPurchase": "Buy this sword to write a review.",
+    "already": "You have already reviewed this sword.",
+    "formTitle": "Write a review",
+    "rating": "Rating",
+    "ratingOption": "{n} {n, plural, one {star} other {stars}}",
+    "ratingOf": "{n} out of 5 stars",
+    "text": "Your review",
+    "hint": "Up to 500 characters. Saved only in this browser’s mock data.",
+    "submit": "Post review",
+    "submitting": "Posting…",
+    "saved": "Your review was posted.",
+    "errorRating": "Choose a rating.",
+    "errorText": "Enter your review.",
+    "failed": "We could not post your review. Please try again."
+  },
+  "Recent": {
+    "title": "Recently viewed"
+  },
+  "Timeline": {
+    "title": "Sword timeline",
+    "intro": "Historical swords laid out by era and region. Legendary swords have no dates and are left out.",
+    "caption": "Historical swords by era and region",
+    "scrollLabel": "Sword timeline table",
+    "period": "Era",
+    "unknown": "Date unknown",
+    "bc2000": "2nd millennium BC",
+    "bc1000": "1st millennium BC",
+    "ad1": "1st–5th c.",
+    "ad500": "6th–10th c.",
+    "ad1000": "11th–13th c.",
+    "ad1300": "14th–15th c.",
+    "ad1500": "16th–17th c.",
+    "ad1700": "18th–19th c.",
+    "ad1900": "20th c. onward"
   }
 }

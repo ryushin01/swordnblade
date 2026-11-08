@@ -10,6 +10,7 @@ import {
   COUNTRY_NAME,
   formatKRW,
   KIND_LABEL,
+  normalizeSearchText,
   requiresPossessionPermit,
   type Sword,
   SWORD_CATEGORIES,
@@ -25,11 +26,10 @@ export function ProductsPage() {
   const { data, isPending } = useSwords();
   const remove = useDeleteSword();
   const [query, setQuery] = useState('');
-  const normalize = (text: string) => text.normalize('NFC').toLowerCase().replace(/\s+/g, '');
-  const needle = normalize(query);
+  const needle = normalizeSearchText(query);
   const swords = needle
     ? data?.filter((sword) =>
-        [sword.name, sword.nameEn, sword.nameOriginal].some((name) => normalize(name).includes(needle)),
+        [sword.name, sword.nameEn, sword.nameOriginal].some((name) => normalizeSearchText(name).includes(needle)),
       )
     : data;
 

@@ -1,4 +1,5 @@
 import { SITE } from '../config';
+import { getAdminToken, setAdminToken } from '../lib/admin-session';
 
 import type { ApiError } from '@snb/mocks';
 
@@ -48,11 +49,18 @@ async function ensureMockApi() {
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   await ensureMockApi();
+  const token = getAdminToken();
   const response = await fetch(path, {
     ...init,
     // FormData(사진 올리기)는 브라우저가 경계값을 넣은 Content-Type을 직접 붙입니다.
-    headers: init?.body instanceof FormData ? init.headers : { 'Content-Type': 'application/json', ...init?.headers },
+    headers: {
+      ...(init?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init?.headers,
+    },
   });
+  // 로그인이 풀렸으면(Mock 데이터를 지운 경우 등) 로그인 화면으로 돌려보냅니다.
+  if (response.status === 401 && token) setAdminToken(null);
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as Partial<ApiError>;
     throw new ApiRequestError(response.status, body);

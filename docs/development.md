@@ -50,9 +50,12 @@
 | GET | `/api/auth/me`, `/api/me/orders` | 로그인한 회원과 그 회원의 주문(`Authorization: Bearer <token>`, 없으면 401) |
 | GET · PUT | `/api/me/wishlist` | 회원의 찜 목록(로그인 필요) |
 | POST | `/api/me/orders/:id/cancel` | 회원의 출고 전 주문 취소, 재고 복구 |
+| GET · POST | `/api/swords/:slug/reviews` | 후기 목록·등록(구매한 회원만, 한 도검에 한 번) |
+| PUT | `/api/me/profile` | 프로필 사진 바꾸기·지우기 |
+| POST | `/api/admin/login`, `/api/admin/logout` | 어드민 데모 로그인 |
 | GET | `/api/users` | 어드민 회원 목록(회원별 주문 수, 비밀번호 해시 제외) |
 
-어드민 화면에는 로그인이 없고 Mock API도 어드민 권한을 검사하지 않습니다(`/api/orders`, `/api/users` 등). 데이터가 브라우저 안의 가상 데이터라 그대로 두었으며, 실제 서비스라면 서버에서 어드민 권한을 확인해야 합니다.
+어드민은 로그인 화면에 공개한 데모 계정으로 들어가며, 브라우저의 Mock API가 어드민 전용 API에 토큰을 요구합니다(단위 테스트는 `requireAdmin` 없이 돌립니다). 토큰과 데이터가 모두 브라우저 안에 있어 실제 보안은 아닙니다. 실제 서비스라면 서버에서 권한을 확인해야 합니다.
 
 회원 비밀번호는 Mock DB에 SHA-256 해시로만 두고, 로그인 실패는 어느 칸이 틀렸는지 밝히지 않습니다. 실제 서비스라면 서버에서 느린 해시(bcrypt·Argon2)와 HttpOnly 쿠키 세션을 써야 합니다. 로그인 뒤 돌아갈 주소(`?next=`)는 `/`로 시작하는 사이트 안 주소만 따릅니다.
 

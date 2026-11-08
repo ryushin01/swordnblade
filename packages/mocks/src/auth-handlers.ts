@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import { canCustomerCancel, EMAIL_RULE, PASSWORD_RULE, type User } from '@snb/domain';
 
+import { isAdmin } from './admin-handlers';
 import { cancelOrderInState } from './order-stock';
 
 import type { Db, Session, StoredUser } from './db';
@@ -40,6 +41,7 @@ const publicUser = (user: StoredUser): User => ({
   email: user.email,
   name: user.name,
   createdAt: user.createdAt,
+  ...(user.avatarUrl ? { avatarUrl: user.avatarUrl } : {}),
 });
 
 /** Authorization: Bearer <token>에서 로그인한 회원을 찾습니다. */
@@ -51,7 +53,11 @@ export function findSessionUser(db: Db, request: Request): StoredUser | undefine
   return session ? state.users?.find((user) => user.id === session.userId) : undefined;
 }
 
-export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => Promise.resolve()) {
+export function createAuthHandlers(
+  db: Db,
+  wait: () => Promise<unknown> = () => Promise.resolve(),
+  requireAdmin = false,
+) {
   const unauthorized = () => HttpResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 });
 
   const startSession = (user: StoredUser): AuthResponse => {
@@ -61,6 +67,22 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
   };
 
   return [
+    http.put('*/api/me/profile', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      const body = (await request.json().catch(() => null)) as { avatarUrl?: unknown } | null;
+      const avatarUrl = body?.avatarUrl;
+      if (avatarUrl !== null && !(typeof avatarUrl === 'string' && avatarUrl.startsWith('/api/images/'))) {
+        return HttpResponse.json({ message: '프로필 사진 주소가 맞지 않습니다.' }, { status: 400 });
+      }
+      const updated: StoredUser = { ...user };
+      if (avatarUrl) updated.avatarUrl = avatarUrl;
+      else delete updated.avatarUrl;
+      db.write((state) => ({ ...state, users: state.users?.map((item) => (item.id === user.id ? updated : item)) }));
+      return HttpResponse.json(publicUser(updated));
+    }),
+
     http.get('*/api/me/wishlist', async ({ request }) => {
       await wait();
       const user = findSessionUser(db, request);
@@ -97,9 +119,9 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
     }),
 
     // 어드민 회원 목록. 비밀번호 해시는 내보내지 않습니다.
-    // Mock에는 어드민 계정이 없어(/api/orders와 같이) 권한을 검사하지 않습니다. 실제 서비스라면 서버에서 어드민 권한을 확인해야 합니다.
-    http.get('*/api/users', async () => {
+    http.get('*/api/users', async ({ request }) => {
       await wait();
+      if (requireAdmin && !isAdmin(db, request)) return unauthorized();
       const { users = [], orders } = db.read();
       const list: AdminUser[] = users.map((user) => ({
         ...publicUser(user),

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { MAX_QUANTITY, selectItemCount, useCartStore } from './store';
+import { MAX_QUANTITY, selectItemCount, toValidLines, useCartStore } from './store';
 
 describe('cart store', () => {
   beforeEach(() => useCartStore.setState({ lines: [], destination: 'KR' }));
@@ -22,5 +22,14 @@ describe('cart store', () => {
     useCartStore.getState().add('sw-001', 2);
     useCartStore.getState().add('sw-002', 1);
     expect(selectItemCount(useCartStore.getState())).toBe(3);
+  });
+});
+
+describe('toValidLines', () => {
+  it('형태가 맞는 줄만 남긴다', () => {
+    expect(toValidLines('oops')).toEqual([]);
+    expect(toValidLines([{ swordId: 'a', quantity: 1 }, { swordId: 1 }, null, { swordId: 'b', quantity: 0 }])).toEqual([
+      { swordId: 'a', quantity: 1 },
+    ]);
   });
 });

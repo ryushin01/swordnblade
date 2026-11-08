@@ -208,6 +208,21 @@ export interface User {
   email: string;
   name: string;
   createdAt: string;
+  /** 프로필 사진 주소(Mock API의 /api/images/:id) */
+  avatarUrl?: string;
+}
+
+/** 구매한 회원이 쓴 후기. 이름은 가려서 내보냅니다. */
+export interface Review {
+  id: string;
+  swordId: string;
+  userId: string;
+  authorName: string;
+  avatarUrl?: string;
+  /** 1~5 */
+  rating: number;
+  text: string;
+  createdAt: string;
 }
 
 export interface Order {

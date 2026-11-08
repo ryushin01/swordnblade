@@ -58,6 +58,27 @@ export function useCancelOrder() {
   });
 }
 
+/** 프로필 사진 바꾸기. file이 null이면 지웁니다. */
+export function useUpdateAvatar() {
+  const queryClient = useQueryClient();
+  const token = useSessionStore((state) => state.token);
+  return useMutation({
+    mutationFn: async (file: Blob | null) => {
+      let avatarUrl: string | null = null;
+      if (file) {
+        const form = new FormData();
+        form.append('file', file, 'avatar.jpg');
+        ({ url: avatarUrl } = await apiFetch<{ url: string }>('/api/images', { method: 'POST', body: form }));
+      }
+      return apiFetch<User>('/api/me/profile', { method: 'PUT', body: JSON.stringify({ avatarUrl }) });
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(sessionKeys.me(token), user);
+      void queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    },
+  });
+}
+
 function useStartSession<TBody>(path: string) {
   const setToken = useSessionStore((state) => state.setToken);
   const queryClient = useQueryClient();

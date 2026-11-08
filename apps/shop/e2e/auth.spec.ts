@@ -169,3 +169,46 @@ test('내 주문 취소: 한 번 더 확인하고, 취소하면 재고가 돌아
   await page.goto('/swords/uchigatana');
   await expect(stockText).toHaveText(before);
 });
+
+test('구매 후기와 프로필 사진: 산 회원만 쓰고, 사진이 원형으로 보인다', async ({ page }) => {
+  await signUp(page, 'review@example.com');
+  await page.getByLabel('프로필 사진').setInputFiles({
+    name: 'me.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVR4nGP4z8DwHwyBDBgAAH7lB/m0mfTcAAAAAElFTkSuQmCC',
+      'base64',
+    ),
+  });
+  await expect(page.getByRole('button', { name: '사진 지우기' })).toBeVisible();
+
+  await page.goto('/swords/uchigatana');
+  await expect(page.getByText('이 도검을 구매하면 후기를 쓸 수 있습니다.')).toBeVisible();
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await expect(page.getByRole('link', { name: /장바구니\s*1점/ })).toBeVisible();
+  await page.goto('/checkout');
+  await expect(page.getByLabel(/^받는 분/)).toHaveValue('김가상');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /신용카드/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-/);
+
+  await page.goto('/swords/uchigatana');
+  const section = page.getByRole('region', { name: /구매 후기/ });
+  await section.getByRole('button', { name: '후기 등록' }).click();
+  await expect(section.getByRole('alert')).toContainText('별점을 골라 주세요.');
+  await section.getByRole('radio', { name: '5점' }).check();
+  await section.getByLabel('후기 내용').fill('균형이 좋고 손잡이 감기가 단단합니다.');
+  await section.getByRole('button', { name: '후기 등록' }).click();
+
+  await expect(section.getByText('균형이 좋고 손잡이 감기가 단단합니다.')).toBeVisible();
+  await expect(section.getByText('김*상')).toBeVisible();
+  await expect(section.getByText('이 도검의 후기를 이미 썼습니다.')).toBeVisible();
+  const avatar = section.getByRole('listitem').locator('img');
+  await expect(avatar).toHaveClass(/rounded-full/);
+  await expect.poll(() => avatar.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
+  await expectNoA11yViolations(page);
+});

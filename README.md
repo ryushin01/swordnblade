@@ -1,7 +1,7 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.8.0-7a4a35)
+![version](https://img.shields.io/badge/version-0.9.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
@@ -50,11 +50,13 @@
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
 | 주문 | 오류 요약과 칸별 안내, 중복 제출 방지. 금액은 Mock 서버가 다시 계산합니다. |
 | 회원 | 회원가입·로그인, 내 계정(회원 정보·내 주문, 출고 전 주문 취소). 로그인하면 주문서에 이름과 이메일이 채워집니다. |
+| 후기 | 구매한 회원만 별점과 글을 남기고, 프로필 사진이 원형으로 보입니다. |
+| 도검 연표 | 역사 도검을 시대와 지역 표로 펼쳐 봅니다. |
 | 찜·비교 | 도검을 찜해 모아 보고(로그인하면 계정에 저장), 최대 3점을 같은 축척과 제원 표로 비교합니다. 상세 아래에 같은 지역의 도검을 추천합니다. |
 
 **어드민** (`apps/admin`, Ant Design, 쇼핑몰 주소의 `/admin`)
 
-어드민은 쇼핑몰과 같은 주소에서 열려(Next.js multi-zones) Mock 데이터를 함께 씁니다. 어드민에서 바꾼 내용이 쇼핑몰에, 쇼핑몰 주문이 어드민에 보입니다.
+어드민은 쇼핑몰과 같은 주소에서 열려(Next.js multi-zones) Mock 데이터를 함께 씁니다. 로그인 화면에 공개한 데모 계정으로 들어갑니다. 어드민에서 바꾼 내용이 쇼핑몰에, 쇼핑몰 주문이 어드민에 보입니다.
 
 | 메뉴 | 내용 |
 |---|---|

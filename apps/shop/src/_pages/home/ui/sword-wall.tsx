@@ -116,9 +116,14 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
             </>
           ) : null}
         </p>
-        <Link href="/compare" className="inline-flex min-h-11 items-center underline underline-offset-4">
-          {compare('navLink')}
-        </Link>
+        <span className="flex flex-wrap gap-x-4">
+          <Link href="/timeline" className="inline-flex min-h-11 items-center underline underline-offset-4">
+            {compare('timelineLink')}
+          </Link>
+          <Link href="/compare" className="inline-flex min-h-11 items-center underline underline-offset-4">
+            {compare('navLink')}
+          </Link>
+        </span>
       </div>
       {shown.total === 0 ? (
         <p className="px-4 py-24 text-center">{q ? t('emptyQuery', { q }) : t('emptyCategory')}</p>

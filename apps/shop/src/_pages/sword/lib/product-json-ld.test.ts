@@ -8,7 +8,7 @@ import { productJsonLd, swordOgImage } from './product-json-ld';
 describe('productJsonLd', () => {
   const sword = SEED_SWORDS[0]!;
 
-  it('이름, 가격, 재고, 언어별 주소를 담는다', () => {
+  it('이름과 언어별 주소를 담고, 가격·재고는 넣지 않는다', () => {
     const data = JSON.parse(productJsonLd(sword, 'en')) as {
       name: string;
       url: string;
@@ -16,7 +16,7 @@ describe('productJsonLd', () => {
     };
     expect(data.name).toBe(sword.name);
     expect(data.url).toMatch(/\/en\/swords\/ssangsudo$/);
-    expect(data.offers).toMatchObject({ price: sword.price, priceCurrency: 'KRW' });
+    expect(productJsonLd(sword, 'en')).not.toContain('offers');
   });
 
   it('글 속의 < 를 그대로 내보내지 않는다', () => {

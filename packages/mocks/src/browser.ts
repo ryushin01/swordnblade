@@ -20,7 +20,11 @@ export function startMockApi(options: {
   if (!started) {
     const db = createDb({ storageKey: options.storageKey });
     const worker = setupWorker(
-      ...createHandlers(db, { latency: options.latency ?? 250, images: createIndexedDbImageStore() }),
+      ...createHandlers(db, {
+        latency: options.latency ?? 250,
+        images: createIndexedDbImageStore(),
+        requireAdmin: true,
+      }),
     );
     started = worker.start({
       onUnhandledFrame: 'bypass',

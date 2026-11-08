@@ -8,6 +8,7 @@ import { useLogout, useMe, useMyOrders, useSessionHydrated, useSessionStore } fr
 import { Link, useRouter } from '@/shared/i18n';
 import { Button } from '@/shared/ui';
 
+import { AvatarField } from './avatar-field';
 import { CancelOrder } from './cancel-order';
 
 function OrderItem({ order }: { order: Order }) {
@@ -96,6 +97,7 @@ export function AccountView() {
         <h2 id="account-profile" className="text-carved text-xl">
           {t('profile')}
         </h2>
+        <AvatarField user={user} />
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
           <dt className="text-ink-muted">{auth('name')}</dt>
           <dd>{user.name}</dd>
