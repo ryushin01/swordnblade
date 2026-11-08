@@ -34,7 +34,9 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
       label: t('photo', { n: n + 1 }),
     })),
   ];
-  const current = items[Math.min(index, items.length - 1)]!;
+  // 사진이 줄어도(어드민에서 지운 뒤 다시 불러올 때) 위치가 범위를 넘지 않게 맞춥니다.
+  const active = Math.min(index, items.length - 1);
+  const current = items[active]!;
   const go = (next: number) => setIndex((next + items.length) % items.length);
 
   return (
@@ -72,7 +74,7 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
       <div className="flex items-center justify-center gap-3 px-4">
         <button
           type="button"
-          onClick={() => go(index - 1)}
+          onClick={() => go(active - 1)}
           aria-label={t('prev')}
           className="inline-flex size-11 items-center justify-center rounded-full border border-line text-ink hover:bg-wall-raised"
         >
@@ -85,10 +87,10 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
                 type="button"
                 onClick={() => setIndex(n)}
                 aria-label={t('thumb', { n: n + 1, label: item.label })}
-                aria-current={n === index ? 'true' : undefined}
+                aria-current={n === active ? 'true' : undefined}
                 className={cn(
                   'block size-14 overflow-hidden rounded-sm border bg-wall-raised/60',
-                  n === index ? 'border-2 border-ink' : 'border-line hover:border-ink-muted',
+                  n === active ? 'border-2 border-ink' : 'border-line hover:border-ink-muted',
                 )}
               >
                 {item.kind === 'relief' ? (
@@ -103,7 +105,7 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
         </ul>
         <button
           type="button"
-          onClick={() => go(index + 1)}
+          onClick={() => go(active + 1)}
           aria-label={t('next')}
           className="inline-flex size-11 items-center justify-center rounded-full border border-line text-ink hover:bg-wall-raised"
         >
@@ -111,7 +113,7 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
         </button>
       </div>
       <p aria-live="polite" className="text-center text-sm text-ink-muted tabular-nums">
-        {t('position', { current: index + 1, total: items.length, label: current.label })}
+        {t('position', { current: active + 1, total: items.length, label: current.label })}
       </p>
     </section>
   );

@@ -97,14 +97,21 @@ export function ImagesField() {
               event.target.value = '';
               if (files.length === 0) return;
               setUploading(true);
+              let uploaded = 0;
               try {
                 for (const file of files) {
                   const url = await uploadSwordImage(await resizeImage(file).catch(() => file));
                   add({ url, alt: '', altEn: '' });
+                  uploaded += 1;
                 }
                 void message.success(`사진 ${files.length}장을 올렸습니다. 대체 텍스트를 입력해 주세요.`);
               } catch {
-                void message.error('사진을 올리지 못했습니다. 다시 시도해 주세요.');
+                // 일부만 올라갔으면 이미 올린 사진을 다시 고르지 않도록 알려 줍니다.
+                void message.error(
+                  uploaded > 0
+                    ? `사진 ${uploaded}장을 올렸지만 나머지 ${files.length - uploaded}장은 올리지 못했습니다. 올리지 못한 사진만 다시 골라 주세요.`
+                    : '사진을 올리지 못했습니다. 다시 시도해 주세요.',
+                );
               } finally {
                 setUploading(false);
               }

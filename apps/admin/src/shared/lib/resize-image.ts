@@ -10,12 +10,18 @@ export function fitWithin(width: number, height: number, max: number): { width: 
  */
 export async function resizeImage(file: File, max = 1600): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
-  const { width, height } = fitWithin(bitmap.width, bitmap.height, max);
   const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  canvas.getContext('2d')?.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close();
+  try {
+    const { width, height } = fitWithin(bitmap.width, bitmap.height, max);
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    // 그리지 못하면 빈 사진이 올라가므로 오류로 알리고, 부르는 쪽이 원본을 올리게 합니다.
+    if (!context) throw new Error('사진을 줄이지 못했습니다.');
+    context.drawImage(bitmap, 0, 0, width, height);
+  } finally {
+    bitmap.close();
+  }
   return new Promise((resolve, reject) =>
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error('사진을 줄이지 못했습니다.'))),
