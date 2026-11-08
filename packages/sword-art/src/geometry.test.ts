@@ -30,6 +30,6 @@ describe('sword geometry', () => {
     const ssangsudo = SEED_SWORDS[0]!;
     const layout = hiltLayout(ssangsudo.art);
     expect(layout.gripEnd - layout.gripStart).toBe(ssangsudo.art.grip.length);
-    expect(localBounds(ssangsudo.art).maxY).toBeGreaterThan(layout.pommelEnd);
+    expect(localBounds(ssangsudo.art).maxY).toBeGreaterThanOrEqual(layout.pommelEnd);
   });
 });

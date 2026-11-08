@@ -18,7 +18,16 @@ import {
   Typography,
 } from 'antd';
 
-import { CATEGORY_LABEL, COUNTRY_NAME, type CountryCode, type Sword, type SwordArt } from '@snb/domain';
+import {
+  CATEGORY_LABEL,
+  COUNTRY_NAME,
+  type CountryCode,
+  KIND_LABEL,
+  type Sword,
+  SWORD_CATEGORIES,
+  SWORD_KINDS,
+  type SwordArt,
+} from '@snb/domain';
 import { SEED_TRANSLATIONS_EN } from '@snb/mocks';
 import { SwordRelief } from '@snb/sword-art';
 
@@ -38,6 +47,14 @@ const GUARD_LABEL: Record<SwordArt['guard']['type'], string> = {
   jian: '중국 검식',
   block: '덩어리형',
   none: '없음',
+  dguard: '손등 보호대(세이버)',
+  swept: '스웹트 힐트(레이피어)',
+  cup: '컵 힐트',
+  basket: '바구니 힐트',
+  katar: '카타르 H자 틀',
+  crescent: '초승달(호두구)',
+  ring: '총구 고리(총검)',
+  ganja: '비대칭 받침(크리스)',
 };
 const WRAP_LABEL: Record<SwordArt['grip']['wrap'], string> = {
   diamond: '마름모 끈 감기',
@@ -45,12 +62,20 @@ const WRAP_LABEL: Record<SwordArt['grip']['wrap'], string> = {
   wire: '철사 감기',
   leather: '가죽',
   ribbed: '홈 파인 뼈',
+  helix: '촘촘한 나선 끈',
+  plain: '민무늬',
+  split: '둘로 나뉜 손잡이(발리송)',
+  katar: '가로 손잡이(카타르)',
 };
 const TIP_LABEL: Record<SwordArt['blade']['tip'], string> = {
   kissaki: '휜 칼끝(기사키)',
   spear: '뾰족한 칼끝',
   round: '둥근 칼끝',
   sickle: '낫 모양 갈고리',
+  square: '사각(처형검)',
+  clip: '클립 포인트',
+  hook: '갈고리(호두구)',
+  needle: '바늘(찌르기 검)',
 };
 const INSCRIPTION_OPTIONS = [
   { value: 'stars', label: '별자리 상감' },
@@ -64,6 +89,10 @@ const POMMEL_LABEL: Record<SwordArt['pommel']['type'], string> = {
   ring: '고리(환두)',
   jian: '중국 검식',
   gem: '보석 박힘',
+  none: '없음',
+  crook: '굽은 지팡이 머리',
+  beak: '새부리(세이버)',
+  spike: '뾰족한 끝',
 };
 
 interface ColorInputProps {
@@ -139,6 +168,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
     : template
       ? {
           category: 'east',
+          kind: 'straight',
           origin: 'KR',
           price: 1_000_000,
           stock: 1,
@@ -223,14 +253,14 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                   <Input autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={12} md={8}>
+              <Col xs={12} md={4}>
                 <Form.Item name="category" label="분류" rules={[{ required: true }]}>
-                  <Select
-                    options={(['east', 'west', 'legend'] as const).map((value) => ({
-                      value,
-                      label: CATEGORY_LABEL[value],
-                    }))}
-                  />
+                  <Select options={SWORD_CATEGORIES.map((value) => ({ value, label: CATEGORY_LABEL[value] }))} />
+                </Form.Item>
+              </Col>
+              <Col xs={12} md={4}>
+                <Form.Item name="kind" label="형태" rules={[{ required: true }]}>
+                  <Select options={SWORD_KINDS.map((value) => ({ value, label: KIND_LABEL[value] }))} />
                 </Form.Item>
               </Col>
               <Col xs={12} md={8}>

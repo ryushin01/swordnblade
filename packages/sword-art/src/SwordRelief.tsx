@@ -1,15 +1,20 @@
 import { type ReactNode, useId } from 'react';
 
 import {
+  bladeCenterX,
   bladeOutline,
   bladeStrip,
   bladeWidthAt,
+  focusViewBox,
   hamonPath,
   type HiltLayout,
   hiltLayout,
+  hookTipPath,
   pointsToPath,
+  type ReliefFocus,
   ROTATION_DEG,
   sickleHookPath,
+  sleevePoints,
   squareViewBox,
 } from './geometry';
 
@@ -29,6 +34,15 @@ const H = {
 const STEEL = '#bfc5ca';
 const GOLD = '#b48a3c';
 
+/** 칼날 재질별 채색과 진하기 */
+const BLADE_PIGMENT: Record<NonNullable<SwordArt['blade']['material']>, [string, number]> = {
+  steel: [STEEL, 0.55],
+  bronze: ['#b5884a', 0.8],
+  wood: ['#8b5a2b', 0.85],
+  bamboo: ['#d9c486', 0.85],
+  foam: ['#3b6fb6', 0.85],
+};
+
 export interface SwordReliefProps {
   art: SwordArt;
   /** 있으면 role="img"와 함께 이름을 붙이고, 없으면 장식 이미지로 숨깁니다. */
@@ -39,14 +53,24 @@ export interface SwordReliefProps {
   pigment?: number;
   /** 부조 깊이 배율 */
   depth?: number;
+  /** 상세 갤러리 확대 보기: 전체, 손잡이, 칼끝 */
+  focus?: ReliefFocus;
   className?: string;
 }
 
-export function SwordRelief({ art, label, frame = 'fit', pigment = 0.8, depth = 1, className }: SwordReliefProps) {
+export function SwordRelief({
+  art,
+  label,
+  frame = 'fit',
+  pigment = 0.8,
+  depth = 1,
+  focus = 'full',
+  className,
+}: SwordReliefProps) {
   const rawId = useId();
   const id = (name: string) => `snb${rawId.replace(/[^a-zA-Z0-9]/g, '')}-${name}`;
   const layout = hiltLayout(art);
-  const viewBox = squareViewBox(art, frame);
+  const viewBox = focus === 'full' ? squareViewBox(art, frame) : focusViewBox(art, focus);
   const side = Number(viewBox.split(' ')[2]);
   // viewBox가 클수록 1mm가 작게 그려지므로 흐림 반경을 맞춰 줍니다.
   const blur = (side / 260) * depth;
@@ -132,8 +156,16 @@ function gripPath(layout: HiltLayout): string {
 
 function renderParts(art: SwordArt, layout: HiltLayout, layer: Layer, id: (name: string) => string): ReactNode {
   const isHeight = layer === 'height';
-  const bladeFill = isHeight ? `url(#${id(art.blade.edge === 'single' ? 'blade-single' : 'blade-double')})` : STEEL;
-  const bladeOpacity = isHeight ? 1 : 0.55;
+  const material = art.blade.material ?? 'steel';
+  const [pigmentColor, pigmentOpacity] = BLADE_PIGMENT[material];
+  // 나무·대나무·스펀지는 능선이 없는 납작한 면으로 칠합니다.
+  const flat = material === 'wood' || material === 'bamboo' || material === 'foam';
+  const bladeFill = isHeight
+    ? flat
+      ? H.mid
+      : `url(#${id(art.blade.edge === 'single' ? 'blade-single' : 'blade-double')})`
+    : (art.blade.color ?? pigmentColor);
+  const bladeOpacity = isHeight ? 1 : pigmentOpacity;
 
   return (
     <>
@@ -156,8 +188,20 @@ function Blade({ art, fill, opacity, layer }: { art: SwordArt; fill: string; opa
     <g>
       <path d={outline} fill={fill} fillOpacity={opacity} />
       {blade.tip === 'sickle' ? (
-        <path d={sickleHookPath(art)} fill={isHeight ? H.mid : STEEL} fillOpacity={opacity} />
+        <path d={sickleHookPath(art)} fill={isHeight ? H.mid : fill} fillOpacity={opacity} />
       ) : null}
+      {blade.tip === 'hook' ? (
+        <path
+          d={hookTipPath(art)}
+          fill="none"
+          stroke={isHeight ? H.mid : STEEL}
+          strokeOpacity={isHeight ? 1 : 0.7}
+          strokeWidth={blade.width * 0.55}
+          strokeLinecap="round"
+        />
+      ) : null}
+      {blade.material === 'bamboo' ? <BambooSlats art={art} layer={layer} /> : null}
+      {blade.teeth ? <ObsidianTeeth art={art} layer={layer} /> : null}
 
       {blade.fuller ? (
         <path
@@ -190,8 +234,79 @@ function Blade({ art, fill, opacity, layer }: { art: SwordArt; fill: string; opa
 
       {blade.inscription === 'stars' ? <Stars art={art} layer={layer} /> : null}
       {blade.inscription === 'runes' ? <Runes art={art} layer={layer} /> : null}
+      {blade.sleeve ? <Sleeve art={art} layer={layer} /> : null}
     </g>
   );
+}
+
+/** 칼날 밑동을 감싼 덧쇠와 리벳 네 개(쌍수도) */
+function Sleeve({ art, layer }: { art: SwordArt; layer: Layer }) {
+  const sleeve = art.blade.sleeve;
+  if (!sleeve) return null;
+  const isHeight = layer === 'height';
+  const end = -Math.min(art.blade.length * 0.6, sleeve.length);
+  const w = art.blade.width;
+  const rivets: Array<[number, number]> = [
+    [-w * 0.26, -w * 0.45],
+    [w * 0.26, -w * 0.9],
+    [-w * 0.26, end + w * 0.9],
+    [w * 0.26, end + w * 0.45],
+  ];
+  return (
+    <g>
+      <path d={pointsToPath(sleevePoints(art, sleeve.length))} fill={isHeight ? H.raised : sleeve.color} />
+      {rivets.map(([x, y]) => (
+        <circle
+          key={`${x}${y}`}
+          cx={x + bladeCenterX(art, -y / art.blade.length)}
+          cy={y}
+          r={w * 0.09}
+          fill={isHeight ? H.top : '#00000040'}
+        />
+      ))}
+    </g>
+  );
+}
+
+/** 죽도: 대나무 쪽 네 가닥과 묶는 가죽 띠 */
+function BambooSlats({ art, layer }: { art: SwordArt; layer: Layer }) {
+  const isHeight = layer === 'height';
+  const stroke = isHeight ? H.low : '#8a7240';
+  return (
+    <g>
+      {[0.3, 0.5, 0.7].map((offset) => (
+        <path key={offset} d={pointsToPath(bladeStrip(art, 0.0, 0.97, offset, 0.03))} fill={stroke} fillOpacity={0.8} />
+      ))}
+      <path d={pointsToPath(bladeStrip(art, 0.72, 0.75, 0.5, 1.05))} fill={isHeight ? H.raised : '#e9e1cc'} />
+      <path d={pointsToPath(bladeStrip(art, 0.93, 1, 0.5, 1.05))} fill={isHeight ? H.raised : '#e9e1cc'} />
+    </g>
+  );
+}
+
+/** 마쿠아후이틀: 나무 몸체 양쪽 날에 박은 흑요석 조각 */
+function ObsidianTeeth({ art, layer }: { art: SwordArt; layer: Layer }) {
+  const isHeight = layer === 'height';
+  const fill = isHeight ? H.top : '#1f1d24';
+  const teeth: ReactNode[] = [];
+  for (let t = 0.08; t < 0.93; t += 0.065) {
+    const y = -t * art.blade.length;
+    const w = bladeWidthAt(art, t);
+    const cx = bladeCenterX(art, t);
+    const s = art.blade.width * 0.22;
+    teeth.push(
+      <path
+        key={`l${t}`}
+        d={`M${cx - w / 2} ${y - s} L${cx - w / 2 - s * 1.6} ${y} L${cx - w / 2} ${y + s} Z`}
+        fill={fill}
+      />,
+      <path
+        key={`r${t}`}
+        d={`M${cx + w / 2} ${y - s} L${cx + w / 2 + s * 1.6} ${y} L${cx + w / 2} ${y + s} Z`}
+        fill={fill}
+      />,
+    );
+  }
+  return <g>{teeth}</g>;
 }
 
 /** 사인검의 별자리 상감 */
@@ -345,6 +460,92 @@ function Guard({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; laye
           <rect x={-half + 6} y={t * 0.4} width={guard.width - 12} height={3} rx={1.5} fill={accent} />
         </g>
       );
+    case 'dguard':
+    case 'swept':
+    case 'cup': {
+      // 손등 보호대: 코등이 날 쪽 끝에서 손잡이를 감싸며 끝장식까지 이어지는 고리
+      const bow = `M${half - 4} ${cy} C${half + 22} ${cy + 30} ${layout.gripWidth / 2 + 30} ${layout.gripEnd - 30} ${layout.gripWidth / 2 + 2} ${layout.gripEnd + 4}`;
+      return (
+        <g>
+          <rect x={-half} y={cy - 5} width={guard.width} height={10} rx={5} fill={fill} />
+          <circle cx={-half + 2} cy={cy} r={7} fill={fill} />
+          <path d={bow} fill="none" stroke={fill} strokeWidth={7} strokeLinecap="round" />
+          {guard.type === 'swept' ? (
+            <>
+              {/* 칼날 밑동을 감싸는 고리와 손잡이 반대쪽으로 휘는 가지 */}
+              <ellipse cx={0} cy={-18} rx={half * 0.55} ry={13} fill="none" stroke={fill} strokeWidth={5} />
+              <path
+                d={`M${-half + 6} ${cy} C${-half - 10} ${cy + 26} ${-layout.gripWidth / 2 - 18} ${cy + 46} ${-layout.gripWidth / 2 - 2} ${cy + 70}`}
+                fill="none"
+                stroke={fill}
+                strokeWidth={5}
+                strokeLinecap="round"
+              />
+            </>
+          ) : null}
+          {guard.type === 'cup' ? <ellipse cx={0} cy={cy - 6} rx={half * 0.62} ry={14} fill={accent} /> : null}
+        </g>
+      );
+    }
+    case 'basket': {
+      // 바구니 힐트: 손을 감싸는 쇠창살
+      const gw = layout.gripWidth / 2 + 22;
+      const y1 = layout.gripEnd - 6;
+      const bars = [0.25, 0.5, 0.75];
+      return (
+        <g fill="none" stroke={fill} strokeWidth={6} strokeLinecap="round">
+          <path d={`M${-half} ${cy} Q${-gw - 8} ${(cy + y1) / 2} ${-layout.gripWidth / 2} ${y1}`} />
+          <path d={`M${half} ${cy} Q${gw + 8} ${(cy + y1) / 2} ${layout.gripWidth / 2} ${y1}`} />
+          <path d={`M${-half} ${cy} L${half} ${cy}`} strokeWidth={10} />
+          {bars.map((r) => (
+            <path
+              key={r}
+              d={`M${-gw + 2} ${cy + (y1 - cy) * r} Q0 ${cy + (y1 - cy) * r + 10} ${gw - 2} ${cy + (y1 - cy) * r}`}
+              strokeWidth={4}
+            />
+          ))}
+          <circle cx={gw - 6} cy={cy + (y1 - cy) * 0.5} r={6} fill={accent} stroke="none" />
+        </g>
+      );
+    }
+    case 'katar': {
+      // 카타르: 손잡이 양옆의 긴 막대와 칼날 쪽 넓은 받침
+      const sx = layout.gripWidth / 2;
+      const y1 = layout.gripEnd + 8;
+      return (
+        <g>
+          <path d={`M${-sx - 10} ${-2} L${sx + 10} ${-2} L${sx + 4} ${t} L${-sx - 4} ${t} Z`} fill={fill} />
+          <rect x={-sx - 6} y={0} width={10} height={y1} rx={4} fill={fill} />
+          <rect x={sx - 4} y={0} width={10} height={y1} rx={4} fill={fill} />
+          <circle cx={-sx - 1} cy={y1} r={7} fill={accent} />
+          <circle cx={sx + 1} cy={y1} r={7} fill={accent} />
+        </g>
+      );
+    }
+    case 'crescent':
+      // 구(호두구)의 초승달 코등이: 양 끝이 칼날 쪽을 향합니다.
+      return (
+        <path
+          d={`M${-half} ${cy - 26} Q0 ${cy + 40} ${half} ${cy - 26} Q0 ${cy + 16} ${-half} ${cy - 26} Z`}
+          fill={fill}
+        />
+      );
+    case 'ring':
+      // 총검식: 짧은 십자와 등 쪽 총구 고리
+      return (
+        <g>
+          <rect x={-half} y={cy - 5} width={guard.width} height={10} rx={4} fill={fill} />
+          <circle cx={-half - 12} cy={cy} r={13} fill="none" stroke={fill} strokeWidth={5} />
+        </g>
+      );
+    case 'ganja':
+      // 크리스의 간자: 날 쪽으로 길게 뻗은 비대칭 받침
+      return (
+        <path
+          d={`M${-half * 0.55} ${t} L${-half * 0.6} ${2} Q${half * 0.3} ${-6} ${half * 1.05} ${-10} Q${half * 0.95} ${t * 0.6} ${half * 0.5} ${t} Z`}
+          fill={fill}
+        />
+      );
   }
 }
 
@@ -438,6 +639,49 @@ function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayou
       });
       break;
     }
+    case 'helix': {
+      // 촘촘한 나선 끈(쌍수도): 가는 끈이 빈틈없이 비스듬히 감깁니다.
+      const step = 4.6;
+      const count = Math.ceil(length / step) + 2;
+      wrap = Array.from({ length: count }, (_, index) => {
+        const y = y0 - step + index * step;
+        return (
+          <path
+            key={index}
+            d={`M${-half} ${y} L${half} ${y + 2.4}`}
+            stroke={wrapFill}
+            strokeWidth={3.4}
+            strokeLinecap="round"
+          />
+        );
+      });
+      break;
+    }
+    case 'split':
+      // 발리송: 둘로 나뉜 손잡이 사이의 틈과 고정 핀
+      wrap = (
+        <>
+          <rect x={-1.5} y={y0} width={3} height={length} fill={isHeight ? H.low : '#00000055'} />
+          <circle cx={-w * 0.25} cy={y0 + 10} r={3} fill={isHeight ? H.top : '#00000040'} />
+          <circle cx={w * 0.25} cy={y0 + 10} r={3} fill={isHeight ? H.top : '#00000040'} />
+        </>
+      );
+      break;
+    case 'plain':
+    case 'katar':
+      break;
+  }
+
+  if (grip.wrap === 'katar') {
+    // 카타르는 칼날과 직각인 가로 손잡이 두 개를 쥡니다.
+    const sx = w / 2;
+    return (
+      <g>
+        {[0.35, 0.62].map((r) => (
+          <rect key={r} x={-sx} y={y0 + length * r - 6} width={sx * 2} height={12} rx={6} fill={wrapFill} />
+        ))}
+      </g>
+    );
   }
 
   return (
@@ -515,6 +759,34 @@ function Pommel({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; lay
           <rect x={-w / 2} y={y - 2} width={w} height={10} rx={3} fill={fill} />
           <ellipse cx={0} cy={y + 34} rx={30} ry={24} fill="none" stroke={fill} strokeWidth={9} />
           <circle cx={0} cy={y + 34} r={8} fill={hi} />
+        </g>
+      );
+    case 'none':
+      return null;
+    case 'crook':
+      // 지팡이칼의 굽은 손잡이 머리(등 쪽으로 휨)
+      return (
+        <path
+          d={`M0 ${y - 4} C0 ${y + 46} ${-62} ${y + 52} ${-64} ${y + 14}`}
+          fill="none"
+          stroke={fill}
+          strokeWidth={w * 0.85}
+          strokeLinecap="round"
+        />
+      );
+    case 'beak':
+      // 세이버의 새부리 끝장식(날 쪽으로 휨)
+      return (
+        <path
+          d={`M${-w / 2 - 1} ${y - 4} L${w / 2 + 1} ${y - 4} Q${w / 2 + 18} ${y + 8} ${w / 2 + 10} ${y + 26} Q${-w / 2 + 2} ${y + 26} ${-w / 2 - 3} ${y + 8} Z`}
+          fill={fill}
+        />
+      );
+    case 'spike':
+      return (
+        <g>
+          <rect x={-w / 2 - 1} y={y - 2} width={w + 2} height={8} rx={3} fill={fill} />
+          <path d={`M${-w / 2 + 2} ${y + 6} L${w / 2 - 2} ${y + 6} L0 ${y + 44} Z`} fill={hi} />
         </g>
       );
     case 'jian':

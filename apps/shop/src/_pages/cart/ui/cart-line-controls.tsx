@@ -4,6 +4,7 @@ import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { MAX_QUANTITY, useCartStore } from '@/entities/cart';
+import { selectClassName } from '@/shared/ui';
 
 export function QuantitySelect({
   swordId,
@@ -29,7 +30,7 @@ export function QuantitySelect({
         id={id}
         value={quantity}
         onChange={(event) => setQuantity(swordId, Number(event.target.value))}
-        className="h-11 rounded-sm border border-input bg-wall-raised px-2"
+        className={selectClassName}
       >
         {Array.from({ length: Math.max(max, quantity) }, (_, index) => index + 1).map((value) => (
           <option key={value} value={value}>

@@ -1,14 +1,41 @@
-import type { CountryCode, CustomsConfig, OrderStatus, SwordCategory } from './types';
+import type { CountryCode, CustomsConfig, OrderStatus, SwordCategory, SwordKind } from './types';
 
 export const CATEGORY_LABEL: Record<SwordCategory, string> = {
   east: '동양 도검',
   west: '서양 도검',
+  middle: '중동·아프리카',
+  americas: '신대륙',
   legend: '신화·전설',
 };
+
+/** 분류를 보여 주는 순서 */
+export const SWORD_CATEGORIES: SwordCategory[] = ['east', 'west', 'middle', 'americas', 'legend'];
+
+export const KIND_LABEL: Record<SwordKind, string> = {
+  straight: '검(곧은 칼)',
+  curved: '도(휜 칼)',
+  great: '양손검·대도',
+  dagger: '단검',
+  exotic: '특수 도검',
+  training: '연습용(가검)',
+};
+
+export const KIND_LABEL_EN: Record<SwordKind, string> = {
+  straight: 'Straight swords',
+  curved: 'Curved swords',
+  great: 'Two-handed & great swords',
+  dagger: 'Daggers & knives',
+  exotic: 'Unusual blades',
+  training: 'Training swords',
+};
+
+export const SWORD_KINDS: SwordKind[] = ['straight', 'curved', 'great', 'dagger', 'exotic', 'training'];
 
 export const CATEGORY_LABEL_EN: Record<SwordCategory, string> = {
   east: 'Eastern',
   west: 'Western',
+  middle: 'Middle East & Africa',
+  americas: 'The Americas',
   legend: 'Myth & Legend',
 };
 
@@ -25,6 +52,22 @@ export const COUNTRY_NAME: Record<CountryCode, string> = {
   GR: '그리스',
   AU: '호주',
   CA: '캐나다',
+  IN: '인도',
+  ID: '인도네시아',
+  NP: '네팔',
+  PH: '필리핀',
+  TR: '튀르키예',
+  IR: '이란',
+  EG: '이집트',
+  ET: '에티오피아',
+  SD: '수단',
+  YE: '예멘',
+  SA: '사우디아라비아',
+  ES: '스페인',
+  CH: '스위스',
+  RU: '러시아',
+  MX: '멕시코',
+  AT: '오스트리아',
 };
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {

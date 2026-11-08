@@ -14,13 +14,25 @@ const SAMPLES = 64;
 export const pointsToPath = (points: Point[], close = true): string =>
   points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ') + (close ? ' Z' : '');
 
+const smoothstep = (from: number, to: number, t: number) => {
+  const x = Math.min(1, Math.max(0, (t - from) / (to - from)));
+  return x * x * (3 - 2 * x);
+};
+
+/** 칼날 가운데 선. 휘어짐(음수면 날 쪽으로 휨)과 물결을 더합니다. 물결은 칼끝에서 잦아듭니다. */
 export function bladeCenterX(art: SwordArt, t: number): number {
-  return -art.blade.curve * t * t;
+  const { curve, wave = 0, waves = 7 } = art.blade;
+  const waveX = wave ? wave * Math.sin(t * waves * Math.PI * 2) * (1 - smoothstep(0.88, 1, t)) : 0;
+  return -curve * t * t + waveX;
 }
 
-/** 칼날 너비(끝으로 갈수록 가늘어지는 distal taper 포함) */
+/** 칼날 너비: 끝으로 갈수록 가늘어지고(distal taper), 넓어짐(flare)·불룩함(bulge)을 반영합니다. */
 export function bladeWidthAt(art: SwordArt, t: number): number {
-  return art.blade.width * (1 - 0.3 * t);
+  const { width, flare = 1, bulge = 0 } = art.blade;
+  const taper = 1 - 0.3 * t;
+  const flareFactor = 1 + (flare - 1) * smoothstep(0.15, 0.85, t);
+  const bulgeFactor = 1 + bulge * Math.exp(-(((t - 0.35) / 0.14) ** 2));
+  return width * taper * flareFactor * bulgeFactor;
 }
 
 export function tipLength(art: SwordArt): number {
@@ -34,6 +46,14 @@ export function tipLength(art: SwordArt): number {
       return width * 0.6;
     case 'sickle':
       return width * 1.2;
+    case 'square':
+      return width * 0.06;
+    case 'clip':
+      return width * 1.8;
+    case 'hook':
+      return width * 1.4;
+    case 'needle':
+      return width * 4;
   }
 }
 
@@ -56,16 +76,24 @@ export function bladeOutline(art: SwordArt): Point[] {
       if (u === 0) {
         spine.push({ x: spineX, y });
         edgeSide.push({ x: spineX + w, y });
+      } else if (tip === 'square') {
+        spine.push({ x: spineX, y });
+        edgeSide.push({ x: spineX + w, y });
+      } else if (tip === 'clip') {
+        // 등 쪽이 비스듬히 깎여 날 쪽으로 내려오는 클립 포인트
+        const drop = w * 0.55 * u;
+        spine.push({ x: spineX + drop, y });
+        edgeSide.push({ x: spineX + drop + (w - drop) * Math.sqrt(Math.max(0, 1 - u * u)), y });
       } else {
-        const curveIn = tip === 'kissaki' ? Math.sqrt(Math.max(0, 1 - u * u)) : 1 - u;
+        const curveIn = tip === 'kissaki' || tip === 'round' ? Math.sqrt(Math.max(0, 1 - u * u)) : Math.pow(1 - u, 0.9);
         spine.push({ x: spineX + w * 0.12 * u * u, y });
         edgeSide.push({ x: spineX + w * 0.12 * u * u + (w - w * 0.12 * u * u) * curveIn, y });
       }
     } else {
       let half = w / 2;
-      if (u > 0) {
+      if (u > 0 && tip !== 'square') {
         if (tip === 'round') half *= Math.sqrt(Math.max(0, 1 - u * u));
-        else half *= Math.pow(1 - u, 0.85);
+        else half *= Math.pow(1 - u, tip === 'needle' ? 0.95 : 0.85);
       }
       spine.push({ x: cx - half, y });
       edgeSide.push({ x: cx + half, y });
@@ -88,6 +116,31 @@ export function sickleHookPath(art: SwordArt): string {
     `C${x0 + reach * 0.82} ${y0 + width * 0.45} ${x0 + reach * 0.45} ${y0 - width * 0.05} ${x0} ${y0 + width * 0.55}`,
     'Z',
   ].join(' ');
+}
+
+/** 구(호두구) 칼끝의 갈고리: 칼끝에서 등 쪽으로 말려 내려옵니다. 굵은 선으로 그립니다. */
+export function hookTipPath(art: SwordArt): string {
+  const { length, width } = art.blade;
+  const x0 = bladeCenterX(art, 1);
+  const y0 = -length;
+  return `M${x0} ${y0 + width * 0.4} C${x0 - width * 0.4} ${y0 - width * 1.6} ${x0 - width * 2.6} ${y0 - width * 1.4} ${x0 - width * 2.4} ${y0 + width * 0.6}`;
+}
+
+/** 칼날 밑동을 감싼 덧쇠 폴리곤(0~to 구간, 칼날보다 조금 넓게) */
+export function sleevePoints(art: SwordArt, sleeveLength: number): Point[] {
+  const to = Math.min(0.6, sleeveLength / art.blade.length);
+  const left: Point[] = [];
+  const right: Point[] = [];
+  const steps = 12;
+  for (let i = 0; i <= steps; i += 1) {
+    const t = (to * i) / steps;
+    const y = -t * art.blade.length;
+    const half = bladeWidthAt(art, t) * 0.56;
+    const cx = bladeCenterX(art, t);
+    left.push({ x: cx - half, y });
+    right.push({ x: cx + half, y });
+  }
+  return [...left, ...right.reverse()];
 }
 
 /** 칼날 위 띠(홈·문양) 폴리곤: from~to 구간, 등에서 offset 비율 위치, 너비 비율 */
@@ -145,6 +198,22 @@ export function guardThickness(art: SwordArt): number {
       return 30;
     case 'none':
       return 0;
+    case 'dguard':
+      return 18;
+    case 'swept':
+      return 20;
+    case 'cup':
+      return 26;
+    case 'basket':
+      return 22;
+    case 'katar':
+      return 12;
+    case 'crescent':
+      return 26;
+    case 'ring':
+      return 16;
+    case 'ganja':
+      return 24;
   }
 }
 
@@ -163,6 +232,14 @@ export function pommelHeight(art: SwordArt): number {
       return 60;
     case 'jian':
       return 34;
+    case 'none':
+      return 0;
+    case 'crook':
+      return 52;
+    case 'beak':
+      return 28;
+    case 'spike':
+      return 44;
   }
 }
 
@@ -176,7 +253,8 @@ export function hiltLayout(art: SwordArt): HiltLayout {
     guardThickness: guard,
     gripStart,
     gripEnd,
-    gripWidth: twoHanded ? 34 : 30,
+    // 카타르는 두 옆 막대 사이를 손으로 쥐어 손잡이 폭이 넓습니다.
+    gripWidth: art.grip.wrap === 'katar' ? 76 : twoHanded ? 34 : 30,
     pommelEnd: gripEnd + pommelHeight(art),
   };
 }
@@ -191,14 +269,20 @@ export interface Bounds {
 /** 회전 전 좌표계에서의 외곽 범위 */
 export function localBounds(art: SwordArt): Bounds {
   const layout = hiltLayout(art);
-  const halfBlade = art.blade.width / 2 + Math.abs(art.blade.curve);
-  const hook = art.blade.tip === 'sickle' ? art.blade.width * 2.4 : 0;
-  const halfGuard = art.guard.width / 2;
+  const { blade, guard } = art;
+  const maxWidth = blade.width * (blade.flare ?? 1) * (1 + (blade.bulge ?? 0));
+  const halfBlade = maxWidth / 2 + Math.abs(blade.curve) + (blade.wave ?? 0) + (blade.teeth ? blade.width * 0.4 : 0);
+  const sickle = blade.tip === 'sickle' ? blade.width * 2.4 : 0;
+  const hook = blade.tip === 'hook' ? blade.width * 2.8 : 0;
+  // 손등 보호대·바구니는 손잡이 옆(날 쪽)으로 나옵니다.
+  const bow = ['dguard', 'swept', 'cup', 'basket'].includes(guard.type) ? layout.gripWidth / 2 + 34 : 0;
+  const halfGuard = guard.type === 'katar' ? layout.gripWidth / 2 + 16 : guard.width / 2;
+  const crook = art.pommel.type === 'crook' ? 72 : 0;
   const tassel = art.tassel ? 120 : 0;
   return {
-    minX: -Math.max(halfBlade, halfGuard, 40),
-    maxX: Math.max(halfBlade + hook, halfGuard, 40) + tassel * 0.7,
-    minY: -art.blade.length - 4,
+    minX: -Math.max(halfBlade + hook, halfGuard, crook, 40),
+    maxX: Math.max(halfBlade + sickle, halfGuard, bow, 40) + tassel * 0.7,
+    minY: -blade.length - 4 - (hook ? blade.width * 1.8 : 0),
     maxY: layout.pommelEnd + tassel,
   };
 }
@@ -235,6 +319,29 @@ export function squareViewBox(art: SwordArt, frame: 'fit' | 'catalog', padding =
   const cy = (b.minY + b.maxY) / 2;
   const fitSide = Math.max(b.maxX - b.minX, b.maxY - b.minY);
   const side = (frame === 'catalog' ? Math.max(fitSide, CATALOG_SIDE) : fitSide) * (1 + padding * 2);
+  return `${(cx - side / 2).toFixed(1)} ${(cy - side / 2).toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`;
+}
+
+export type ReliefFocus = 'full' | 'hilt' | 'tip';
+
+/**
+ * 상세 갤러리의 확대 보기용 정사각 viewBox.
+ * - hilt: 칼날 밑동부터 손잡이 끝까지
+ * - tip: 칼끝 쪽 3할(짧은 칼은 칼날 너비의 7배 이상)
+ */
+export function focusViewBox(art: SwordArt, focus: ReliefFocus): string {
+  if (focus === 'full') return squareViewBox(art, 'fit');
+  const full = localBounds(art);
+  const { length, width } = art.blade;
+  const sleeve = art.blade.sleeve ? art.blade.sleeve.length : 0;
+  const bounds: Bounds =
+    focus === 'hilt'
+      ? { ...full, minY: -Math.max(width * 2.5, sleeve + width) }
+      : { ...full, maxY: -length + Math.max(length * 0.3, width * 7) };
+  const b = rotatedBounds(bounds);
+  const cx = (b.minX + b.maxX) / 2;
+  const cy = (b.minY + b.maxY) / 2;
+  const side = Math.max(b.maxX - b.minX, b.maxY - b.minY) * 1.16;
   return `${(cx - side / 2).toFixed(1)} ${(cy - side / 2).toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`;
 }
 

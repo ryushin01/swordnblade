@@ -13,6 +13,7 @@ const base: Sword = {
   nameOriginal: '環刀',
   nameEn: 'Hwando',
   category: 'east',
+  kind: 'curved',
   origin: 'KR',
   era: '조선',
   summary: '요약',

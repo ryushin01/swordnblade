@@ -1,6 +1,22 @@
-import { CATEGORY_LABEL, CATEGORY_LABEL_EN, COUNTRY_NAME, ORDER_STATUS_LABEL } from './constants';
+import {
+  CATEGORY_LABEL,
+  CATEGORY_LABEL_EN,
+  COUNTRY_NAME,
+  KIND_LABEL,
+  KIND_LABEL_EN,
+  ORDER_STATUS_LABEL,
+} from './constants';
 
-import type { CountryCode, CountryRule, Locale, OrderStatus, Sword, SwordCategory, SwordTranslation } from './types';
+import type {
+  CountryCode,
+  CountryRule,
+  Locale,
+  OrderStatus,
+  Sword,
+  SwordCategory,
+  SwordKind,
+  SwordTranslation,
+} from './types';
 
 export const LOCALES: Locale[] = ['ko', 'en'];
 
@@ -17,6 +33,22 @@ export const COUNTRY_NAME_EN: Record<CountryCode, string> = {
   GR: 'Greece',
   AU: 'Australia',
   CA: 'Canada',
+  IN: 'India',
+  ID: 'Indonesia',
+  NP: 'Nepal',
+  PH: 'Philippines',
+  TR: 'Türkiye',
+  IR: 'Iran',
+  EG: 'Egypt',
+  ET: 'Ethiopia',
+  SD: 'Sudan',
+  YE: 'Yemen',
+  SA: 'Saudi Arabia',
+  ES: 'Spain',
+  CH: 'Switzerland',
+  RU: 'Russia',
+  MX: 'Mexico',
+  AT: 'Austria',
 };
 
 export const ORDER_STATUS_LABEL_EN: Record<OrderStatus, string> = {
@@ -33,6 +65,9 @@ export const countryName = (code: CountryCode, locale: Locale): string =>
 
 export const categoryLabel = (category: SwordCategory, locale: Locale): string =>
   locale === 'en' ? CATEGORY_LABEL_EN[category] : CATEGORY_LABEL[category];
+
+export const kindLabel = (kind: SwordKind, locale: Locale): string =>
+  locale === 'en' ? KIND_LABEL_EN[kind] : KIND_LABEL[kind];
 
 export const orderStatusLabel = (status: OrderStatus, locale: Locale): string =>
   locale === 'en' ? ORDER_STATUS_LABEL_EN[status] : ORDER_STATUS_LABEL[status];

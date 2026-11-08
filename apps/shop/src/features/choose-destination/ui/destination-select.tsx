@@ -7,6 +7,7 @@ import { type CountryCode, countryName, type CustomsConfig, type Locale } from '
 
 import { useCartStore } from '@/entities/cart';
 import { cn } from '@/shared/lib';
+import { selectClassName } from '@/shared/ui';
 
 /** 배송 국가를 고르면 장바구니 전체의 관세 계산 기준이 바뀝니다. */
 export function DestinationSelect({ config, className }: { config: CustomsConfig; className?: string }) {
@@ -26,7 +27,7 @@ export function DestinationSelect({ config, className }: { config: CustomsConfig
         value={destination}
         onChange={(event) => setDestination(event.target.value as CountryCode)}
         aria-describedby={`${id}-hint`}
-        className="h-11 rounded-sm border border-input bg-wall-raised px-3"
+        className={selectClassName}
       >
         {config.countries.map((country) => (
           <option key={country.code} value={country.code}>

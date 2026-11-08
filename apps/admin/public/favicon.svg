@@ -2,11 +2,11 @@
   <!-- Sword & Blade 칼날 로고(BladeMark). 석고색 원 위에 먹색 칼날 -->
   <circle cx="32" cy="32" r="31" fill="#dddcd7"/>
   <g fill="none" stroke="#2f2e2a" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="32" cy="34" r="19" stroke-width="2"/>
-    <path d="M32 4 L36 12.5 L35.2 44 L28.8 44 L28 12.5 Z" fill="#2f2e2a" stroke="none"/>
-    <path d="M32 11 L32 41" stroke="#dddcd7" stroke-width="1.2"/>
-    <path d="M21 46.5 Q32 42.5 43 46.5" stroke-width="3"/>
-    <path d="M32 48.5 L32 57" stroke-width="4"/>
-    <circle cx="32" cy="59.5" r="2.4" fill="#2f2e2a" stroke="none"/>
+    <circle cx="32" cy="34" r="19" stroke-width="1.8"/>
+    <path d="M32 2.5 L34.6 15 L33.9 45 L30.1 45 L29.4 15 Z" fill="#2f2e2a" stroke="none"/>
+    <path d="M32 14 L32 42.5" stroke="#dddcd7" stroke-width="0.9"/>
+    <path d="M24 47.2 Q32 44.4 40 47.2" stroke-width="2.6"/>
+    <path d="M32 49 L32 58.4" stroke-width="3.2"/>
+    <path d="M29.8 60.6 L32 58.4 L34.2 60.6 L32 62.8 Z" fill="#2f2e2a" stroke="none"/>
   </g>
 </svg>
