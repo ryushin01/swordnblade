@@ -5,6 +5,14 @@ export {
   type CreateOrderBody,
   type DashboardStats,
   type HandlerOptions,
+  MAX_IMAGE_BYTES,
 } from './handlers';
+export {
+  createIndexedDbImageStore,
+  createMemoryImageStore,
+  type ImageStore,
+  ImageStoreUnavailableError,
+  type StoredImage,
+} from './image-store';
 export { SEED_ORDERS, SEED_SWORDS } from './seed';
 export { SEED_TRANSLATIONS_EN } from './seed-en';

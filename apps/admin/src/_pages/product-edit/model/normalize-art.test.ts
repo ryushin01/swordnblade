@@ -1,6 +1,6 @@
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { normalizeArt, normalizeStories, normalizeTranslation } from './normalize-art';
+import { normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from './normalize-art';
 
 const ssangsudo = SEED_SWORDS[0]!.art;
 
@@ -67,5 +67,20 @@ describe('normalizeTranslation', () => {
       material: 'Steel',
       stories: [{ when: 'Today', text: 'Forged' }],
     });
+  });
+});
+
+describe('normalizeImages', () => {
+  it('주소 없는 줄은 버리고 대체 텍스트를 다듬는다', () => {
+    expect(
+      normalizeImages([
+        { url: '/api/images/a', alt: ' 칼날 ', altEn: ' ' },
+        { url: '', alt: 'x' },
+        { url: '/api/images/b', alt: '손잡이', altEn: ' Grip ' },
+      ]),
+    ).toEqual([
+      { url: '/api/images/a', alt: '칼날' },
+      { url: '/api/images/b', alt: '손잡이', altEn: 'Grip' },
+    ]);
   });
 });

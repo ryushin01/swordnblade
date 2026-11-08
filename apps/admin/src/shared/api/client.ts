@@ -50,7 +50,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   await ensureMockApi();
   const response = await fetch(path, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    // FormData(사진 올리기)는 브라우저가 경계값을 넣은 Content-Type을 직접 붙입니다.
+    headers: init?.body instanceof FormData ? init.headers : { 'Content-Type': 'application/json', ...init?.headers },
   });
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as Partial<ApiError>;

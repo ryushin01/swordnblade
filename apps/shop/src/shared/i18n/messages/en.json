@@ -200,5 +200,16 @@
   },
   "NotFound": {
     "title": "Nothing is carved in this spot"
+  },
+  "Gallery": {
+    "title": "Images",
+    "prev": "Previous image",
+    "next": "Next image",
+    "position": "{current} of {total}: {label}",
+    "full": "Full view",
+    "hilt": "Hilt close-up",
+    "tip": "Tip close-up",
+    "photo": "Photo {n}",
+    "thumb": "Image {n}: {label}"
   }
 }

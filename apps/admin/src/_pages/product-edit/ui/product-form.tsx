@@ -34,7 +34,8 @@ import { SwordRelief } from '@snb/sword-art';
 import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
 
-import { normalizeArt, normalizeStories, normalizeTranslation } from '../model/normalize-art';
+import { normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from '../model/normalize-art';
+import { ImagesField } from './images-field';
 
 import type { Color } from 'antd/es/color-picker';
 
@@ -205,6 +206,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           ...values,
           id: initial?.id,
           stories: normalizeStories(values.stories),
+          images: normalizeImages(values.images),
           art: normalizeArt(values.art, values.specs.bladeLength),
         };
         const en = normalizeTranslation(values.translations?.en);
@@ -513,6 +515,10 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Flex>
               )}
             </Form.List>
+          </Card>
+
+          <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>사진</h2>} style={{ marginTop: 16 }}>
+            <ImagesField />
           </Card>
 
           <Card

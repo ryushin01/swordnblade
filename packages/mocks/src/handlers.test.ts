@@ -88,3 +88,29 @@ describe('Mock API', () => {
     expect(((await response.json()) as Order).status).toBe('shipped');
   });
 });
+
+describe('상품 사진 Mock API', () => {
+  it('사진을 올리면 주소를 돌려주고, 그 주소로 같은 바이트를 받는다', async () => {
+    const bytes = new Uint8Array([137, 80, 78, 71, 1, 2, 3]);
+    const form = new FormData();
+    form.append('file', new Blob([bytes], { type: 'image/png' }), 'a.png');
+    const response = await fetch(`${BASE}/api/images`, { method: 'POST', body: form });
+    expect(response.status).toBe(201);
+    const { url } = (await response.json()) as { url: string };
+    expect(url).toMatch(/^\/api\/images\/[\w-]+$/);
+
+    const image = await fetch(`${BASE}${url}`);
+    expect(image.headers.get('content-type')).toBe('image/png');
+    expect(new Uint8Array(await image.arrayBuffer())).toEqual(bytes);
+  });
+
+  it('이미지가 아닌 파일은 거절한다', async () => {
+    const form = new FormData();
+    form.append('file', new Blob(['hello'], { type: 'text/plain' }), 'a.txt');
+    expect((await fetch(`${BASE}/api/images`, { method: 'POST', body: form })).status).toBe(415);
+  });
+
+  it('없는 사진은 404', async () => {
+    expect((await fetch(`${BASE}/api/images/nope`)).status).toBe(404);
+  });
+});

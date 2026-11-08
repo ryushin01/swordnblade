@@ -2,6 +2,7 @@ import { setupWorker } from 'msw/browser';
 
 import { createDb } from './db';
 import { createHandlers } from './handlers';
+import { createIndexedDbImageStore } from './image-store';
 
 let started: Promise<unknown> | null = null;
 
@@ -18,7 +19,9 @@ export function startMockApi(options: {
 }) {
   if (!started) {
     const db = createDb({ storageKey: options.storageKey });
-    const worker = setupWorker(...createHandlers(db, { latency: options.latency ?? 250 }));
+    const worker = setupWorker(
+      ...createHandlers(db, { latency: options.latency ?? 250, images: createIndexedDbImageStore() }),
+    );
     started = worker.start({
       onUnhandledFrame: 'bypass',
       quiet: true,
