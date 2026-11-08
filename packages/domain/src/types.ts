@@ -110,6 +110,15 @@ export interface SwordArt {
   tassel?: string;
 }
 
+/** 어드민에서 올린 상품 사진. url은 Mock API(/api/images/:id)가 돌려줍니다. */
+export interface SwordImage {
+  url: string;
+  /** 대체 텍스트(필수) */
+  alt: string;
+  /** 영어 화면의 대체 텍스트. 없으면 alt를 씁니다. */
+  altEn?: string;
+}
+
 export interface SwordStory {
   /** 연도나 시기 표기, 예: "1598" 또는 "6세기" */
   when: string;
@@ -153,6 +162,8 @@ export interface Sword {
   price: number;
   stock: number;
   art: SwordArt;
+  /** 상세 갤러리에서 부조 그림 뒤에 보여 줄 사진 */
+  images?: SwordImage[];
   /** 언어별 번역. 없으면 한국어 원문을 보여 줍니다. */
   translations?: Partial<Record<Exclude<Locale, 'ko'>, SwordTranslation>>;
 }

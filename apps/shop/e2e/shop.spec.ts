@@ -149,3 +149,17 @@ test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 
   await expect(page.getByRole('heading', { level: 1, name: /아주아주긴이름/ })).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
+
+test('상세 갤러리: 이전·다음 버튼과 썸네일로 넘기고 위치를 알린다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  const gallery = page.getByRole('region', { name: '이미지' });
+  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('2 / 3: 손잡이 확대')).toBeVisible();
+  await expect(gallery.getByRole('button', { name: '이미지 2: 손잡이 확대' })).toHaveAttribute('aria-current', 'true');
+  await gallery.getByRole('button', { name: '이미지 3: 칼끝 확대' }).click();
+  await expect(gallery.getByRole('img', { name: /칼끝 확대/ })).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await expectNoA11yViolations(page);
+});

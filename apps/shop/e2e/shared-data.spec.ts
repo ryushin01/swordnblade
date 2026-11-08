@@ -83,3 +83,26 @@ test('어드민에서 고친 영어 글이 영어 화면에 보이고, 비우면
   await expect(page.getByRole('heading', { level: 1, name: 'Longsword' })).toBeVisible();
   await expect(page.getByText('한 손 반, 두 손으로도 쥐는 중세 유럽의 십자형 검.')).toBeVisible();
 });
+
+// 2×2 크기의 붉은 PNG
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDK+mmyAAAAABJRU5ErkJggg==',
+  'base64',
+);
+
+test('어드민에서 올린 사진이 쇼핑몰 상세 갤러리에 대체 텍스트와 함께 보인다', async ({ page }) => {
+  await page.goto('/admin/products/sw-004');
+  await expect(page.getByRole('heading', { level: 1, name: '우치가타나 수정' })).toBeVisible();
+  await page.locator('input[type="file"]').setInputFiles({ name: 'katana.png', mimeType: 'image/png', buffer: PNG });
+  await page.getByLabel('사진 1: 대체 텍스트', { exact: true }).fill('칼날을 따라 흐르는 하몬 무늬를 가까이 찍은 사진');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+
+  await page.goto('/swords/uchigatana');
+  const gallery = page.getByRole('region', { name: '이미지' });
+  await gallery.getByRole('button', { name: '이미지 4: 사진 1' }).click();
+  const photo = gallery.getByRole('img', { name: '칼날을 따라 흐르는 하몬 무늬를 가까이 찍은 사진' });
+  await expect(photo).toBeVisible();
+  // Mock API(서비스 워커)가 실제 이미지를 돌려줬는지 확인합니다.
+  await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+});

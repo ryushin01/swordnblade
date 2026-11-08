@@ -12,6 +12,8 @@ import {
   type SwordCategory,
 } from '@snb/domain';
 
+import { createMemoryImageStore, type ImageStore } from './image-store';
+
 import type { Db } from './db';
 
 export interface CreateOrderBody {
@@ -61,13 +63,39 @@ function validateCustomer(customer: Partial<Customer> | undefined): Record<strin
 export interface HandlerOptions {
   /** 응답 지연(ms). 테스트에서는 0 */
   latency?: number;
+  /** 상품 사진 저장소. 기본은 메모리 */
+  images?: ImageStore;
 }
+
+/** 올릴 수 있는 사진 크기(어드민이 미리 줄여 보내므로 넉넉히) */
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 /** '*'로 시작해 브라우저(상대 경로)와 Node(절대 경로) 모두에서 맞습니다. */
 export function createHandlers(db: Db, options: HandlerOptions = {}) {
   const wait = () => (options.latency ? delay(options.latency) : Promise.resolve());
+  const images = options.images ?? createMemoryImageStore();
 
   return [
+    http.post('*/api/images', async ({ request }) => {
+      await wait();
+      const form = await request.formData().catch(() => null);
+      const file = form?.get('file');
+      if (!(file instanceof Blob)) return error(400, { message: '사진 파일이 없습니다.' });
+      if (!file.type.startsWith('image/')) return error(415, { message: '이미지 파일만 올릴 수 있습니다.' });
+      if (file.size > MAX_IMAGE_BYTES) return error(413, { message: '사진은 5MB 이하만 올릴 수 있습니다.' });
+      const id = crypto.randomUUID();
+      await images.put(id, { type: file.type, data: await file.arrayBuffer() });
+      return HttpResponse.json({ url: `/api/images/${id}` }, { status: 201 });
+    }),
+
+    http.get<{ id: string }>('*/api/images/:id', async ({ params }) => {
+      const image = await images.get(params.id);
+      if (!image) return new HttpResponse(null, { status: 404 });
+      return HttpResponse.arrayBuffer(image.data, {
+        headers: { 'Content-Type': image.type, 'Cache-Control': 'private, max-age=31536000, immutable' },
+      });
+    }),
+
     http.get('*/api/swords', async ({ request }) => {
       await wait();
       const category = new URL(request.url).searchParams.get('category') as SwordCategory | null;

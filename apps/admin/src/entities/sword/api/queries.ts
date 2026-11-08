@@ -34,3 +34,11 @@ export function useDeleteSword() {
     successMessage: '상품을 삭제했습니다.',
   });
 }
+
+/** 사진 한 장을 Mock API에 올리고 주소를 돌려받습니다. */
+export async function uploadSwordImage(file: Blob): Promise<string> {
+  const form = new FormData();
+  form.append('file', file, 'photo.jpg');
+  const { url } = await apiFetch<{ url: string }>('/api/images', { method: 'POST', body: form });
+  return url;
+}

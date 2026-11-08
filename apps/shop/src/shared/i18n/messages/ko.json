@@ -200,5 +200,16 @@
   },
   "NotFound": {
     "title": "이 자리에는 아무것도 새겨져 있지 않습니다"
+  },
+  "Gallery": {
+    "title": "이미지",
+    "prev": "이전 이미지",
+    "next": "다음 이미지",
+    "position": "{current} / {total}: {label}",
+    "full": "전체 모습",
+    "hilt": "손잡이 확대",
+    "tip": "칼끝 확대",
+    "photo": "사진 {n}",
+    "thumb": "이미지 {n}: {label}"
   }
 }

@@ -1,4 +1,4 @@
-import type { SwordArt, SwordStory, SwordTranslation } from '@snb/domain';
+import type { SwordArt, SwordImage, SwordStory, SwordTranslation } from '@snb/domain';
 
 /**
  * 폼에서 비운 선택 값을 그림 데이터에 맞게 정리합니다.
@@ -44,4 +44,14 @@ export function normalizeTranslation(
   const stories = normalizeStories(translation?.stories);
   if (!summary && !description && !era && !material && stories.length === 0) return undefined;
   return { summary, description, era, material, stories };
+}
+
+/** 주소가 없는 줄은 버리고 대체 텍스트의 공백을 지웁니다. 영어 대체 텍스트가 비면 속성을 없앱니다. */
+export function normalizeImages(images: Array<Partial<SwordImage>> | undefined): SwordImage[] {
+  return (images ?? [])
+    .filter((image): image is Partial<SwordImage> & { url: string } => Boolean(image.url))
+    .map((image) => {
+      const altEn = (image.altEn ?? '').trim();
+      return { url: image.url, alt: (image.alt ?? '').trim(), ...(altEn ? { altEn } : {}) };
+    });
 }

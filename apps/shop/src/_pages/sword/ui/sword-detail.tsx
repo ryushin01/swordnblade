@@ -13,7 +13,6 @@ import {
   requiresPossessionPermit,
   type Sword,
 } from '@snb/domain';
-import { SwordRelief } from '@snb/sword-art';
 
 import { useCartStore } from '@/entities/cart';
 import { localizeForLocale, useSword } from '@/entities/sword';
@@ -24,6 +23,7 @@ import { Link } from '@/shared/i18n';
 import { LiveTotal, OrnamentHeading } from '@/shared/ui';
 
 import { AddToCart } from './add-to-cart';
+import { SwordGallery } from './sword-gallery';
 
 export function SwordDetail({ slug, initialSword }: { slug: string; initialSword?: Sword }) {
   const t = useTranslations('Sword');
@@ -62,18 +62,8 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
 
   return (
     <article className="mx-auto grid max-w-[90rem] lg:grid-cols-[minmax(0,1fr)_28rem] lg:gap-8">
-      <div className="relative lg:sticky lg:top-0 lg:h-[calc(100dvh-4.5rem)]">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(closest-side,var(--glow)_0%,transparent_75%)]"
-        />
-        <SwordRelief
-          art={sword.art}
-          pigment={0.86}
-          depth={1.1}
-          label={t('reliefLabel', { name: sword.name, summary: sword.summary })}
-          className="relative mx-auto aspect-square w-full max-w-[min(100%,calc(100dvh-6rem))] lg:h-full"
-        />
+      <div className="relative py-4 lg:sticky lg:top-0 lg:h-[calc(100dvh-4.5rem)]">
+        <SwordGallery sword={sword} reliefLabel={t('reliefLabel', { name: sword.name, summary: sword.summary })} />
       </div>
 
       <div className="grid content-start gap-8 px-4 pb-16 pt-6 sm:px-8 lg:px-0 lg:pr-8 lg:pt-12">
