@@ -97,6 +97,21 @@
     outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
+  /* 셀렉트 화살표: 오른쪽 여백(0.75rem)을 왼쪽 글자 여백과 같게 둡니다. 클래스는 shared/ui의 selectClassName */
+  .select-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%232f2e2a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+  }
+  /* 고대비 모드에서는 배경 그림이 사라지므로 브라우저 기본 화살표로 돌아갑니다. */
+  @media (forced-colors: active) {
+    .select-field {
+      appearance: auto;
+      background-image: none;
+    }
+  }
   ::selection {
     background: #c9b8a6;
   }

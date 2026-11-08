@@ -1,9 +1,41 @@
 /** ISO 3166-1 alpha-2 국가 코드 중 이 쇼핑몰에서 쓰는 것 */
-export type CountryCode = 'KR' | 'JP' | 'CN' | 'US' | 'GB' | 'DE' | 'FR' | 'IT' | 'NO' | 'GR' | 'AU' | 'CA';
+export type CountryCode =
+  | 'KR'
+  | 'JP'
+  | 'CN'
+  | 'US'
+  | 'GB'
+  | 'DE'
+  | 'FR'
+  | 'IT'
+  | 'NO'
+  | 'GR'
+  | 'AU'
+  | 'CA'
+  | 'IN'
+  | 'ID'
+  | 'NP'
+  | 'PH'
+  | 'TR'
+  | 'IR'
+  | 'EG'
+  | 'ET'
+  | 'SD'
+  | 'YE'
+  | 'SA'
+  | 'ES'
+  | 'CH'
+  | 'RU'
+  | 'MX'
+  | 'AT';
 
 export type CurrencyCode = 'KRW' | 'USD' | 'JPY' | 'CNY' | 'GBP' | 'EUR' | 'AUD' | 'CAD';
 
-export type SwordCategory = 'east' | 'west' | 'legend';
+/** 지역(나무위키 '고대~근세기 무기'의 구분을 따름). legend는 신화·전설 재현품 */
+export type SwordCategory = 'east' | 'west' | 'middle' | 'americas' | 'legend';
+
+/** 형태: 곧은 검, 휜 도, 양손검·대도, 단검, 특수(물결·갈고리·카타르 등), 연습용(가검) */
+export type SwordKind = 'straight' | 'curved' | 'great' | 'dagger' | 'exotic' | 'training';
 
 /** 진검(날 있음) 또는 장식용(날 없음) */
 export type EdgeKind = 'sharp' | 'blunt';
@@ -14,18 +46,50 @@ export interface SwordArt {
     length: number;
     /** 날 밑동 너비, mm */
     width: number;
-    /** 휘어짐(sori), mm. 0이면 직검 */
+    /** 휘어짐(sori), mm. 0이면 직검, 음수면 날 쪽으로 휨(쿠크리·팔카타) */
     curve: number;
     edge: 'single' | 'double';
-    tip: 'kissaki' | 'spear' | 'round' | 'sickle';
+    /** kissaki 휜 칼끝, spear 뾰족, round 둥긂, sickle 낫, square 사각(처형검), clip 클립 포인트, hook 갈고리(구), needle 바늘(찌르기 검) */
+    tip: 'kissaki' | 'spear' | 'round' | 'sickle' | 'square' | 'clip' | 'hook' | 'needle';
     fuller?: boolean;
     ridge?: boolean;
     hamon?: boolean;
     inscription?: 'stars' | 'runes';
+    /** 물결 칼날의 진폭(mm). 크리스·플랑베르주·우르미 */
+    wave?: number;
+    /** 물결 수. 기본 7 */
+    waves?: number;
+    /** 칼끝 쪽 너비 배율(1보다 크면 넓어짐). 펄션·팔카타·대도 */
+    flare?: number;
+    /** 칼날 중간이 불룩한 정도(0~1). 비파형 동검 */
+    bulge?: number;
+    /** 칼날 재질. 기본 steel */
+    material?: 'steel' | 'bronze' | 'wood' | 'bamboo' | 'foam';
+    /** 재질 색을 바꿀 때(스펀지 검 등) */
+    color?: string;
+    /** 양쪽 날에 흑요석 조각을 박음(마쿠아후이틀) */
+    teeth?: boolean;
+    /** 칼날 밑동을 감싼 덧쇠(쌍수도의 구리 덧쇠). 리벳 네 개 */
+    sleeve?: { length: number; color: string };
   };
   collar?: { color: string };
   guard: {
-    type: 'disc' | 'cross' | 'quillon' | 'jian' | 'block' | 'none';
+    /** dguard 손등 보호대, swept 스웹트 힐트, cup 컵 힐트, basket 바구니 힐트, katar 카타르 H자 틀, crescent 초승달(구), ring 총구 고리(대검), ganja 비대칭 받침(크리스) */
+    type:
+      | 'disc'
+      | 'cross'
+      | 'quillon'
+      | 'jian'
+      | 'block'
+      | 'none'
+      | 'dguard'
+      | 'swept'
+      | 'cup'
+      | 'basket'
+      | 'katar'
+      | 'crescent'
+      | 'ring'
+      | 'ganja';
     width: number;
     color: string;
     accent?: string;
@@ -33,11 +97,13 @@ export interface SwordArt {
   grip: {
     length: number;
     color: string;
-    wrap: 'diamond' | 'cord' | 'wire' | 'leather' | 'ribbed';
+    /** helix 촘촘한 나선 끈, plain 민무늬, split 둘로 나뉜 손잡이(발리송), katar 가로 손잡이(카타르) */
+    wrap: 'diamond' | 'cord' | 'wire' | 'leather' | 'ribbed' | 'helix' | 'plain' | 'split' | 'katar';
     wrapColor?: string;
   };
   pommel: {
-    type: 'cap' | 'wheel' | 'lobed' | 'ball' | 'ring' | 'jian' | 'gem';
+    /** none 없음, crook 굽은 지팡이 머리, beak 새부리(세이버), spike 뾰족한 끝(구) */
+    type: 'cap' | 'wheel' | 'lobed' | 'ball' | 'ring' | 'jian' | 'gem' | 'none' | 'crook' | 'beak' | 'spike';
     color: string;
     gem?: string;
   };
@@ -69,6 +135,7 @@ export interface Sword {
   nameOriginal: string;
   nameEn: string;
   category: SwordCategory;
+  kind: SwordKind;
   /** 제작·출고 국가. 관세 계산의 출발지 */
   origin: CountryCode;
   era: string;

@@ -3,6 +3,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { SWORD_SORTS, type SwordSort } from '@/entities/sword';
 import { getPathname } from '@/shared/i18n';
+import { selectClassName } from '@/shared/ui';
 
 import type { SwordCategory } from '@snb/domain';
 
@@ -39,12 +40,7 @@ export function SearchForm({ category, q, sort }: { category?: SwordCategory; q:
         <label htmlFor="sword-sort" className="text-sm">
           {t('sortLabel')}
         </label>
-        <select
-          id="sword-sort"
-          name="sort"
-          defaultValue={sort}
-          className="h-11 rounded-sm border border-input bg-wall-raised px-3"
-        >
+        <select id="sword-sort" name="sort" defaultValue={sort} className={selectClassName}>
           {SWORD_SORTS.map((value) => (
             <option key={value} value={value}>
               {t(`sort.${value}`)}

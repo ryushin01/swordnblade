@@ -6,7 +6,8 @@ import { toast } from 'sonner';
 
 import { MAX_QUANTITY, useCartStore } from '@/entities/cart';
 import { Link, useRouter } from '@/shared/i18n';
-import { Button } from '@/shared/ui';
+import { cn } from '@/shared/lib';
+import { Button, selectClassName } from '@/shared/ui';
 
 import type { Sword } from '@snb/domain';
 
@@ -32,7 +33,7 @@ export function AddToCart({ sword }: { sword: Sword }) {
           id={selectId}
           value={quantity}
           onChange={(event) => setQuantity(Number(event.target.value))}
-          className="h-11 min-w-20 rounded-sm border border-input bg-wall-raised px-3"
+          className={cn(selectClassName, 'min-w-24')}
         >
           {Array.from({ length: max }, (_, index) => index + 1).map((value) => (
             <option key={value} value={value}>

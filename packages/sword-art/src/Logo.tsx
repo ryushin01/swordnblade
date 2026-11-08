@@ -27,14 +27,14 @@ export function BladeMark({ className, label }: BladeMarkProps) {
       </defs>
       <g clipPath={`url(#${clip})`} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="32" cy="34" r="20" strokeWidth="1.4" />
-        {/* 칼날 */}
-        <path d="M32 3 L36 12 L35.2 44 L28.8 44 L28 12 Z" fill="currentColor" stroke="none" />
-        <path d="M32 10 L32 41" stroke="var(--mark-groove, #ffffff)" strokeWidth="1" opacity="0.7" />
-        {/* 코등이 */}
-        <path d="M21 46 Q32 42 43 46" strokeWidth="2.6" />
+        {/* 칼날: 가늘고 긴 칼날이 길게 좁아지며 뾰족한 칼끝으로 끝납니다. */}
+        <path d="M32 1.5 L34.3 15 L33.6 45 L30.4 45 L29.7 15 Z" fill="currentColor" stroke="none" />
+        <path d="M32 14 L32 42.5" stroke="var(--mark-groove, #ffffff)" strokeWidth="0.7" opacity="0.75" />
+        {/* 코등이: 칼끝 쪽으로 살짝 휜 짧은 가지 */}
+        <path d="M24.5 47.2 Q32 44.6 39.5 47.2" strokeWidth="2" />
         {/* 손잡이와 끝장식 */}
-        <path d="M32 48 L32 58" strokeWidth="3.6" />
-        <circle cx="32" cy="60.5" r="2.2" fill="currentColor" stroke="none" />
+        <path d="M32 48.8 L32 58.6" strokeWidth="2.6" />
+        <path d="M30.2 60.6 L32 58.8 L33.8 60.6 L32 62.4 Z" fill="currentColor" stroke="none" />
       </g>
     </svg>
   );

@@ -4,7 +4,16 @@ import Link from 'next/link';
 import { PlusOutlined } from '@ant-design/icons';
 import { Badge, Button, Flex, Popconfirm, Table, Typography } from 'antd';
 
-import { CATEGORY_LABEL, COUNTRY_NAME, formatKRW, requiresPossessionPermit, type Sword } from '@snb/domain';
+import {
+  CATEGORY_LABEL,
+  COUNTRY_NAME,
+  formatKRW,
+  KIND_LABEL,
+  requiresPossessionPermit,
+  type Sword,
+  SWORD_CATEGORIES,
+  SWORD_KINDS,
+} from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
 import { useDeleteSword, useSwords } from '@/entities/sword';
@@ -54,9 +63,16 @@ export function ProductsPage() {
             {
               title: '분류',
               dataIndex: 'category',
-              filters: (['east', 'west', 'legend'] as const).map((value) => ({ text: CATEGORY_LABEL[value], value })),
+              filters: SWORD_CATEGORIES.map((value) => ({ text: CATEGORY_LABEL[value], value })),
               onFilter: (value, sword) => sword.category === value,
               render: (category: Sword['category']) => CATEGORY_LABEL[category],
+            },
+            {
+              title: '형태',
+              dataIndex: 'kind',
+              filters: SWORD_KINDS.map((value) => ({ text: KIND_LABEL[value], value })),
+              onFilter: (value, sword) => sword.kind === value,
+              render: (kind: Sword['kind']) => KIND_LABEL[kind],
             },
             { title: '출고지', dataIndex: 'origin', render: (origin: Sword['origin']) => COUNTRY_NAME[origin] },
             {

@@ -7,10 +7,11 @@ import type { SwordTranslation } from '@snb/domain';
 export const SEED_TRANSLATIONS_EN: Record<string, SwordTranslation> = {
   'sw-001': {
     era: 'Late Joseon · 18th century',
-    summary: 'A long two-handed sword of Joseon, its grip wrapped in red silk cord in a diamond pattern.',
+    summary:
+      'A long two-handed sword of Joseon, with a copper sleeve over the blade root and a long grip wound tightly in red cord.',
     description:
-      'Recreated from the ssangsudo recorded in the Muyedobotongji. The blade has a gentle curve, and red silk cord is crossed over black lacquer in a diamond pattern so the hands do not slip. The guard and fittings are hammered brass, and a red tassel hangs from the pommel.',
-    material: 'High-carbon steel, brass fittings, red silk cord',
+      'Recreated from the ssangsudo recorded in the Muyedobotongji. The unfullered single-edged blade curves gently toward the tip, with a wave-shaped temper line along the edge. A riveted copper sleeve covers the blade root, followed by a small, thick brass guard, a long grip wound tightly in red cord and a flat brass end cap.',
+    material: 'High-carbon steel, copper sleeve, brass guard and cap, red cord',
     stories: [
       {
         when: 'Late 16th c.',
@@ -22,7 +23,7 @@ export const SEED_TRANSLATIONS_EN: Record<string, SwordTranslation> = {
       },
       {
         when: 'Today',
-        text: 'The blade is forged again to the recorded proportions, and fourteen knots of red cord are wound around the grip.',
+        text: 'The blade is forged again to the recorded proportions, and the grip is wound in red cord with no gaps.',
       },
     ],
   },

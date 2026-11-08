@@ -36,3 +36,40 @@ describe('createDb (localStorage 공유)', () => {
     expect(db.read().orders).toEqual([]);
   });
 });
+
+describe('migrateSeed (시드 버전)', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('예전 시드 데이터는 그림·설명을 새 시드로 바꾸고 가격·재고는 둔다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const legacy = {
+      ...fresh,
+      seedVersion: undefined,
+      swords: fresh.swords.map((sword, index) =>
+        index === 0 ? { ...sword, price: 7_777_000, stock: 9, art: { ...sword.art, tassel: '#000000' } } : sword,
+      ),
+    };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+
+    const migrated = createDb({ storageKey: 'test-db' }).read();
+    const first = migrated.swords[0]!;
+    expect(first.price).toBe(7_777_000);
+    expect(first.stock).toBe(9);
+    expect(first.art.tassel).toBeUndefined();
+    expect(first.art.blade.sleeve).toBeDefined();
+    expect(JSON.parse(localStorage.getItem('test-db')!).seedVersion).toBe(migrated.seedVersion);
+  });
+
+  it('새 시드에만 있는 도검은 더하고, 어드민에서 만든 도검은 남긴다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const custom = { ...fresh.swords[1]!, id: 'custom-1', slug: 'custom' };
+    const legacy = { ...fresh, seedVersion: 1, swords: [fresh.swords[0]!, custom] };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+
+    const ids = createDb({ storageKey: 'test-db' })
+      .read()
+      .swords.map((sword) => sword.id);
+    expect(ids).toContain('custom-1');
+    expect(ids.length).toBe(fresh.swords.length + 1);
+  });
+});
