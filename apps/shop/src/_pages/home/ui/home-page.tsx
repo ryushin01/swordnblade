@@ -4,19 +4,28 @@ import { categoryLabel, type Locale, SWORD_CATEGORIES, type SwordCategory } from
 import { SEED_SWORDS } from '@snb/mocks';
 
 import { filterSwords, localizeForLocale, paginate, toPage, toSwordKind, toSwordSort } from '@/entities/sword';
+import { firstParam } from '@/shared/lib';
 
 import { CategoryNav } from './category-nav';
 import { SearchForm } from './search-form';
 import { SwordWall } from './sword-wall';
 
 type Params = Promise<{ locale: string }>;
-type SearchParams = Promise<{ category?: string; q?: string; sort?: string; kind?: string; page?: string }>;
+type Param = string | string[];
+type SearchParams = Promise<{ category?: Param; q?: Param; sort?: Param; kind?: Param; page?: Param }>;
 
 export async function HomePage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('Home');
-  const query = await searchParams;
+  const raw = await searchParams;
+  const query = {
+    category: firstParam(raw.category),
+    q: firstParam(raw.q),
+    sort: firstParam(raw.sort),
+    kind: firstParam(raw.kind),
+    page: firstParam(raw.page),
+  };
   const category = SWORD_CATEGORIES.includes(query.category as SwordCategory)
     ? (query.category as SwordCategory)
     : undefined;

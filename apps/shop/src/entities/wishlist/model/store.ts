@@ -27,6 +27,9 @@ const safeStorage = createJSONStorage(() => {
   }
 });
 
+export const toValidIds = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : [];
+
 export const useWishlistStore = create<WishlistState>()(
   persist(
     (set) => ({
@@ -36,6 +39,15 @@ export const useWishlistStore = create<WishlistState>()(
           ids: state.ids.includes(swordId) ? state.ids.filter((id) => id !== swordId) : [...state.ids, swordId],
         })),
     }),
-    { name: SITE.wishlistStorageKey, storage: safeStorage, skipHydration: true },
+    {
+      name: SITE.wishlistStorageKey,
+      storage: safeStorage,
+      skipHydration: true,
+      // 저장값이 깨져 있어도 머리글(모든 화면)이 멈추지 않게 문자열 배열만 받습니다.
+      merge: (persisted, current) => {
+        const ids = (persisted as { ids?: unknown } | undefined)?.ids;
+        return { ...current, ids: toValidIds(ids) };
+      },
+    },
   ),
 );

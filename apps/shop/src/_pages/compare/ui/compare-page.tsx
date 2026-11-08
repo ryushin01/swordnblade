@@ -5,13 +5,15 @@ import { SEED_SWORDS } from '@snb/mocks';
 
 import { localizeForLocale } from '@/entities/sword';
 import { type AppLocale, languageAlternates } from '@/shared/i18n';
+import { firstParam } from '@/shared/lib';
 
 import { CompareView, type SwordOption } from './compare-view';
 
 import type { Metadata } from 'next';
 
 type Params = Promise<{ locale: string }>;
-type SearchParams = Promise<{ a?: string; b?: string; c?: string }>;
+type Param = string | string[];
+type SearchParams = Promise<{ a?: Param; b?: Param; c?: Param }>;
 
 export async function generateCompareMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params;
@@ -24,7 +26,7 @@ export async function ComparePage({ params, searchParams }: { params: Params; se
   setRequestLocale(locale);
   const t = await getTranslations('Compare');
   const { a, b, c } = await searchParams;
-  const slugs = [...new Set([a, b, c].filter((slug): slug is string => Boolean(slug)))];
+  const slugs = [...new Set([a, b, c].map(firstParam).filter((slug): slug is string => Boolean(slug)))];
   const localized = SEED_SWORDS.map((sword) => localizeForLocale(sword, locale as Locale));
   // 첫 화면에는 고르기 칸에 필요한 값과 고른 도검만 실어 보냅니다. 브라우저에서 Mock API 값으로 바뀝니다.
   const options: SwordOption[] = localized.map(({ slug, name, category }) => ({ slug, name, category }));
