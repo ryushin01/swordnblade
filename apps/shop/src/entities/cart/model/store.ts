@@ -1,9 +1,10 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
 import { SITE } from '@/shared/config';
+import { safeJsonStorage } from '@/shared/lib/safe-storage';
 
 import type { CartLine, CountryCode } from '@snb/domain';
 
@@ -20,23 +21,6 @@ interface CartState {
 }
 
 const clamp = (value: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.round(value)));
-
-/** localStorage를 쓸 수 없으면 메모리에만 담습니다. */
-const safeStorage = createJSONStorage(() => {
-  try {
-    const probe = '__snb_probe__';
-    window.localStorage.setItem(probe, probe);
-    window.localStorage.removeItem(probe);
-    return window.localStorage;
-  } catch {
-    const memory = new Map<string, string>();
-    return {
-      getItem: (key: string) => memory.get(key) ?? null,
-      setItem: (key: string, value: string) => void memory.set(key, value),
-      removeItem: (key: string) => void memory.delete(key),
-    };
-  }
-});
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -63,7 +47,7 @@ export const useCartStore = create<CartState>()(
       setDestination: (destination) => set({ destination }),
       clear: () => set({ lines: [] }),
     }),
-    { name: SITE.cartStorageKey, storage: safeStorage, skipHydration: true },
+    { name: SITE.cartStorageKey, storage: safeJsonStorage, skipHydration: true },
   ),
 );
 
