@@ -45,6 +45,11 @@
 | GET · POST | `/api/orders` | 주문 목록·주문 |
 | GET · PATCH | `/api/orders/:id` | 주문 상세·상태 변경 |
 | GET | `/api/stats` | 대시보드 통계 |
+| POST · GET | `/api/images`, `/api/images/:id` | 사진 올리기(이미지만, 5MB 이하, IndexedDB에 저장)·받기 |
+| POST | `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout` | 회원가입·로그인·로그아웃. 성공하면 `{ token, user }` |
+| GET | `/api/auth/me`, `/api/me/orders` | 로그인한 회원과 그 회원의 주문(`Authorization: Bearer <token>`, 없으면 401) |
+
+회원 비밀번호는 Mock DB에 SHA-256 해시로만 두고, 로그인 실패는 어느 칸이 틀렸는지 밝히지 않습니다. 실제 서비스라면 서버에서 느린 해시(bcrypt·Argon2)와 HttpOnly 쿠키 세션을 써야 합니다. 로그인 뒤 돌아갈 주소(`?next=`)는 `/`로 시작하는 사이트 안 주소만 따릅니다.
 
 ## 테스트
 

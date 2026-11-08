@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Link } from '@/shared/i18n';
 import { Wordmark } from '@/shared/ui';
 
+import { AccountLink } from './account-link';
 import { CartLink } from './cart-link';
 import { CategoryNav } from './category-nav';
 import { HeaderNav } from './header-nav';
@@ -24,6 +25,7 @@ export function SiteHeader() {
           <Suspense fallback={null}>
             <LocaleSwitch />
           </Suspense>
+          <AccountLink />
           <CartLink />
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
   type SwordCategory,
 } from '@snb/domain';
 
+import { createAuthHandlers, findSessionUser } from './auth-handlers';
 import { createMemoryImageStore, type ImageStore } from './image-store';
 
 import type { Db } from './db';
@@ -76,6 +77,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
   const images = options.images ?? createMemoryImageStore();
 
   return [
+    ...createAuthHandlers(db, wait),
+
     http.post('*/api/images', async ({ request }) => {
       await wait();
       const form = await request.formData().catch(() => null);
@@ -213,12 +216,15 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
         quantity: line.quantity,
       }));
       const estimate = estimateCustoms(orderLines, body.destination!, state.customs);
+      const buyer = findSessionUser(db, request);
       const now = new Date();
       const order: Order = {
         id: nextOrderId(state.orders, now),
         createdAt: now.toISOString(),
         status: needsPermit ? 'permit-review' : 'paid',
         destination: body.destination!,
+        // 로그인한 채 주문하면 내 주문 내역에 남도록 회원 id를 붙입니다.
+        ...(buyer ? { userId: buyer.id } : {}),
         customer: body.customer as Customer,
         lines: orderLines,
         paymentMethod: body.paymentMethod!,

@@ -191,10 +191,20 @@ export interface Customer {
   address: string;
 }
 
+/** 쇼핑몰 회원(비밀번호는 Mock 서버에만 해시로 둡니다) */
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}
+
 export interface Order {
   id: string;
   createdAt: string;
   status: OrderStatus;
+  /** 로그인한 채 주문했으면 회원 id */
+  userId?: string;
   destination: CountryCode;
   customer: Customer;
   lines: OrderLine[];

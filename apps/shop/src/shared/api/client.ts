@@ -15,6 +15,12 @@ export class ApiRequestError extends Error {
 }
 
 let mockReady: Promise<unknown> | null = null;
+let authToken: string | null = null;
+
+/** 로그인 세션 토큰. entities/session이 로그인·복원·로그아웃 때 알려 줍니다. */
+export function setApiAuthToken(token: string | null) {
+  authToken = token;
+}
 
 /**
  * 브라우저에서는 첫 요청 전에 Mock API(MSW)를 켭니다.
@@ -34,7 +40,11 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   await ensureMockApi();
   const response = await fetch(path, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...init?.headers,
+    },
   });
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as Partial<ApiError>;
