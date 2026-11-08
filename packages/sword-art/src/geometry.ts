@@ -54,6 +54,8 @@ export function tipLength(art: SwordArt): number {
       return width * 1.4;
     case 'needle':
       return width * 4;
+    case 'fork':
+      return width * 1.1;
   }
 }
 
@@ -92,7 +94,8 @@ export function bladeOutline(art: SwordArt): Point[] {
     } else {
       let half = w / 2;
       if (u > 0 && tip !== 'square') {
-        if (tip === 'round') half *= Math.sqrt(Math.max(0, 1 - u * u));
+        if (tip === 'fork') half *= 1 - 0.15 * u;
+        else if (tip === 'round') half *= Math.sqrt(Math.max(0, 1 - u * u));
         else half *= Math.pow(1 - u, tip === 'needle' ? 0.95 : 0.85);
       }
       spine.push({ x: cx - half, y });
@@ -100,6 +103,11 @@ export function bladeOutline(art: SwordArt): Point[] {
     }
   }
 
+  if (tip === 'fork' && edge === 'double') {
+    // 두 갈래 칼끝(줄피카르): 칼끝 가운데를 V자로 파 두 갈래로 나눕니다.
+    const notch = { x: bladeCenterX(art, 1), y: -length + art.blade.width * 1.1 };
+    return [...spine, notch, ...edgeSide.reverse()];
+  }
   return [...spine, ...edgeSide.reverse()];
 }
 

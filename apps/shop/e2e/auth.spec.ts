@@ -42,6 +42,8 @@ test('회원가입 → 주문서 자동 채우기 → 내 계정에서 주문 �
   await expect(page.getByText('member@example.com')).toBeVisible();
   await expect(page.getByText('아직 주문이 없습니다.')).toBeVisible();
   await expect(header(page).getByRole('link', { name: '내 계정' })).toBeVisible();
+  // 화면 전환 직후에는 문서 제목이 잠시 비어 있으므로 바뀐 뒤에 검사합니다.
+  await expect(page).toHaveTitle(/내 계정/);
   await expectNoA11yViolations(page);
 
   await page.goto('/swords/uchigatana');

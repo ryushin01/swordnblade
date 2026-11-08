@@ -20,8 +20,6 @@
     "showPassword": "Show password"
   },
   "Header": {
-    "categoryNav": "Sword categories",
-    "all": "All",
     "cart": "Cart",
     "cartCount": "{count, plural, one {# item} other {# items}}",
     "languageNav": "Language",
@@ -40,7 +38,7 @@
   "Home": {
     "eyebrow": "Carved in plaster, forged in steel",
     "title": "The Wall of Blades",
-    "intro": "From the two-handed ssangsudo of Joseon to the sword the Lady of the Lake gave a king. Pick a blade from the wall, read its story, and estimate the duties for your country before you buy.",
+    "intro": "From the two-handed ssangsudo of Joseon to the sword the Lady of the Lake gave a king: 213 historical and legendary swords from East and West. Pick a blade from the wall, read its story, and estimate the duties for your country before you buy.",
     "searchLabel": "Find a sword",
     "queryLabel": "Search by name",
     "queryPlaceholder": "e.g. Excalibur, Gladius, legend",
@@ -59,7 +57,18 @@
     "emptyCategory": "No swords in this category yet.",
     "loading": "Loading the swords.",
     "loadError": "Could not load the swords.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "categoryNav": "Sword categories",
+    "all": "All",
+    "kindLabel": "Type",
+    "kindAll": "All types",
+    "pagination": "Pages",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "pageStatus": "{from}–{to} of {count} swords",
+    "resultPageStatus": "{from}–{to} of {count} results for “{q}”",
+    "pagePrefix": "Page ",
+    "pageSuffix": ""
   },
   "Tile": {
     "soldOut": "Sold out"

@@ -6,11 +6,14 @@ import { SwordRelief } from '@snb/sword-art';
 import { Link } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
 
+/** 칸을 그리는 데 필요한 값. 서버가 첫 화면에 이 값만 실어 보내 HTML을 가볍게 합니다. */
+export type SwordTileData = Pick<Sword, 'id' | 'slug' | 'name' | 'nameEn' | 'nameOriginal' | 'price' | 'stock' | 'art'>;
+
 /**
  * 석고 벽의 한 칸. 부조는 장식이고, 이름과 가격 글자가 링크 이름이 됩니다.
  * 마우스를 올리거나 초점을 받으면 따뜻한 빛이 번집니다. sword는 화면 언어로 바꾼 값을 받습니다.
  */
-export function SwordTile({ sword, className }: { sword: Sword; className?: string }) {
+export function SwordTile({ sword, className }: { sword: SwordTileData; className?: string }) {
   const t = useTranslations('Tile');
   const locale = useLocale() as Locale;
   const soldOut = sword.stock <= 0;

@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 test('대시보드: 통계와 최근 주문을 보여 준다', async ({ page }) => {
   await page.goto('/admin/');
   await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
-  await expect(page.getByText('16')).toBeVisible();
+  await expect(page.getByText('213', { exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'SNB-20261103-0002' })).toBeVisible();
   await expectNoA11yViolations(page);
 });

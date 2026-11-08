@@ -28,19 +28,46 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('도검의 벽: 16점이 보이고 분류로 거를 수 있다', async ({ page }) => {
+test('도검의 벽: 한 쪽에 24점씩 보이고 분류로 거를 수 있다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: '도검의 벽' })).toBeVisible();
-  await expect(tiles(page)).toHaveCount(16);
+  await expect(tiles(page)).toHaveCount(24);
+  await expect(page.getByRole('status').filter({ hasText: '213점 가운데 1–24번째' })).toBeVisible();
 
-  await page.getByRole('navigation', { name: '도검 분류' }).getByRole('link', { name: '신화·전설' }).click();
+  const categories = page.getByRole('navigation', { name: '도검 분류' });
+  await expect(categories.getByRole('link')).toHaveCount(6);
+  await categories.getByRole('link', { name: '신화·전설' }).click();
   await expect(page).toHaveURL(/category=legend/);
   await expect(page.getByRole('heading', { level: 1, name: '신화·전설' })).toBeVisible();
-  await expect(tiles(page)).toHaveCount(5);
-  await expect(page.getByRole('link', { name: '신화·전설' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('status').filter({ hasText: '112점 가운데 1–24번째' })).toBeVisible();
+  await expect(categories.getByRole('link', { name: '신화·전설' })).toHaveAttribute('aria-current', 'page');
 
   await expectNoA11yViolations(page);
   await expectNoHorizontalOverflow(page);
+});
+
+test('쪽 이동과 형태 거르기: 조건이 주소에 남는다', async ({ page }) => {
+  await page.goto('/?category=legend');
+  const pages = page.getByRole('navigation', { name: '목록 쪽 이동' });
+  await expect(pages.getByRole('link', { name: /^1 ?쪽$/ })).toHaveAttribute('aria-current', 'page');
+  await pages.getByRole('link', { name: '다음 쪽' }).click();
+  await expect(page).toHaveURL(/category=legend.*page=2|page=2.*category=legend/);
+  await expect(page.getByRole('status').filter({ hasText: '112점 가운데 25–48번째' })).toBeVisible();
+  await expect(pages.getByRole('link', { name: /^2 ?쪽$/ })).toHaveAttribute('aria-current', 'page');
+  await pages.getByRole('link', { name: /^5 ?쪽$/ }).click();
+  await expect(tiles(page)).toHaveCount(16);
+  await expect(pages.getByRole('link', { name: '다음 쪽' })).toHaveCount(0);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto('/');
+  const search = page.getByRole('search', { name: '도검 찾기' });
+  await search.getByLabel('형태').selectOption('training');
+  await search.getByRole('button', { name: '찾기' }).click();
+  await expect(page).toHaveURL(/kind=training/);
+  await expect(page.getByRole('status').filter({ hasText: '7점' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /죽도/ })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: '목록 쪽 이동' })).toHaveCount(0);
 });
 
 test('본문 바로가기 링크가 첫 초점을 받는다', async ({ page, isMobile }) => {
