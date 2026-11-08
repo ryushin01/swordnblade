@@ -9,7 +9,9 @@
     "sword": "도검",
     "login": "로그인",
     "signup": "회원가입",
-    "account": "내 계정"
+    "account": "내 계정",
+    "wishlist": "찜 목록",
+    "compare": "도검 비교"
   },
   "Common": {
     "skipToContent": "본문 바로가기",
@@ -26,7 +28,9 @@
     "korean": "한국어",
     "english": "English",
     "login": "로그인",
-    "account": "내 계정"
+    "account": "내 계정",
+    "wishlist": "찜 목록",
+    "wishlistCount": "{count}점"
   },
   "Footer": {
     "disclaimer": "포트폴리오용 가상 쇼핑몰입니다. 상품, 공방, 가격, 주문은 모두 지어낸 것이며 실제로 판매하거나 배송하지 않습니다.",
@@ -267,6 +271,48 @@
     "orderSummary": "{date} · {items} · {total}",
     "itemsCount": "{name} 외 {rest}점",
     "loadError": "계정 정보를 불러오지 못했습니다.",
+    "retry": "다시 불러오기"
+  },
+  "Wishlist": {
+    "title": "찜 목록",
+    "button": "찜하기",
+    "empty": "아직 찜한 도검이 없습니다.",
+    "browse": "도검의 벽 둘러보기",
+    "count": "{count}점",
+    "remove": "{name} 찜 해제",
+    "loading": "찜 목록을 불러오는 중입니다.",
+    "loadError": "찜 목록을 불러오지 못했습니다.",
+    "retry": "다시 불러오기"
+  },
+  "Related": {
+    "title": "함께 볼 도검"
+  },
+  "Compare": {
+    "title": "도검 비교",
+    "intro": "도검을 세 점까지 골라 같은 축척으로 나란히 봅니다.",
+    "formLabel": "비교할 도검 고르기",
+    "slot": "{n}번째 도검",
+    "none": "고르지 않음",
+    "submit": "비교하기",
+    "needPick": "비교할 도검을 골라 주세요.",
+    "tableCaption": "고른 도검의 제원 비교",
+    "scrollLabel": "도검 제원 비교 표",
+    "specHeader": "항목",
+    "region": "지역",
+    "type": "형태",
+    "era": "시대",
+    "blade": "칼날 길이",
+    "total": "전체 길이",
+    "weight": "무게",
+    "material": "소재",
+    "edge": "날",
+    "price": "가격",
+    "sharp": "진검",
+    "blunt": "날 없음",
+    "scaleNote": "그림은 모두 같은 축척입니다.",
+    "link": "다른 도검과 비교",
+    "navLink": "도검 비교",
+    "loadError": "도검 목록을 불러오지 못했습니다.",
     "retry": "다시 불러오기"
   }
 }

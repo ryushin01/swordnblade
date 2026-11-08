@@ -28,6 +28,11 @@ export async function hashPassword(email: string, password: string): Promise<str
 }
 
 /** 응답에는 비밀번호 해시를 넣지 않습니다. */
+/** 어드민 회원 목록의 한 줄 */
+export interface AdminUser extends User {
+  orderCount: number;
+}
+
 const publicUser = (user: StoredUser): User => ({
   id: user.id,
   email: user.email,
@@ -54,6 +59,17 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
   };
 
   return [
+    // 어드민 회원 목록. 비밀번호 해시는 내보내지 않습니다.
+    http.get('*/api/users', async () => {
+      await wait();
+      const { users = [], orders } = db.read();
+      const list: AdminUser[] = users.map((user) => ({
+        ...publicUser(user),
+        orderCount: orders.filter((order) => order.userId === user.id).length,
+      }));
+      return HttpResponse.json(list);
+    }),
+
     http.post('*/api/auth/signup', async ({ request }) => {
       await wait();
       const body = (await request.json().catch(() => ({}))) as Partial<SignupBody>;

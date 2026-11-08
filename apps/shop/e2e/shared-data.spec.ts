@@ -106,3 +106,17 @@ test('어드민에서 올린 사진이 쇼핑몰 상세 갤러리에 대체 텍�
   // Mock API(서비스 워커)가 실제 이미지를 돌려줬는지 확인합니다.
   await expect.poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
 });
+
+test('쇼핑몰에서 가입한 회원이 어드민 회원 목록에 보인다', async ({ page }) => {
+  await page.goto('/signup');
+  await page.getByLabel(/^이름/).fill('김가상');
+  await page.getByLabel(/^이메일/).fill('admin-view@example.com');
+  await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
+  await page.getByLabel(/^비밀번호 확인/).fill('sword1234');
+  await page.getByRole('button', { name: '가입하기' }).click();
+  await expect(page).toHaveURL(/\/account$/);
+
+  await page.goto('/admin/users');
+  await expect(page.getByRole('heading', { level: 1, name: '회원' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'admin-view@example.com' })).toBeVisible();
+});

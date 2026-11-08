@@ -1,4 +1,4 @@
-export { type AuthResponse, hashPassword, type LoginBody, type SignupBody } from './auth-handlers';
+export { type AdminUser, type AuthResponse, hashPassword, type LoginBody, type SignupBody } from './auth-handlers';
 export { createDb, type Db, type DbState } from './db';
 export { type Session, type StoredUser } from './db';
 export {

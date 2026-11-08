@@ -8,6 +8,7 @@ export const SITE = {
   /** 어드민(/admin)과 같은 키를 써서 Mock 데이터를 함께 씁니다. */
   mockStorageKey: 'snb-db-v1',
   cartStorageKey: 'snb-cart-v1',
+  wishlistStorageKey: 'snb-wishlist-v1',
   /** 로그인 세션 토큰을 두는 localStorage 키 */
   sessionStorageKey: 'snb-session-v1',
 } as const;
