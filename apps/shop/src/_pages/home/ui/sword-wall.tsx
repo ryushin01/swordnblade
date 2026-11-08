@@ -58,7 +58,7 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
       )
     : initialView;
 
-  if (isError && !data) {
+  if (isError && !shown) {
     return (
       <div role="alert" className="grid justify-items-center gap-4 px-4 py-24 text-center">
         <p>{t('loadError')}</p>
