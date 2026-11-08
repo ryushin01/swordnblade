@@ -4,6 +4,7 @@ import { type FormEvent, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useCreateOrder } from '@/entities/order';
+import { useMe } from '@/entities/session';
 import { ApiRequestError } from '@/shared/api';
 import { cn } from '@/shared/lib';
 import { Button, TextField } from '@/shared/ui';
@@ -42,6 +43,19 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
   const summaryRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
   const createOrder = useCreateOrder();
+  const me = useMe();
+  const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
+
+  // 로그인한 회원이면 비어 있는 이름·이메일을 회원 정보로 한 번 채웁니다(렌더 중 상태 맞추기).
+  if (me.data && prefilledFor !== me.data.id) {
+    const user = me.data;
+    setPrefilledFor(user.id);
+    setValues((current) => ({
+      ...current,
+      name: current.name || user.name,
+      email: current.email || user.email,
+    }));
+  }
 
   const update = <K extends keyof CheckoutValues>(key: K, value: CheckoutValues[K]) =>
     setValues((current) => ({ ...current, [key]: value }));

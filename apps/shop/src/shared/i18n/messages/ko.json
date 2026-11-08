@@ -6,14 +6,18 @@
     "cart": "장바구니",
     "checkout": "주문서",
     "order": "주문 확인",
-    "sword": "도검"
+    "sword": "도검",
+    "login": "로그인",
+    "signup": "회원가입",
+    "account": "내 계정"
   },
   "Common": {
     "skipToContent": "본문 바로가기",
     "backToWall": "도검 벽으로 돌아가기",
     "browse": "도검 둘러보기",
     "required": "(필수)",
-    "reload": "새로고침해 주세요."
+    "reload": "새로고침해 주세요.",
+    "showPassword": "비밀번호 보기"
   },
   "Header": {
     "categoryNav": "도검 분류",
@@ -22,7 +26,9 @@
     "cartCount": "{count}점",
     "languageNav": "언어",
     "korean": "한국어",
-    "english": "English"
+    "english": "English",
+    "login": "로그인",
+    "account": "내 계정"
   },
   "Footer": {
     "disclaimer": "포트폴리오용 가상 쇼핑몰입니다. 상품, 공방, 가격, 주문은 모두 지어낸 것이며 실제로 판매하거나 배송하지 않습니다.",
@@ -211,5 +217,45 @@
     "tip": "칼끝 확대",
     "photo": "사진 {n}",
     "thumb": "이미지 {n}: {label}"
+  },
+  "Auth": {
+    "loginTitle": "로그인",
+    "signupTitle": "회원가입",
+    "loginIntro": "주문 내역을 확인하고 주문서를 빠르게 채우려면 로그인하세요.",
+    "signupIntro": "가입하면 주문서에 이름과 이메일이 자동으로 채워지고, 주문 내역을 한곳에서 봅니다. 포트폴리오용 가상 회원이라 실제 개인정보를 넣지 마세요.",
+    "name": "이름",
+    "email": "이메일",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
+    "passwordHint": "8자 이상, 영문과 숫자를 함께 넣어 주세요.",
+    "submitLogin": "로그인",
+    "submitSignup": "가입하기",
+    "submitting": "처리 중…",
+    "toSignup": "아직 회원이 아니신가요? 회원가입",
+    "toLogin": "이미 회원이신가요? 로그인",
+    "checkError": "입력 내용을 확인해 주세요.",
+    "loginFailed": "이메일 또는 비밀번호가 맞지 않습니다.",
+    "genericError": "요청을 처리하지 못했습니다. 잠시 뒤 다시 시도해 주세요.",
+    "errors": {
+      "name": "이름을 입력해 주세요.",
+      "email": "이메일을 example@domain.com 형식으로 입력해 주세요.",
+      "emailTaken": "이미 가입한 이메일입니다. 로그인해 주세요.",
+      "password": "비밀번호를 8자 이상, 영문과 숫자를 함께 넣어 입력해 주세요.",
+      "passwordRequired": "비밀번호를 입력해 주세요.",
+      "passwordConfirm": "비밀번호가 서로 다릅니다."
+    }
+  },
+  "Account": {
+    "title": "내 계정",
+    "needLogin": "내 계정을 보려면 로그인해 주세요.",
+    "loading": "계정 정보를 불러오는 중입니다.",
+    "profile": "회원 정보",
+    "joined": "가입일",
+    "logout": "로그아웃",
+    "ordersTitle": "내 주문",
+    "noOrders": "아직 주문이 없습니다.",
+    "orderLink": "{id} 주문 보기",
+    "orderSummary": "{date} · {items} · {total}",
+    "itemsCount": "{name} 외 {rest}점"
   }
 }

@@ -1,4 +1,4 @@
-import { type CustomsConfig, DEFAULT_CUSTOMS_CONFIG, type Order, type Sword } from '@snb/domain';
+import { type CustomsConfig, DEFAULT_CUSTOMS_CONFIG, type Order, type Sword, type User } from '@snb/domain';
 
 import { SEED_ORDERS, SEED_SWORDS, SEED_VERSION } from './seed';
 
@@ -8,6 +8,20 @@ export interface DbState {
   customs: CustomsConfig;
   /** 이 데이터를 만든 시드 버전. 없으면 1(버전을 두기 전 데이터) */
   seedVersion?: number;
+  /** 회원(비밀번호는 SHA-256 해시). 예전 데이터에는 없을 수 있음 */
+  users?: StoredUser[];
+  /** 로그인 세션 */
+  sessions?: Session[];
+}
+
+export interface StoredUser extends User {
+  passwordHash: string;
+}
+
+export interface Session {
+  token: string;
+  userId: string;
+  createdAt: string;
 }
 
 export interface Db {

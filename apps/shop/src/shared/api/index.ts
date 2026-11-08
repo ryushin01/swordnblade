@@ -1,1 +1,1 @@
-export { apiFetch, ApiRequestError } from './client';
+export { apiFetch, ApiRequestError, setApiAuthToken } from './client';

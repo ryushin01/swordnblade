@@ -6,14 +6,18 @@
     "cart": "Cart",
     "checkout": "Checkout",
     "order": "Order",
-    "sword": "Sword"
+    "sword": "Sword",
+    "login": "Log in",
+    "signup": "Sign up",
+    "account": "My account"
   },
   "Common": {
     "skipToContent": "Skip to content",
     "backToWall": "Back to the wall",
     "browse": "Browse the swords",
     "required": "(required)",
-    "reload": "Please reload the page."
+    "reload": "Please reload the page.",
+    "showPassword": "Show password"
   },
   "Header": {
     "categoryNav": "Sword categories",
@@ -22,7 +26,9 @@
     "cartCount": "{count, plural, one {# item} other {# items}}",
     "languageNav": "Language",
     "korean": "한국어",
-    "english": "English"
+    "english": "English",
+    "login": "Log in",
+    "account": "My account"
   },
   "Footer": {
     "disclaimer": "This is a fictional store built for a portfolio. All products, workshops, prices and orders are made up; nothing is sold or shipped.",
@@ -211,5 +217,45 @@
     "tip": "Tip close-up",
     "photo": "Photo {n}",
     "thumb": "Image {n}: {label}"
+  },
+  "Auth": {
+    "loginTitle": "Log in",
+    "signupTitle": "Sign up",
+    "loginIntro": "Log in to see your orders and fill in the checkout form faster.",
+    "signupIntro": "With an account, your name and email are filled in at checkout and your orders are kept in one place. This is a fictional portfolio store, so please do not enter real personal data.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "passwordHint": "At least 8 characters with both letters and numbers.",
+    "submitLogin": "Log in",
+    "submitSignup": "Create account",
+    "submitting": "Working…",
+    "toSignup": "New here? Create an account",
+    "toLogin": "Already have an account? Log in",
+    "checkError": "Please check your details.",
+    "loginFailed": "The email or password is incorrect.",
+    "genericError": "We could not process the request. Please try again shortly.",
+    "errors": {
+      "name": "Enter your name.",
+      "email": "Enter an email like example@domain.com.",
+      "emailTaken": "This email is already registered. Please log in.",
+      "password": "Use at least 8 characters with both letters and numbers.",
+      "passwordRequired": "Enter your password.",
+      "passwordConfirm": "The passwords do not match."
+    }
+  },
+  "Account": {
+    "title": "My account",
+    "needLogin": "Please log in to see your account.",
+    "loading": "Loading your account.",
+    "profile": "Profile",
+    "joined": "Joined",
+    "logout": "Log out",
+    "ordersTitle": "My orders",
+    "noOrders": "No orders yet.",
+    "orderLink": "View order {id}",
+    "orderSummary": "{date} · {items} · {total}",
+    "itemsCount": "{name} and {rest} more"
   }
 }
