@@ -190,3 +190,48 @@ test('상세 갤러리: 이전·다음 버튼과 썸네일로 넘기고 위치�
   await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
   await expectNoA11yViolations(page);
 });
+
+test('찜하기: 상세에서 찜하고 찜 목록에서 보고 뺀다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  const button = page.getByRole('button', { name: '찜하기' });
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+  await page
+    .getByRole('banner')
+    .getByRole('link', { name: /찜 목록/ })
+    .click();
+  await expect(page.getByRole('heading', { level: 1, name: '찜 목록' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /쌍수도/ })).toBeVisible();
+  await expect(page).toHaveTitle(/찜 목록/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+
+  await page.getByRole('button', { name: '쌍수도 찜 해제' }).click();
+  await expect(page.getByText('아직 찜한 도검이 없습니다.')).toBeVisible();
+});
+
+test('함께 볼 도검: 상세 아래에 같은 지역의 도검을 보여 준다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  const related = page.getByRole('list', { name: '함께 볼 도검' });
+  await expect(related.getByRole('link')).toHaveCount(4);
+  await expect(related.getByRole('link', { name: /쌍수도/ })).toHaveCount(0);
+});
+
+test('도검 비교: 상세에서 넘어와 도검을 더 고르면 주소에 남고 제원 표로 본다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  await page.getByRole('link', { name: '다른 도검과 비교' }).click();
+  await expect(page).toHaveURL(/\/compare\?a=ssangsudo/);
+  await expect(page.getByLabel('1번째 도검')).toHaveValue('ssangsudo');
+
+  await page.getByLabel('2번째 도검').selectOption('wakizashi');
+  await page.getByRole('button', { name: '비교하기' }).click();
+  await expect(page).toHaveURL(/a=ssangsudo.*b=wakizashi/);
+  const table = page.getByRole('table', { name: '고른 도검의 제원 비교' });
+  await expect(table.getByRole('columnheader', { name: '와키자시' })).toBeVisible();
+  await expect(table.getByRole('rowheader', { name: '칼날 길이' })).toBeVisible();
+  await expect(page).toHaveTitle(/도검 비교/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});

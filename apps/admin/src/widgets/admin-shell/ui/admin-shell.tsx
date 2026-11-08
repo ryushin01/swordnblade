@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { DashboardOutlined, SettingOutlined, ShoppingOutlined, TagsOutlined } from '@ant-design/icons';
+import { DashboardOutlined, SettingOutlined, ShoppingOutlined, TagsOutlined, TeamOutlined } from '@ant-design/icons';
 import { Layout, Menu, Typography } from 'antd';
 
 import { BladeMark } from '@snb/sword-art';
@@ -17,6 +17,7 @@ const ITEMS = [
   { key: '/', icon: <DashboardOutlined aria-hidden />, label: <Link href="/">대시보드</Link> },
   { key: '/products', icon: <TagsOutlined aria-hidden />, label: <Link href="/products">상품</Link> },
   { key: '/orders', icon: <ShoppingOutlined aria-hidden />, label: <Link href="/orders">주문</Link> },
+  { key: '/users', icon: <TeamOutlined aria-hidden />, label: <Link href="/users">회원</Link> },
   { key: '/settings', icon: <SettingOutlined aria-hidden />, label: <Link href="/settings">관세·환율 설정</Link> },
 ];
 

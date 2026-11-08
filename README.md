@@ -1,7 +1,7 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.6.0-7a4a35)
+![version](https://img.shields.io/badge/version-0.7.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
@@ -48,6 +48,7 @@
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
 | 주문 | 오류 요약과 칸별 안내, 중복 제출 방지. 금액은 Mock 서버가 다시 계산합니다. |
 | 회원 | 회원가입·로그인, 내 계정(회원 정보·내 주문). 로그인하면 주문서에 이름과 이메일이 채워집니다. |
+| 찜·비교 | 도검을 찜해 모아 보고, 최대 3점을 같은 축척과 제원 표로 비교합니다. 상세 아래에 같은 지역의 도검을 추천합니다. |
 
 **어드민** (`apps/admin`, Ant Design, 쇼핑몰 주소의 `/admin`)
 
@@ -58,6 +59,7 @@
 | 대시보드 | 상품·재고 부족·주문·허가 확인 대기·매출 통계 |
 | 상품 | 목록(정렬·필터), 등록·수정·삭제, 사진 여러 장 올리기(대체 텍스트 필수). 칼끝·홈·하몬·상감·손잡이 감기·술 색, 전해지는 이야기, 영어 글까지 고치고 일러스트를 바로 미리 봄 |
 | 주문 | 주문 상세 펼치기, 상태 변경 |
+| 회원 | 쇼핑몰에서 가입한 회원과 회원별 주문 수 |
 | 관세·환율 설정 | 환율, 배송비, 국가별 관세율·부가세율·면세 한도 |
 
 ## 기술 스택

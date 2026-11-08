@@ -46,6 +46,7 @@ interface SwordWallProps {
 
 export function SwordWall({ category, q, sort, kind, page, initialView, labelledBy }: SwordWallProps) {
   const t = useTranslations('Home');
+  const compare = useTranslations('Compare');
   const locale = useLocale() as Locale;
   const { data, isError, refetch } = useSwords(category);
   const shown: WallView | undefined = data
@@ -103,17 +104,22 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
           </Button>
         </div>
       ) : null}
-      <p role="status" className="mx-auto max-w-[90rem] px-4 pb-3 text-sm text-ink-muted sm:px-8">
-        {status}
-        {q ? (
-          <>
-            {' · '}
-            <Link href={resetHref} className="underline underline-offset-4">
-              {t('clearQuery')}
-            </Link>
-          </>
-        ) : null}
-      </p>
+      <div className="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-x-4 px-4 pb-3 text-sm text-ink-muted sm:px-8">
+        <p role="status">
+          {status}
+          {q ? (
+            <>
+              {' · '}
+              <Link href={resetHref} className="underline underline-offset-4">
+                {t('clearQuery')}
+              </Link>
+            </>
+          ) : null}
+        </p>
+        <Link href="/compare" className="inline-flex min-h-11 items-center underline underline-offset-4">
+          {compare('navLink')}
+        </Link>
+      </div>
       {shown.total === 0 ? (
         <p className="px-4 py-24 text-center">{q ? t('emptyQuery', { q }) : t('emptyCategory')}</p>
       ) : (

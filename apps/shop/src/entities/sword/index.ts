@@ -10,4 +10,5 @@ export {
   toSwordKind,
   toSwordSort,
 } from './model/filter';
+export { relatedSwords } from './model/related';
 export { SwordTile, type SwordTileData } from './ui/sword-tile';

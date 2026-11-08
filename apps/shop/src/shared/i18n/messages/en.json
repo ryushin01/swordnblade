@@ -9,7 +9,9 @@
     "sword": "Sword",
     "login": "Log in",
     "signup": "Sign up",
-    "account": "My account"
+    "account": "My account",
+    "wishlist": "Wishlist",
+    "compare": "Compare swords"
   },
   "Common": {
     "skipToContent": "Skip to content",
@@ -26,7 +28,9 @@
     "korean": "한국어",
     "english": "English",
     "login": "Log in",
-    "account": "My account"
+    "account": "My account",
+    "wishlist": "Wishlist",
+    "wishlistCount": "{count, plural, one {# sword} other {# swords}}"
   },
   "Footer": {
     "disclaimer": "This is a fictional store built for a portfolio. All products, workshops, prices and orders are made up; nothing is sold or shipped.",
@@ -267,6 +271,48 @@
     "orderSummary": "{date} · {items} · {total}",
     "itemsCount": "{name} and {rest} more",
     "loadError": "We could not load your account.",
+    "retry": "Try again"
+  },
+  "Wishlist": {
+    "title": "Wishlist",
+    "button": "Save to wishlist",
+    "empty": "You have not saved any swords yet.",
+    "browse": "Browse the wall",
+    "count": "{count, plural, one {# sword} other {# swords}}",
+    "remove": "Remove {name} from wishlist",
+    "loading": "Loading your wishlist.",
+    "loadError": "We could not load your wishlist.",
+    "retry": "Try again"
+  },
+  "Related": {
+    "title": "You may also like"
+  },
+  "Compare": {
+    "title": "Compare swords",
+    "intro": "Choose up to three swords and see them side by side at the same scale.",
+    "formLabel": "Choose swords to compare",
+    "slot": "Sword {n}",
+    "none": "None",
+    "submit": "Compare",
+    "needPick": "Choose swords to compare.",
+    "tableCaption": "Specifications of the chosen swords",
+    "scrollLabel": "Sword specifications table",
+    "specHeader": "Item",
+    "region": "Region",
+    "type": "Type",
+    "era": "Era",
+    "blade": "Blade length",
+    "total": "Overall length",
+    "weight": "Weight",
+    "material": "Material",
+    "edge": "Edge",
+    "price": "Price",
+    "sharp": "Sharp",
+    "blunt": "Unsharpened",
+    "scaleNote": "All drawings share one scale.",
+    "link": "Compare with other swords",
+    "navLink": "Compare swords",
+    "loadError": "We could not load the swords.",
     "retry": "Try again"
   }
 }

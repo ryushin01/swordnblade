@@ -84,4 +84,23 @@ describe('회원 Mock API', () => {
     expect(mine[0]?.lines[0]?.swordId).toBe('sw-010');
     expect((await fetch(`${BASE}/api/me/orders`)).status).toBe(401);
   });
+
+  it('어드민 회원 목록은 주문 수를 주고 비밀번호 해시는 주지 않는다', async () => {
+    db.write((state) => ({
+      ...state,
+      users: [
+        {
+          id: 'u-9',
+          email: 'a@example.com',
+          name: '가상',
+          createdAt: '2026-11-08T00:00:00.000Z',
+          passwordHash: 'secret',
+        },
+      ],
+      orders: state.orders.map((order, index) => (index === 0 ? { ...order, userId: 'u-9' } : order)),
+    }));
+    const list = (await (await fetch('http://localhost/api/users')).json()) as Array<Record<string, unknown>>;
+    expect(list).toEqual([expect.objectContaining({ id: 'u-9', orderCount: 1 })]);
+    expect(list[0]).not.toHaveProperty('passwordHash');
+  });
 });
