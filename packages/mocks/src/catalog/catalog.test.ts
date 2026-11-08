@@ -11,8 +11,8 @@ describe('시드 도검 목록', () => {
     }
   });
 
-  it('역사 도검 96점과 신화·전설 112점이 있다', () => {
-    expect(SEED_SWORDS.filter((sword) => sword.category !== 'legend')).toHaveLength(96);
+  it('역사 도검 101점과 신화·전설 112점이 있다', () => {
+    expect(SEED_SWORDS.filter((sword) => sword.category !== 'legend')).toHaveLength(101);
     expect(SEED_SWORDS.filter((sword) => sword.category === 'legend')).toHaveLength(112);
   });
 

@@ -496,7 +496,7 @@ const SWORDS_KO: Sword[] = [
  * 시드 내용(그림·설명·번역·도검 목록)이 바뀔 때마다 올립니다.
  * 브라우저에 저장된 Mock 데이터가 이 값보다 낮으면 db.ts의 migrateSeed가 새 시드에 맞춥니다.
  */
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 
 /** 영어 번역을 붙인 시드 도검 */
 export const SEED_SWORDS: Sword[] = [

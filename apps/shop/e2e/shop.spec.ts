@@ -32,7 +32,7 @@ test('도검의 벽: 한 쪽에 24점씩 보이고 분류로 거를 수 있다',
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1, name: '도검의 벽' })).toBeVisible();
   await expect(tiles(page)).toHaveCount(24);
-  await expect(page.getByRole('status').filter({ hasText: '208점 가운데 1–24번째' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '213점 가운데 1–24번째' })).toBeVisible();
 
   const categories = page.getByRole('navigation', { name: '도검 분류' });
   await expect(categories.getByRole('link')).toHaveCount(6);

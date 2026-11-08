@@ -29,7 +29,7 @@ test('영어 화면: /en에서 영어로 보이고 lang이 en이다', async ({ p
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'The Wall of Blades' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Excalibur.*₩12,000,000/ })).toBeVisible();
-  await expect(page.getByRole('status').filter({ hasText: '1–24 of 208 swords' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '1–24 of 213 swords' })).toBeVisible();
   await expectNoA11yViolations(page);
   await expectNoHorizontalOverflow(page);
 });
