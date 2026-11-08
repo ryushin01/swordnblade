@@ -94,6 +94,15 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
 
   return (
     <>
+      {/* 최신 값을 못 받아 서버가 그린 목록을 보여 주는 중이면 알리고 다시 받을 수 있게 합니다. */}
+      {isError && !data ? (
+        <div role="alert" className="mx-auto flex max-w-[90rem] flex-wrap items-center gap-3 px-4 pb-3 text-sm sm:px-8">
+          <p>{t('loadError')}</p>
+          <Button variant="outline" className="min-h-11 rounded-sm" onClick={() => void refetch()}>
+            {t('retry')}
+          </Button>
+        </div>
+      ) : null}
       <p role="status" className="mx-auto max-w-[90rem] px-4 pb-3 text-sm text-ink-muted sm:px-8">
         {status}
         {q ? (
