@@ -34,7 +34,7 @@ export function LocaleSwitch({ className }: { className?: string }) {
               hrefLang={value}
               aria-current={value === locale ? 'true' : undefined}
               className={cn(
-                'inline-flex min-h-11 items-center px-2 text-ink-muted hover:text-ink',
+                'inline-flex min-h-11 items-center px-1.5 text-ink-muted hover:text-ink sm:px-2',
                 value === locale && 'text-ink underline decoration-accent decoration-1 underline-offset-8',
               )}
             >

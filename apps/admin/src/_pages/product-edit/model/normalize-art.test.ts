@@ -1,6 +1,6 @@
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { normalizeArt, normalizeStories } from './normalize-art';
+import { normalizeArt, normalizeStories, normalizeTranslation } from './normalize-art';
 
 const ssangsudo = SEED_SWORDS[0]!.art;
 
@@ -37,5 +37,35 @@ describe('normalizeStories', () => {
     expect(
       normalizeStories([{ when: ' 1790 ', text: ' 기록 ' }, { when: '', text: '' }, { when: '오늘', text: ' ' }, {}]),
     ).toEqual([{ when: '1790', text: '기록' }]);
+  });
+});
+
+describe('normalizeTranslation', () => {
+  it('칸을 모두 비우면 번역을 지운다', () => {
+    expect(
+      normalizeTranslation({ summary: ' ', description: '', era: '', material: '', stories: [{}] }),
+    ).toBeUndefined();
+    expect(normalizeTranslation(undefined)).toBeUndefined();
+  });
+
+  it('공백을 지우고 내용이 빈 이야기는 버린다', () => {
+    expect(
+      normalizeTranslation({
+        summary: ' A sword ',
+        description: 'Desc',
+        era: 'Joseon',
+        material: 'Steel',
+        stories: [
+          { when: 'Today', text: ' Forged ' },
+          { when: 'Myth', text: '' },
+        ],
+      }),
+    ).toEqual({
+      summary: 'A sword',
+      description: 'Desc',
+      era: 'Joseon',
+      material: 'Steel',
+      stories: [{ when: 'Today', text: 'Forged' }],
+    });
   });
 });

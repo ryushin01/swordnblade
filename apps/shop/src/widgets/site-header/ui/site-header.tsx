@@ -11,7 +11,7 @@ import { LocaleSwitch } from './locale-switch';
 export function SiteHeader() {
   return (
     <header className="relative z-10 border-b border-line">
-      <div className="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-3 sm:px-8">
+      <div className="mx-auto flex max-w-[90rem] flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 sm:gap-x-6 sm:px-8 sm:py-3">
         <Link href="/" className="inline-flex min-h-11 items-center">
           <Wordmark />
         </Link>
@@ -20,7 +20,7 @@ export function SiteHeader() {
             <HeaderNav />
           </Suspense>
         </div>
-        <div className="order-2 flex items-center gap-2 sm:order-3">
+        <div className="order-2 flex items-center gap-1 sm:order-3 sm:gap-2">
           <Suspense fallback={null}>
             <LocaleSwitch />
           </Suspense>
