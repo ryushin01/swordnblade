@@ -45,6 +45,19 @@ export function useMyOrders() {
   });
 }
 
+/** 내 주문 취소. 재고와 주문 상세도 함께 새로 받습니다. */
+export function useCancelOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => apiFetch<Order>(`/api/me/orders/${encodeURIComponent(id)}/cancel`, { method: 'POST' }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['session'] });
+      void queryClient.invalidateQueries({ queryKey: ['orders'] });
+      void queryClient.invalidateQueries({ queryKey: ['swords'] });
+    },
+  });
+}
+
 function useStartSession<TBody>(path: string) {
   const setToken = useSessionStore((state) => state.setToken);
   const queryClient = useQueryClient();

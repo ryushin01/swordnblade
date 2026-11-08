@@ -271,7 +271,13 @@
     "orderSummary": "{date} · {items} · {total}",
     "itemsCount": "{name} 외 {rest}점",
     "loadError": "계정 정보를 불러오지 못했습니다.",
-    "retry": "다시 불러오기"
+    "retry": "다시 불러오기",
+    "cancelOpen": "주문 취소",
+    "cancelQuestion": "이 주문을 취소할까요? 취소하면 직접 되돌릴 수 없습니다.",
+    "cancelConfirm": "취소 확정",
+    "cancelBack": "그대로 두기",
+    "cancelDone": "주문을 취소했습니다.",
+    "cancelFailed": "주문을 취소하지 못했습니다. 출고가 시작됐을 수 있으니 주문 상태를 확인해 주세요."
   },
   "Wishlist": {
     "title": "찜 목록",

@@ -2,11 +2,13 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatKRW, type Locale, type Order, orderStatusLabel } from '@snb/domain';
+import { canCustomerCancel, formatKRW, type Locale, type Order, orderStatusLabel } from '@snb/domain';
 
 import { useLogout, useMe, useMyOrders, useSessionHydrated, useSessionStore } from '@/entities/session';
 import { Link, useRouter } from '@/shared/i18n';
 import { Button } from '@/shared/ui';
+
+import { CancelOrder } from './cancel-order';
 
 function OrderItem({ order }: { order: Order }) {
   const t = useTranslations('Account');
@@ -27,6 +29,7 @@ function OrderItem({ order }: { order: Order }) {
       <p className="text-sm text-ink-muted">
         {t('orderSummary', { date, items, total: formatKRW(order.amounts.total, locale) })}
       </p>
+      {canCustomerCancel(order.status) ? <CancelOrder orderId={order.id} /> : null}
     </li>
   );
 }
@@ -114,7 +117,7 @@ export function AccountView() {
         </div>
       </section>
       <section aria-labelledby="account-orders" className="grid gap-2">
-        <h2 id="account-orders" className="text-carved text-xl">
+        <h2 id="account-orders" tabIndex={-1} className="text-carved text-xl outline-none">
           {t('ordersTitle')}
         </h2>
         {orders.isPending ? (

@@ -48,6 +48,8 @@
 | POST · GET | `/api/images`, `/api/images/:id` | 사진 올리기(이미지만, 5MB 이하, IndexedDB에 저장)·받기 |
 | POST | `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout` | 회원가입·로그인·로그아웃. 성공하면 `{ token, user }` |
 | GET | `/api/auth/me`, `/api/me/orders` | 로그인한 회원과 그 회원의 주문(`Authorization: Bearer <token>`, 없으면 401) |
+| GET · PUT | `/api/me/wishlist` | 회원의 찜 목록(로그인 필요) |
+| POST | `/api/me/orders/:id/cancel` | 회원의 출고 전 주문 취소, 재고 복구 |
 | GET | `/api/users` | 어드민 회원 목록(회원별 주문 수, 비밀번호 해시 제외) |
 
 어드민 화면에는 로그인이 없고 Mock API도 어드민 권한을 검사하지 않습니다(`/api/orders`, `/api/users` 등). 데이터가 브라우저 안의 가상 데이터라 그대로 두었으며, 실제 서비스라면 서버에서 어드민 권한을 확인해야 합니다.

@@ -41,6 +41,15 @@ export async function generateMetadata({ params }: { params: LayoutParams }): Pr
     title: { default: t('defaultTitle'), template: `%s · ${t('siteName')}` },
     description: t('description'),
     alternates: languageAlternates('', locale),
+    openGraph: {
+      type: 'website',
+      siteName: t('siteName'),
+      title: t('defaultTitle'),
+      description: t('description'),
+      locale: locale === 'en' ? 'en_US' : 'ko_KR',
+      images: [{ url: SITE.ogImage, width: 1200, height: 630, alt: t('defaultTitle') }],
+    },
+    twitter: { card: 'summary_large_image' },
   };
 }
 

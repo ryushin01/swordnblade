@@ -9,6 +9,7 @@ import { safeJsonStorage } from '@/shared/lib/safe-storage';
 interface WishlistState {
   ids: string[];
   toggle: (swordId: string) => void;
+  setIds: (ids: string[]) => void;
 }
 
 export const toValidIds = (value: unknown): string[] =>
@@ -18,6 +19,7 @@ export const useWishlistStore = create<WishlistState>()(
   persist(
     (set) => ({
       ids: [],
+      setIds: (ids) => set({ ids }),
       toggle: (swordId) =>
         set((state) => ({
           ids: state.ids.includes(swordId) ? state.ids.filter((id) => id !== swordId) : [...state.ids, swordId],

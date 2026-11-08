@@ -102,3 +102,13 @@ test('상품: 칼날 무늬·술·전해지는 이야기를 고쳐 저장한다'
   await expect(page.getByLabel('이야기 3: 내용', { exact: true })).toHaveValue('어드민에서 덧붙인 이야기');
   await expect(page.getByRole('button', { name: '술 색 없애기' })).toHaveCount(0);
 });
+
+test('상품: 이름으로 찾으면 목록과 개수가 바뀐다', async ({ page }) => {
+  await page.goto('/admin/products');
+  await expect(page.getByRole('link', { name: '환도 수정' })).toBeVisible();
+  await page.getByLabel('이름으로 찾기').fill('Excalibur');
+  await expect(page.getByRole('status').filter({ hasText: '1점' })).toBeVisible();
+  await expect(page.getByRole('link', { name: '엑스칼리버 수정' })).toBeVisible();
+  await expect(page.getByRole('link', { name: '환도 수정' })).toHaveCount(0);
+  await expectNoA11yViolations(page);
+});

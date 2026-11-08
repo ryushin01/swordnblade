@@ -7,6 +7,7 @@ import { AccountLink } from './account-link';
 import { CartLink } from './cart-link';
 import { LocaleSwitch } from './locale-switch';
 import { WishlistLink } from './wishlist-link';
+import { WishlistSync } from './wishlist-sync';
 
 export function SiteHeader() {
   return (
@@ -21,6 +22,7 @@ export function SiteHeader() {
           </Suspense>
           <AccountLink />
           <WishlistLink />
+          <WishlistSync />
           <CartLink />
         </div>
       </div>

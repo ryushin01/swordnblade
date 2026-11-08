@@ -14,6 +14,7 @@ import {
 
 import { createAuthHandlers, findSessionUser } from './auth-handlers';
 import { createMemoryImageStore, type ImageStore } from './image-store';
+import { cancelOrderInState, reviveOrderInState, reviveShortage } from './order-stock';
 
 import type { Db } from './db';
 
@@ -250,9 +251,19 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       if (!ORDER_STATUSES.includes(status)) return error(400, { message: '알 수 없는 주문 상태입니다.' });
       const order = db.read().orders.find((item) => item.id === params.id);
       if (!order) return error(404, { message: '주문을 찾을 수 없습니다.' });
-      const updated = { ...order, status };
-      db.write((state) => ({ ...state, orders: state.orders.map((item) => (item.id === params.id ? updated : item)) }));
-      return HttpResponse.json(updated);
+      // 취소하면 재고를 돌려주고, 취소를 되살리면 재고를 다시 뺍니다.
+      const cancelling = status === 'cancelled' && order.status !== 'cancelled';
+      const reviving = status !== 'cancelled' && order.status === 'cancelled';
+      if (reviving) {
+        const short = reviveShortage(db.read(), order);
+        if (short) return error(409, { message: `${short}의 재고가 모자라 주문을 되살릴 수 없습니다.` });
+      }
+      const next = db.write((state) => {
+        if (cancelling) return cancelOrderInState(state, order);
+        if (reviving) return reviveOrderInState(state, order, status);
+        return { ...state, orders: state.orders.map((item) => (item.id === params.id ? { ...item, status } : item)) };
+      });
+      return HttpResponse.json(next.orders.find((item) => item.id === params.id));
     }),
 
     http.get('*/api/stats', async () => {

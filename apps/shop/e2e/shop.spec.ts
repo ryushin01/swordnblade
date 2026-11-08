@@ -235,3 +235,21 @@ test('도검 비교: 상세에서 넘어와 도검을 더 고르면 주소에 �
   await expectNoA11yViolations(page);
   await expectNoHorizontalOverflow(page);
 });
+
+test('검색 엔진: sitemap, robots, 공유 정보, 상품 구조화 데이터', async ({ page, request }) => {
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).toContain('/en/swords/ssangsudo');
+  expect(sitemap).toContain('/swords/bongukgeom');
+  expect(await (await request.get('/robots.txt')).text()).toContain('sitemap.xml');
+  expect((await request.get('/og.jpg')).status()).toBe(200);
+
+  await page.goto('/swords/ssangsudo');
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', '쌍수도');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\.jpg/);
+  const product = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}') as {
+    '@type': string;
+    offers: { price: number };
+  };
+  expect(product['@type']).toBe('Product');
+  expect(product.offers.price).toBeGreaterThan(0);
+});

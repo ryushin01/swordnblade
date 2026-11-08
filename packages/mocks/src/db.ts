@@ -16,6 +16,8 @@ export interface DbState {
 
 export interface StoredUser extends User {
   passwordHash: string;
+  /** 찜한 도검 id */
+  wishlist?: string[];
 }
 
 export interface Session {

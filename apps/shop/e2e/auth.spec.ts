@@ -106,3 +106,66 @@ test('로그인 뒤 돌아갈 주소는 사이트 안 주소만 따른다', asyn
   await page.getByRole('button', { name: '로그인' }).click();
   await expect(page).toHaveURL(/\/cart$/);
 });
+
+const signUp = async (page: Page, email: string) => {
+  await page.goto('/signup');
+  await page.getByLabel(/^이름/).fill('김가상');
+  await page.getByLabel(/^이메일/).fill(email);
+  await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
+  await page.getByLabel(/^비밀번호 확인/).fill('sword1234');
+  await page.getByRole('button', { name: '가입하기' }).click();
+  await expect(page).toHaveURL(/\/account$/);
+};
+
+test('찜 목록은 계정에 남는다: 로그아웃하면 비고, 다시 로그인하면 돌아온다', async ({ page }) => {
+  await signUp(page, 'wish@example.com');
+  await header(page).getByRole('link', { name: '내 계정' }).waitFor();
+  await page.goto('/swords/ssangsudo');
+  const saved = page.waitForResponse((r) => r.url().endsWith('/api/me/wishlist') && r.request().method() === 'PUT');
+  await page.getByRole('button', { name: '찜하기' }).click();
+  await saved;
+
+  await header(page).getByRole('link', { name: '내 계정' }).click();
+  await page.getByRole('button', { name: '로그아웃' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(header(page).getByRole('link', { name: /찜 목록\s*0점/ })).toBeVisible();
+
+  await page.goto('/login');
+  await page.getByLabel(/^이메일/).fill('wish@example.com');
+  await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
+  await page.getByRole('button', { name: '로그인' }).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(header(page).getByRole('link', { name: /찜 목록\s*1점/ })).toBeVisible();
+});
+
+test('내 주문 취소: 한 번 더 확인하고, 취소하면 재고가 돌아온다', async ({ page }) => {
+  await signUp(page, 'cancel@example.com');
+  const stockText = page.getByText(/남은 수량 \d+점/);
+  await page.goto('/swords/uchigatana');
+  const before = await stockText.innerText();
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await expect(page.getByRole('link', { name: /장바구니\s*1점/ })).toBeVisible();
+  await page.goto('/checkout');
+  await expect(page.getByLabel(/^받는 분/)).toHaveValue('김가상');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /신용카드/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-/);
+
+  await page.goto('/swords/uchigatana');
+  await expect(stockText).not.toHaveText(before);
+
+  await page.goto('/account');
+  await page.getByRole('button', { name: '주문 취소' }).click();
+  await expect(page.getByRole('button', { name: '취소 확정' })).toBeFocused();
+  await expectNoA11yViolations(page);
+  await page.getByRole('button', { name: '취소 확정' }).click();
+  await expect(page.getByRole('button', { name: '주문 취소' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '내 주문' })).toBeFocused();
+
+  await page.goto('/swords/uchigatana');
+  await expect(stockText).toHaveText(before);
+});

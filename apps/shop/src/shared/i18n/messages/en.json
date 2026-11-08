@@ -271,7 +271,13 @@
     "orderSummary": "{date} · {items} · {total}",
     "itemsCount": "{name} and {rest} more",
     "loadError": "We could not load your account.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "cancelOpen": "Cancel order",
+    "cancelQuestion": "Cancel this order? You cannot undo this yourself.",
+    "cancelConfirm": "Yes, cancel",
+    "cancelBack": "Keep order",
+    "cancelDone": "Your order has been cancelled.",
+    "cancelFailed": "We could not cancel this order. It may have shipped, so please check its status."
   },
   "Wishlist": {
     "title": "Wishlist",

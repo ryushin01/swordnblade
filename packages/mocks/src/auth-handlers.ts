@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 
-import { EMAIL_RULE, PASSWORD_RULE, type User } from '@snb/domain';
+import { canCustomerCancel, EMAIL_RULE, PASSWORD_RULE, type User } from '@snb/domain';
+
+import { cancelOrderInState } from './order-stock';
 
 import type { Db, Session, StoredUser } from './db';
 
@@ -59,6 +61,41 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
   };
 
   return [
+    http.get('*/api/me/wishlist', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      return user ? HttpResponse.json(user.wishlist ?? []) : unauthorized();
+    }),
+
+    http.put('*/api/me/wishlist', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      const body = (await request.json().catch(() => null)) as unknown;
+      if (!Array.isArray(body) || !body.every((id) => typeof id === 'string')) {
+        return HttpResponse.json({ message: '찜 목록 형식이 맞지 않습니다.' }, { status: 400 });
+      }
+      const wishlist = [...new Set(body as string[])];
+      db.write((state) => ({
+        ...state,
+        users: state.users?.map((item) => (item.id === user.id ? { ...item, wishlist } : item)),
+      }));
+      return HttpResponse.json(wishlist);
+    }),
+
+    http.post<{ id: string }>('*/api/me/orders/:id/cancel', async ({ params, request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      // 다른 회원의 주문은 있는지도 알리지 않습니다.
+      const order = db.read().orders.find((item) => item.id === params.id && item.userId === user.id);
+      if (!order) return HttpResponse.json({ message: '주문을 찾을 수 없습니다.' }, { status: 404 });
+      if (!canCustomerCancel(order.status))
+        return HttpResponse.json({ message: '출고된 주문은 취소할 수 없습니다.' }, { status: 409 });
+      const next = db.write((state) => cancelOrderInState(state, order));
+      return HttpResponse.json(next.orders.find((item) => item.id === params.id));
+    }),
+
     // 어드민 회원 목록. 비밀번호 해시는 내보내지 않습니다.
     // Mock에는 어드민 계정이 없어(/api/orders와 같이) 권한을 검사하지 않습니다. 실제 서비스라면 서버에서 어드민 권한을 확인해야 합니다.
     http.get('*/api/users', async () => {
