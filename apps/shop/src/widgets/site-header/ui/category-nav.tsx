@@ -13,7 +13,7 @@ export function CategoryNav({ current, className }: { current?: SwordCategory; c
   const locale = useLocale() as Locale;
   return (
     <nav aria-label={t('categoryNav')} className={className}>
-      <ul className="flex flex-wrap items-center gap-x-1 gap-y-1">
+      <ul className="flex flex-wrap items-center gap-x-0.5 gap-y-1 sm:gap-x-1">
         {CATEGORIES.map((value) => {
           const active = value === current;
           return (
@@ -22,7 +22,7 @@ export function CategoryNav({ current, className }: { current?: SwordCategory; c
                 href={value ? { pathname: '/', query: { category: value } } : '/'}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'inline-flex min-h-11 items-center px-3 text-sm small-caps text-ink-muted transition-colors hover:text-ink',
+                  'inline-flex min-h-11 items-center px-1.5 text-sm small-caps text-ink-muted transition-colors hover:text-ink sm:px-3',
                   active && 'text-ink underline decoration-accent decoration-1 underline-offset-8',
                 )}
               >

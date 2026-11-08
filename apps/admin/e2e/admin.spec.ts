@@ -89,9 +89,9 @@ test('상품: 칼날 무늬·술·전해지는 이야기를 고쳐 저장한다'
   await page.getByRole('button', { name: '술 색 없애기' }).click();
   await expect(page.getByRole('button', { name: '술 색 없애기' })).toHaveCount(0);
 
-  await page.getByRole('button', { name: '이야기 추가' }).click();
-  await page.getByLabel('이야기 3: 때').fill('오늘');
-  await page.getByLabel('이야기 3: 내용').fill('어드민에서 덧붙인 이야기');
+  await page.getByRole('button', { name: '이야기 추가', exact: true }).click();
+  await page.getByLabel('이야기 3: 때', { exact: true }).fill('오늘');
+  await page.getByLabel('이야기 3: 내용', { exact: true }).fill('어드민에서 덧붙인 이야기');
   await expectNoA11yViolations(page);
 
   await page.getByRole('button', { name: '변경 저장' }).click();
@@ -99,6 +99,6 @@ test('상품: 칼날 무늬·술·전해지는 이야기를 고쳐 저장한다'
 
   await page.reload();
   await expect(page.getByRole('checkbox', { name: '하몬(물결 무늬)' })).toBeChecked();
-  await expect(page.getByLabel('이야기 3: 내용')).toHaveValue('어드민에서 덧붙인 이야기');
+  await expect(page.getByLabel('이야기 3: 내용', { exact: true })).toHaveValue('어드민에서 덧붙인 이야기');
   await expect(page.getByRole('button', { name: '술 색 없애기' })).toHaveCount(0);
 });

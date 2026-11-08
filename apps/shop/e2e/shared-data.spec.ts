@@ -47,9 +47,9 @@ test('쇼핑몰 주문이 어드민 주문 목록에 보인다', async ({ page }
 test('어드민에서 덧붙인 이야기가 쇼핑몰 상세에 보인다', async ({ page }) => {
   await page.goto('/admin/products/sw-010');
   await expect(page.getByRole('heading', { level: 1, name: '글라디우스 수정' })).toBeVisible();
-  await page.getByRole('button', { name: '이야기 추가' }).click();
-  await page.getByLabel('이야기 2: 때').fill('오늘');
-  await page.getByLabel('이야기 2: 내용').fill('공방에서 새로 벼린 한 자루');
+  await page.getByRole('button', { name: '이야기 추가', exact: true }).click();
+  await page.getByLabel('이야기 2: 때', { exact: true }).fill('오늘');
+  await page.getByLabel('이야기 2: 내용', { exact: true }).fill('공방에서 새로 벼린 한 자루');
   await page.getByRole('button', { name: '변경 저장' }).click();
   await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
 
@@ -57,4 +57,29 @@ test('어드민에서 덧붙인 이야기가 쇼핑몰 상세에 보인다', asy
   await expect(
     page.getByRole('region', { name: '전해지는 이야기' }).getByText('공방에서 새로 벼린 한 자루'),
   ).toBeVisible();
+});
+
+test('어드민에서 고친 영어 글이 영어 화면에 보이고, 비우면 한국어 원문이 보인다', async ({ page }) => {
+  await page.goto('/admin/products/sw-008');
+  await expect(page.getByRole('heading', { level: 1, name: '롱소드 수정' })).toBeVisible();
+  await page.getByLabel('영어 한 줄 소개').fill('A reforged longsword from the admin.');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+  await page.goto('/en/swords/longsword');
+  await expect(page.getByText('A reforged longsword from the admin.')).toBeVisible();
+
+  await page.goto('/admin/products/sw-008');
+  for (const label of ['영어 시대', '영어 소재', '영어 한 줄 소개']) await page.getByLabel(label).fill('');
+  await page.getByLabel('영어 설명').fill('');
+  while (await page.getByRole('button', { name: /영어 이야기 \d+ 지우기/ }).count()) {
+    await page
+      .getByRole('button', { name: /영어 이야기 \d+ 지우기/ })
+      .first()
+      .click();
+  }
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+  await page.goto('/en/swords/longsword');
+  await expect(page.getByRole('heading', { level: 1, name: 'Longsword' })).toBeVisible();
+  await expect(page.getByText('한 손 반, 두 손으로도 쥐는 중세 유럽의 십자형 검.')).toBeVisible();
 });

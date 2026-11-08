@@ -19,12 +19,13 @@ import {
 } from 'antd';
 
 import { CATEGORY_LABEL, COUNTRY_NAME, type CountryCode, type Sword, type SwordArt } from '@snb/domain';
+import { SEED_TRANSLATIONS_EN } from '@snb/mocks';
 import { SwordRelief } from '@snb/sword-art';
 
 import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
 
-import { normalizeArt, normalizeStories } from '../model/normalize-art';
+import { normalizeArt, normalizeStories, normalizeTranslation } from '../model/normalize-art';
 
 import type { Color } from 'antd/es/color-picker';
 
@@ -129,9 +130,13 @@ export function ProductForm({ initial }: { initial?: Sword }) {
   const watched = Form.useWatch([], { form, preserve: true }) as SwordInput | undefined;
 
   const template = initial ?? swords.data?.[0];
-  const initialValues: Partial<SwordInput> | undefined =
-    initial ??
-    (template
+  const initialValues: Partial<SwordInput> | undefined = initial
+    ? {
+        ...initial,
+        // 예전에 저장된 데이터에 영어 글이 없으면 같은 상품의 시드 번역을 채워 둡니다.
+        translations: { en: initial.translations ? initial.translations.en : SEED_TRANSLATIONS_EN[initial.id] },
+      }
+    : template
       ? {
           category: 'east',
           origin: 'KR',
@@ -147,7 +152,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           },
           art: template.art,
         }
-      : undefined);
+      : undefined;
 
   const previewArt: SwordArt | undefined = watched?.art?.blade
     ? normalizeArt(watched.art, watched.specs?.bladeLength)
@@ -172,6 +177,9 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           stories: normalizeStories(values.stories),
           art: normalizeArt(values.art, values.specs.bladeLength),
         };
+        const en = normalizeTranslation(values.translations?.en);
+        // 비우면 빈 객체로 저장해 '일부러 지움'을 남깁니다(쇼핑몰이 시드 번역으로 되돌아가지 않음).
+        data.translations = en ? { en } : {};
         save.mutate(data);
       }}
     >
@@ -471,6 +479,71 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                   ))}
                   <Button icon={<PlusOutlined aria-hidden />} onClick={() => add({ when: '', text: '' })}>
                     이야기 추가
+                  </Button>
+                </Flex>
+              )}
+            </Form.List>
+          </Card>
+
+          <Card
+            title={<h2 style={{ margin: 0, fontSize: 16 }}>영어(English)</h2>}
+            extra={<Typography.Text type="secondary">쇼핑몰 /en 화면에 보입니다</Typography.Text>}
+            style={{ marginTop: 16 }}
+          >
+            <Typography.Paragraph type="secondary">
+              모두 비우면 영어 화면에서 한국어 원문을 보여 줍니다. 이름은 기본 정보의 영문 이름을 씁니다.
+            </Typography.Paragraph>
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item name={['translations', 'en', 'era']} label="영어 시대">
+                  <Input lang="en" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item name={['translations', 'en', 'material']} label="영어 소재">
+                  <Input lang="en" />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item name={['translations', 'en', 'summary']} label="영어 한 줄 소개">
+                  <Input lang="en" maxLength={160} showCount />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item name={['translations', 'en', 'description']} label="영어 설명">
+                  <Input.TextArea lang="en" rows={4} />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.List name={['translations', 'en', 'stories']}>
+              {(fields, { add, remove }) => (
+                <Flex vertical gap={12}>
+                  {fields.map((field, index) => (
+                    <Row key={field.key} gutter={12} align="top">
+                      <Col xs={24} md={6}>
+                        <Form.Item name={[field.name, 'when']} label={`영어 이야기 ${index + 1}: 때`}>
+                          <Input lang="en" placeholder="e.g. 1790, Legend" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={15}>
+                        <Form.Item name={[field.name, 'text']} label={`영어 이야기 ${index + 1}: 내용`}>
+                          <Input.TextArea lang="en" autoSize={{ minRows: 1, maxRows: 4 }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={3}>
+                        <Button
+                          className="story-remove"
+                          icon={<DeleteOutlined aria-hidden />}
+                          onClick={() => remove(field.name)}
+                          danger
+                        >
+                          <span className="sr-only">영어 이야기 {index + 1} </span>지우기
+                        </Button>
+                      </Col>
+                    </Row>
+                  ))}
+                  <Button icon={<PlusOutlined aria-hidden />} onClick={() => add({ when: '', text: '' })}>
+                    영어 이야기 추가
                   </Button>
                 </Flex>
               )}

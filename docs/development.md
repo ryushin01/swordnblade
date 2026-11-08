@@ -71,7 +71,7 @@ E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel
 - 쇼핑몰만 한국어와 영어를 지원합니다. 한국어는 지금 주소(`/`), 영어는 `/en` 아래입니다(`localePrefix: 'as-needed'`). 브라우저 언어로 자동 이동하지 않습니다.
 - `src/proxy.ts`(Next 16의 미들웨어)가 언어 경로를 처리합니다. `/admin`, `/storybook`, `/api`, 정적 파일은 건드리지 않습니다.
 - 라우트는 `src/app/[locale]/` 아래에 있고, 화면 글은 `shared/i18n/messages/{ko,en}.json`에 있습니다. 앱 안 이동에는 `next/link` 대신 `@/shared/i18n`의 `Link`·`useRouter`를 씁니다(`/en`을 알아서 붙임).
-- 도검의 영어 글은 `packages/mocks/src/seed-en.ts`에 있고 `Sword.translations.en`으로 붙습니다. 화면은 `localizeForLocale`로 바꿔 보여 주며, 예전에 저장된 Mock 데이터에 번역이 없으면 같은 id의 시드 번역을, 그것도 없으면(어드민에서 새로 만든 도검) 한국어 원문을 씁니다. 어드민은 한국어만 고칩니다.
+- 도검의 영어 글은 `packages/mocks/src/seed-en.ts`에 있고 `Sword.translations.en`으로 붙습니다. 화면은 `localizeForLocale`로 바꿔 보여 주며, 예전에 저장된 Mock 데이터에 번역이 없으면 같은 id의 시드 번역을, 그것도 없으면(어드민에서 새로 만든 도검) 한국어 원문을 씁니다. 어드민 상품 수정 화면의 "영어(English)" 카드에서 영어 글을 고칩니다. 모두 비우면 `translations`를 빈 객체로 저장해, 시드 번역으로 되돌아가지 않고 한국어 원문을 보여 줍니다.
 - 금액은 한국어 `1,234원`, 영어 `₩1,234`로, 국가 이름·주문 상태·허가 안내도 언어에 맞춥니다(`@snb/domain`의 `i18n.ts`).
 - 머리글의 언어 링크는 지금 주소와 검색 조건을 그대로 두고 언어만 바꿉니다. 링크 글자는 그 언어로 쓰고 `lang`·`hrefLang`을 붙입니다. 페이지마다 `hreflang` 대체 주소를 알립니다.
 - 시드 도검 상세, 장바구니, 주문서는 언어마다 정적으로 만듭니다(`setRequestLocale`).

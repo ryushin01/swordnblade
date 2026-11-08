@@ -1,4 +1,4 @@
-import type { SwordArt, SwordStory } from '@snb/domain';
+import type { SwordArt, SwordStory, SwordTranslation } from '@snb/domain';
 
 /**
  * 폼에서 비운 선택 값을 그림 데이터에 맞게 정리합니다.
@@ -28,4 +28,20 @@ export function normalizeStories(stories: Array<Partial<SwordStory>> | undefined
   return (stories ?? [])
     .map((story) => ({ when: (story.when ?? '').trim(), text: (story.text ?? '').trim() }))
     .filter((story) => story.text);
+}
+
+/**
+ * 영어 글을 정리합니다. 모든 칸이 비면 undefined를 돌려줘 번역을 지웁니다
+ * (쇼핑몰 영어 화면은 그때 한국어 원문을 보여 줍니다).
+ */
+export function normalizeTranslation(
+  translation: (Partial<Omit<SwordTranslation, 'stories'>> & { stories?: Array<Partial<SwordStory>> }) | undefined,
+): SwordTranslation | undefined {
+  const summary = (translation?.summary ?? '').trim();
+  const description = (translation?.description ?? '').trim();
+  const era = (translation?.era ?? '').trim();
+  const material = (translation?.material ?? '').trim();
+  const stories = normalizeStories(translation?.stories);
+  if (!summary && !description && !era && !material && stories.length === 0) return undefined;
+  return { summary, description, era, material, stories };
 }
