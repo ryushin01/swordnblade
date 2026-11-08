@@ -10,4 +10,4 @@ export {
   toSwordKind,
   toSwordSort,
 } from './model/filter';
-export { SwordTile } from './ui/sword-tile';
+export { SwordTile, type SwordTileData } from './ui/sword-tile';

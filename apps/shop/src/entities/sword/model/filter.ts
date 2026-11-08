@@ -36,6 +36,7 @@ export function paginate<T>(items: T[], page: number, size = PAGE_SIZE) {
   const start = (current - 1) * size;
   return {
     items: items.slice(start, start + size),
+    total: items.length,
     page: current,
     pages,
     from: start + 1,

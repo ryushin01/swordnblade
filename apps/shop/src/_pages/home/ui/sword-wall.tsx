@@ -2,16 +2,34 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { filterSwords, localizeForLocale, paginate, type SwordSort, SwordTile, useSwords } from '@/entities/sword';
+import {
+  filterSwords,
+  localizeForLocale,
+  paginate,
+  type SwordSort,
+  SwordTile,
+  type SwordTileData,
+  useSwords,
+} from '@/entities/sword';
 import { Link } from '@/shared/i18n';
 import { Button } from '@/shared/ui';
 
 import { Pagination } from './pagination';
 
-import type { Locale, Sword, SwordCategory, SwordKind } from '@snb/domain';
+import type { Locale, SwordCategory, SwordKind } from '@snb/domain';
 
 const GRID = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4';
 const CELL = 'border-b border-r border-line';
+
+/** 벽에 보여 줄 한 쪽 */
+export interface WallView {
+  items: SwordTileData[];
+  total: number;
+  page: number;
+  pages: number;
+  from: number;
+  to: number;
+}
 
 /** 석고 벽처럼 정사각 칸을 이어 붙인 상품 목록 */
 interface SwordWallProps {
@@ -21,17 +39,26 @@ interface SwordWallProps {
   kind?: SwordKind;
   /** 1부터 시작하는 쪽 번호 */
   page: number;
-  /** 서버가 시드로 먼저 그린 목록 */
-  initialSwords?: Sword[];
+  /** 서버가 시드로 먼저 그린 지금 쪽. Mock API 값이 오면 바뀝니다. */
+  initialView?: WallView;
   labelledBy: string;
 }
 
-export function SwordWall({ category, q, sort, kind, page, initialSwords, labelledBy }: SwordWallProps) {
+export function SwordWall({ category, q, sort, kind, page, initialView, labelledBy }: SwordWallProps) {
   const t = useTranslations('Home');
   const locale = useLocale() as Locale;
-  const { data, isPending, isError, refetch } = useSwords(category, initialSwords);
+  const { data, isError, refetch } = useSwords(category);
+  const shown: WallView | undefined = data
+    ? paginate(
+        filterSwords(
+          data.map((sword) => localizeForLocale(sword, locale)),
+          { q, sort, kind },
+        ),
+        page,
+      )
+    : initialView;
 
-  if (isError) {
+  if (isError && !data) {
     return (
       <div role="alert" className="grid justify-items-center gap-4 px-4 py-24 text-center">
         <p>{t('loadError')}</p>
@@ -42,7 +69,7 @@ export function SwordWall({ category, q, sort, kind, page, initialSwords, labell
     );
   }
 
-  if (isPending) {
+  if (!shown) {
     return (
       <div aria-busy="true" aria-live="polite" className={`${GRID} border-l border-t border-line`}>
         <p className="sr-only">{t('loading')}</p>
@@ -53,11 +80,6 @@ export function SwordWall({ category, q, sort, kind, page, initialSwords, labell
     );
   }
 
-  const swords = filterSwords(
-    data.map((sword) => localizeForLocale(sword, locale)),
-    { q, sort, kind },
-  );
-  const shown = paginate(swords, page);
   // 쪽 링크와 검색어 지우기에 지금 조건을 그대로 넘깁니다(기본값은 주소에 남기지 않음).
   const withoutQuery: Record<string, string> = {
     ...(category ? { category } : {}),
@@ -66,7 +88,7 @@ export function SwordWall({ category, q, sort, kind, page, initialSwords, labell
   };
   const query = q ? { ...withoutQuery, q } : withoutQuery;
   const resetHref = { pathname: '/' as const, query: withoutQuery };
-  const counts = { q, count: swords.length, from: shown.from, to: shown.to };
+  const counts = { q, count: shown.total, from: shown.from, to: shown.to };
   const status =
     shown.pages > 1 ? t(q ? 'resultPageStatus' : 'pageStatus', counts) : t(q ? 'resultCount' : 'count', counts);
 
@@ -83,7 +105,7 @@ export function SwordWall({ category, q, sort, kind, page, initialSwords, labell
           </>
         ) : null}
       </p>
-      {swords.length === 0 ? (
+      {shown.total === 0 ? (
         <p className="px-4 py-24 text-center">{q ? t('emptyQuery', { q }) : t('emptyCategory')}</p>
       ) : (
         <ul aria-labelledby={labelledBy} className={`${GRID} border-l border-t border-line`}>
