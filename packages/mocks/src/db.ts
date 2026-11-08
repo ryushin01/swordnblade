@@ -32,6 +32,9 @@ export interface Db {
   reset: () => void;
 }
 
+/** 출처를 확인하지 못해 시드에서 뺀 도검. 예전 데이터에서도 지웁니다. */
+const REMOVED_SEED_IDS = ['sw-ings-sword', 'sw-hwer', 'sw-ecke-king'];
+
 const clone = <T>(value: T): T => structuredClone(value);
 
 const seedState = (): DbState => ({
@@ -66,7 +69,8 @@ export function migrateSeed(state: DbState): DbState {
     };
   });
   const added = SEED_SWORDS.filter((seed) => !byId.has(seed.id)).map(clone);
-  return { ...state, swords: [...swords, ...added], seedVersion: SEED_VERSION };
+  const kept = swords.filter((sword) => !REMOVED_SEED_IDS.includes(sword.id));
+  return { ...state, swords: [...kept, ...added], seedVersion: SEED_VERSION };
 }
 
 /**

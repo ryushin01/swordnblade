@@ -1064,8 +1064,8 @@ export const EAST_ENTRIES: CatalogEntry[] = [
       [
         '조선',
         'Joseon',
-        '호랑이의 기운을 담은 사인검처럼, 때를 맞춰 쇠를 두드려 나쁜 기운을 물리치는 칼로 여겼습니다.',
-        'Like the tiger-sign saingeom, it was timed to its sign and treated as a blade that wards off evil.',
+        '호랑이의 기운을 담은 사인검의 형식을 따랐습니다. 사진검을 직접 다룬 자료는 드물어, 이 재현품의 모습은 사인검을 바탕으로 상상한 것입니다.',
+        'It follows the form of the tiger-sign saingeom. Sources on the sajingeom itself are scarce, so this replica is imagined from the saingeom.',
       ],
     ],
     specs: [640, 820, 950],

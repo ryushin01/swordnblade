@@ -1078,8 +1078,8 @@ export const LEGEND_A: CatalogEntry[] = [
     story: [
       '중세 로맨스',
       'Medieval romance',
-      '호른은 이 검을 빼앗겼다가 다시 찾아 나라를 되찾습니다.',
-      'Horn loses the sword, wins it back and reclaims his kingdom.',
+      '호른이 이 검을 빼앗겼다가 다시 찾았다는 이야기가 국내 정리본에 전합니다. 원전에서 이름을 확인하지는 못했습니다.',
+      'Korean compilations say Horn lost and regained it; the name could not be confirmed in the original texts.',
     ],
     specs: [860, 1080, 1400],
     price: 5_200_000,
@@ -1128,8 +1128,8 @@ export const LEGEND_A: CatalogEntry[] = [
     story: [
       '중세 로맨스',
       'Medieval romance',
-      '호른 왕 이야기의 한 판본에서 왕의 검으로 나옵니다.',
-      'One version of the King Horn tale names it as the king’s sword.',
+      '호른 왕의 검이라는 이야기가 국내 정리본에 전합니다. 원전에서 이름을 확인하지는 못했습니다.',
+      'Korean compilations name it as King Horn’s sword; the name could not be confirmed in the original texts.',
     ],
     specs: [880, 1100, 1450],
     price: 6_000_000,
