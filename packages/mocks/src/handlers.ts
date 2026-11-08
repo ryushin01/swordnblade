@@ -84,7 +84,12 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       if (!file.type.startsWith('image/')) return error(415, { message: '이미지 파일만 올릴 수 있습니다.' });
       if (file.size > MAX_IMAGE_BYTES) return error(413, { message: '사진은 5MB 이하만 올릴 수 있습니다.' });
       const id = crypto.randomUUID();
-      await images.put(id, { type: file.type, data: await file.arrayBuffer() });
+      try {
+        await images.put(id, { type: file.type, data: await file.arrayBuffer() });
+      } catch {
+        // 저장하지 못한 사진의 주소를 돌려주면 상품에 깨진 사진이 남으므로 실패로 알립니다.
+        return error(507, { message: '사진을 저장하지 못했습니다. 브라우저 저장 공간을 확인해 주세요.' });
+      }
       return HttpResponse.json({ url: `/api/images/${id}` }, { status: 201 });
     }),
 
