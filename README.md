@@ -1,7 +1,7 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.4.3-7a4a35)
+![version](https://img.shields.io/badge/version-0.5.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
@@ -47,6 +47,7 @@
 | 한국어·영어 | 한국어는 `/`, 영어는 `/en`. 화면 글, 도검 16점의 설명과 이야기, 국가별 허가 안내를 영어로 옮겼고, 머리글에서 언어를 바꿉니다. 어드민은 한국어만 제공합니다. |
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
 | 주문 | 오류 요약과 칸별 안내, 중복 제출 방지. 금액은 Mock 서버가 다시 계산합니다. |
+| 회원 | 회원가입·로그인, 내 계정(회원 정보·내 주문). 로그인하면 주문서에 이름과 이메일이 채워집니다. |
 
 **어드민** (`apps/admin`, Ant Design, 쇼핑몰 주소의 `/admin`)
 
