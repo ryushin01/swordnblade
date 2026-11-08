@@ -1,6 +1,8 @@
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from './normalize-art';
+import { mergeArt, normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from './normalize-art';
+
+import type { SwordArt } from '@snb/domain';
 
 const ssangsudo = SEED_SWORDS[0]!.art;
 
@@ -82,5 +84,39 @@ describe('normalizeImages', () => {
       { url: '/api/images/a', alt: '칼날' },
       { url: '/api/images/b', alt: '손잡이', altEn: 'Grip' },
     ]);
+  });
+});
+
+describe('mergeArt', () => {
+  const saved = {
+    blade: {
+      length: 900,
+      width: 36,
+      curve: 20,
+      edge: 'single',
+      tip: 'kissaki',
+      sleeve: { length: 190, color: '#b8734f' },
+    },
+    guard: { type: 'plate', width: 72, color: '#d4af57' },
+    grip: { length: 330, color: '#5a1410', wrap: 'helix', ferrule: { length: 24, color: '#d4af57' } },
+    pommel: { type: 'cap', color: '#d4af57' },
+  } as SwordArt;
+
+  it('폼에 칸이 없는 값은 지키고, 폼에서 고친 값은 반영한다', () => {
+    const form = {
+      blade: { length: 950, width: 36, curve: 20, edge: 'single', tip: 'kissaki' },
+      guard: { type: 'plate', width: 80, color: '#d4af57' },
+      grip: { length: 330, color: '#5a1410', wrap: 'helix' },
+      pommel: { type: 'cap', color: '#d4af57' },
+    } as SwordArt;
+    const merged = mergeArt(saved, form);
+    expect(merged.blade.sleeve).toEqual(saved.blade.sleeve);
+    expect(merged.grip.ferrule).toEqual(saved.grip.ferrule);
+    expect(merged.blade.length).toBe(950);
+    expect(merged.guard.width).toBe(80);
+  });
+
+  it('새 상품은 폼 값을 그대로 쓴다', () => {
+    expect(mergeArt(undefined, saved)).toBe(saved);
   });
 });

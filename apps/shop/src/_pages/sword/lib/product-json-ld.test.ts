@@ -1,6 +1,9 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { productJsonLd } from './product-json-ld';
+import { productJsonLd, swordOgImage } from './product-json-ld';
 
 describe('productJsonLd', () => {
   const sword = SEED_SWORDS[0]!;
@@ -20,5 +23,10 @@ describe('productJsonLd', () => {
     const output = productJsonLd({ ...sword, name: '</script><b>' }, 'ko');
     expect(output).not.toContain('<');
     expect((JSON.parse(output) as { name: string }).name).toBe('</script><b>');
+  });
+
+  it('모든 시드 도검에 공유 이미지 파일이 있다', () => {
+    const missing = SEED_SWORDS.filter((item) => !existsSync(resolve(`public${swordOgImage(item.slug)}`)));
+    expect(missing.map((item) => item.slug)).toEqual([]);
   });
 });

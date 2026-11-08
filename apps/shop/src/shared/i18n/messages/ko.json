@@ -229,7 +229,11 @@
     "hilt": "손잡이 확대",
     "tip": "칼끝 확대",
     "photo": "사진 {n}",
-    "thumb": "이미지 {n}: {label}"
+    "thumb": "이미지 {n}: {label}",
+    "guard": "코등이 확대",
+    "bladeBase": "칼날 밑동 확대",
+    "mid": "칼날 중간 확대",
+    "sleeve": "덧쇠 확대"
   },
   "Auth": {
     "loginTitle": "로그인",

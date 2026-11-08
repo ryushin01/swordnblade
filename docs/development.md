@@ -94,6 +94,10 @@ E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel
 - 시드 도검 상세는 빌드할 때 정적으로 만듭니다(`generateStaticParams`). 어드민에서 새로 만든 도검은 브라우저에서 불러옵니다.
 - 찾기·정렬은 GET 폼(`next/form`)이라 결과가 주소(`?q=&sort=`)에 남습니다.
 
+## 도검별 공유 이미지
+
+`apps/shop/public/og/swords/<slug>.jpg`(1200×630)는 부조 그림의 SVG 필터 때문에 실제 브라우저로 그려 저장합니다. 시드 도검이 바뀌면 프로덕션 서버를 띄우고 `node scripts/generate-og.mjs http://localhost:3101`을 `apps/shop`에서 실행합니다. 파일이 빠지면 단위 테스트가 실패합니다.
+
 ## 성능 (Lighthouse, 모바일)
 
 | 화면 | 성능 | 접근성 | 권장사항 | SEO |

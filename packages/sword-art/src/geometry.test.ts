@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { bladeOutline, CATALOG_SIDE, hiltLayout, localBounds, squareViewBox } from './geometry';
+import {
+  bladeOutline,
+  CATALOG_SIDE,
+  focusViewBox,
+  hiltLayout,
+  localBounds,
+  type ReliefFocus,
+  squareViewBox,
+} from './geometry';
 
 describe('sword geometry', () => {
   it('모든 시드 도검의 viewBox가 유한한 정사각형이다', () => {
@@ -31,5 +39,19 @@ describe('sword geometry', () => {
     const layout = hiltLayout(ssangsudo.art);
     expect(layout.gripEnd - layout.gripStart).toBe(ssangsudo.art.grip.length);
     expect(localBounds(ssangsudo.art).maxY).toBeGreaterThanOrEqual(layout.pommelEnd);
+  });
+
+  it('모든 도검의 확대 보기는 전체 그림보다 좁은 유한한 정사각 영역이다', () => {
+    for (const sword of SEED_SWORDS) {
+      const side = (focus: ReliefFocus) => {
+        const [, , width, height] = focusViewBox(sword.art, focus).split(' ').map(Number);
+        expect(width, `${sword.slug} ${focus}`).toBe(height);
+        expect(Number.isFinite(width), `${sword.slug} ${focus}`).toBe(true);
+        return width!;
+      };
+      for (const focus of ['guard', 'mid', 'sleeve'] as const) {
+        expect(side(focus), `${sword.slug} ${focus}`).toBeLessThanOrEqual(side('full'));
+      }
+    }
   });
 });

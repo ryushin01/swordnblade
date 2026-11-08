@@ -246,24 +246,32 @@ function Sleeve({ art, layer }: { art: SwordArt; layer: Layer }) {
   const isHeight = layer === 'height';
   const end = -Math.min(art.blade.length * 0.6, sleeve.length);
   const w = art.blade.width;
+  // 코등이 쪽 두 개와 칼날 쪽 두 개. 양쪽 모두 칼날 너비 방향으로 짝지어 살짝 엇갈립니다.
   const rivets: Array<[number, number]> = [
-    [-w * 0.26, -w * 0.45],
-    [w * 0.26, -w * 0.9],
-    [-w * 0.26, end + w * 0.9],
-    [w * 0.26, end + w * 0.45],
+    [-w * 0.27, -w * 0.95],
+    [w * 0.27, -w * 0.75],
+    [-w * 0.27, end + w * 0.6],
+    [w * 0.27, end + w * 0.8],
   ];
+  // 접어 감싼 덧쇠의 이음선. 날 쪽 가장자리를 따라갑니다.
+  const seam = Array.from({ length: 9 }, (_, index) => {
+    const y = (end * index) / 8;
+    return `${bladeCenterX(art, -y / art.blade.length) + w * 0.4},${y}`;
+  }).join(' ');
   return (
     <g>
       <path d={pointsToPath(sleevePoints(art, sleeve.length))} fill={isHeight ? H.raised : sleeve.color} />
-      {rivets.map(([x, y]) => (
-        <circle
-          key={`${x}${y}`}
-          cx={x + bladeCenterX(art, -y / art.blade.length)}
-          cy={y}
-          r={w * 0.09}
-          fill={isHeight ? H.top : '#00000040'}
-        />
-      ))}
+      {/* 높이 층에 그리면 조명 때문에 검은 홈처럼 보이므로 채색 층에만 옅게 그립니다. */}
+      {isHeight ? null : <polyline points={seam} fill="none" stroke="#00000022" strokeWidth={1.5} />}
+      {rivets.map(([x, y]) => {
+        const cx = x + bladeCenterX(art, -y / art.blade.length);
+        return (
+          <g key={`${x}${y}`}>
+            <circle cx={cx} cy={y} r={w * 0.12} fill={isHeight ? H.low : '#00000055'} />
+            <circle cx={cx} cy={y} r={w * 0.075} fill={isHeight ? H.top : sleeve.color} />
+          </g>
+        );
+      })}
     </g>
   );
 }
@@ -416,6 +424,38 @@ function Guard({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; laye
           <rect x={-layout.gripWidth / 2 - 2} y={t - 1} width={layout.gripWidth + 4} height={4} rx={1} fill={accent} />
         </g>
       );
+    case 'plate': {
+      // 손잡이 쪽 면이 보이도록 비스듬히 그려, 칼날 쪽으로 두툼한 테두리가 드러납니다.
+      const ry = half * 0.42;
+      const rimY = t * 0.2;
+      const bevelY = rimY + (t - rimY) * 0.45;
+      const rim = isHeight ? H.mid : accent;
+      return (
+        <g>
+          <ellipse cx={0} cy={rimY} rx={half} ry={ry} fill={rim} />
+          <rect x={-half} y={rimY} width={guard.width} height={t - rimY} fill={rim} />
+          <ellipse
+            cx={0}
+            cy={bevelY}
+            rx={half}
+            ry={ry}
+            fill="none"
+            stroke={isHeight ? H.top : '#ffffff55'}
+            strokeWidth={1.5}
+          />
+          <ellipse cx={0} cy={t} rx={half} ry={ry} fill={fill} />
+          <ellipse
+            cx={0}
+            cy={t}
+            rx={half - 3}
+            ry={ry - 2}
+            fill="none"
+            stroke={isHeight ? H.top : '#ffffff66'}
+            strokeWidth={1.5}
+          />
+        </g>
+      );
+    }
     case 'cross':
       return (
         <g>
@@ -547,6 +587,43 @@ function Guard({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; laye
         />
       );
   }
+}
+
+/** 코등이 판에서 솟은 원통형 쇠 깃. 양 끝을 타원으로 그려 원통처럼 보이게 합니다. */
+function Ferrule({
+  ferrule,
+  y0,
+  width,
+  isHeight,
+}: {
+  ferrule: NonNullable<SwordArt['grip']['ferrule']>;
+  y0: number;
+  width: number;
+  isHeight: boolean;
+}) {
+  const rx = width / 2 + 3;
+  const ry = rx * 0.42;
+  const end = y0 + ferrule.length;
+  const fill = isHeight ? H.top : ferrule.color;
+  return (
+    <g>
+      <path d={`M${-rx} ${y0} L${-rx} ${end} A${rx} ${ry} 0 0 0 ${rx} ${end} L${rx} ${y0} Z`} fill={fill} />
+      <ellipse cx={0} cy={y0} rx={rx} ry={ry} fill={fill} />
+      <path
+        d={`M${-rx} ${end} A${rx} ${ry} 0 0 0 ${rx} ${end}`}
+        fill="none"
+        stroke={isHeight ? H.low : '#00000040'}
+        strokeWidth={1.5}
+      />
+      <rect
+        x={-rx * 0.45}
+        y={y0 - ry * 0.3}
+        width={rx * 0.3}
+        height={ferrule.length + ry * 0.9}
+        fill={isHeight ? H.top : '#ffffff40'}
+      />
+    </g>
+  );
 }
 
 function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayout; layer: Layer; clipId: string }) {
@@ -690,6 +767,7 @@ function Grip({ art, layout, layer, clipId }: { art: SwordArt; layout: HiltLayou
       <g clipPath={`url(#${clipId})`}>{wrap}</g>
       {/* 손잡이 양 끝 쇠테(후치) */}
       <rect x={-w / 2 - 2} y={y0} width={w + 4} height={7} rx={2} fill={isHeight ? H.raised : art.pommel.color} />
+      {grip.ferrule ? <Ferrule ferrule={grip.ferrule} y0={y0} width={w} isHeight={isHeight} /> : null}
     </g>
   );
 }

@@ -180,15 +180,21 @@ test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 
 test('상세 갤러리: 이전·다음 버튼과 썸네일로 넘기고 위치를 알린다', async ({ page }) => {
   await page.goto('/swords/ssangsudo');
   const gallery = page.getByRole('region', { name: '이미지' });
-  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await expect(gallery.getByText('1 / 5: 전체 모습')).toBeVisible();
   await gallery.getByRole('button', { name: '다음 이미지' }).click();
-  await expect(gallery.getByText('2 / 3: 손잡이 확대')).toBeVisible();
+  await expect(gallery.getByText('2 / 5: 손잡이 확대')).toBeVisible();
   await expect(gallery.getByRole('button', { name: '이미지 2: 손잡이 확대' })).toHaveAttribute('aria-current', 'true');
   await gallery.getByRole('button', { name: '이미지 3: 칼끝 확대' }).click();
   await expect(gallery.getByRole('img', { name: /칼끝 확대/ })).toBeVisible();
+  await expect(gallery.getByRole('button', { name: /^이미지 \d/ })).toHaveCount(5);
   await gallery.getByRole('button', { name: '다음 이미지' }).click();
-  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await expect(gallery.getByText('4 / 5: 코등이 확대')).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('5 / 5: 덧쇠 확대')).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('1 / 5: 전체 모습')).toBeVisible();
   await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
 });
 
 test('찜하기: 상세에서 찜하고 찜 목록에서 보고 뺀다', async ({ page }) => {
@@ -242,10 +248,11 @@ test('검색 엔진: sitemap, robots, 공유 정보, 상품 구조화 데이터'
   expect(sitemap).toContain('/swords/bongukgeom');
   expect(await (await request.get('/robots.txt')).text()).toContain('sitemap.xml');
   expect((await request.get('/og.jpg')).status()).toBe(200);
+  expect((await request.get('/og/swords/ssangsudo.jpg')).status()).toBe(200);
 
   await page.goto('/swords/ssangsudo');
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', '쌍수도');
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\.jpg/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/swords\/ssangsudo\.jpg/);
   const product = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}') as {
     '@type': string;
     offers: { price: number };

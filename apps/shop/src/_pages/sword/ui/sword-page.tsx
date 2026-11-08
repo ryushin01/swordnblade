@@ -4,10 +4,9 @@ import { type Locale } from '@snb/domain';
 import { SEED_SWORDS } from '@snb/mocks';
 
 import { localizeForLocale } from '@/entities/sword';
-import { SITE } from '@/shared/config';
 import { type AppLocale, languageAlternates } from '@/shared/i18n';
 
-import { productJsonLd } from '../lib/product-json-ld';
+import { productJsonLd, swordOgImage } from '../lib/product-json-ld';
 import { SwordDetail } from './sword-detail';
 
 import type { Metadata } from 'next';
@@ -27,7 +26,7 @@ export async function generateSwordMetadata({ params }: { params: Params }): Pro
     title: sword.name,
     description: sword.summary,
     alternates,
-    openGraph: { title: sword.name, description: sword.summary, images: [SITE.ogImage] },
+    openGraph: { title: sword.name, description: sword.summary, images: [swordOgImage(sword.slug)] },
   };
 }
 

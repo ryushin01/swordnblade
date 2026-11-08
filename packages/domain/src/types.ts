@@ -82,7 +82,7 @@ export interface SwordArt {
   };
   collar?: { color: string };
   guard: {
-    /** dguard 손등 보호대, swept 스웹트 힐트, cup 컵 힐트, basket 바구니 힐트, katar 카타르 H자 틀, crescent 초승달(구), ring 총구 고리(대검), ganja 비대칭 받침(크리스) */
+    /** dguard 손등 보호대, swept 스웹트 힐트, cup 컵 힐트, basket 바구니 힐트, katar 카타르 H자 틀, crescent 초승달(구), ring 총구 고리(대검), ganja 비대칭 받침(크리스), plate 두툼한 민무늬 원판(쌍수도) */
     type:
       | 'disc'
       | 'cross'
@@ -97,7 +97,8 @@ export interface SwordArt {
       | 'katar'
       | 'crescent'
       | 'ring'
-      | 'ganja';
+      | 'ganja'
+      | 'plate';
     width: number;
     color: string;
     accent?: string;
@@ -108,6 +109,8 @@ export interface SwordArt {
     /** helix 촘촘한 나선 끈, plain 민무늬, split 둘로 나뉜 손잡이(발리송), katar 가로 손잡이(카타르) */
     wrap: 'diamond' | 'cord' | 'wire' | 'leather' | 'ribbed' | 'helix' | 'plain' | 'split' | 'katar';
     wrapColor?: string;
+    /** 코등이 바로 뒤의 원통형 쇠 깃(쌍수도의 황동 깃). length는 mm */
+    ferrule?: { length: number; color: string };
   };
   pommel: {
     /** none 없음, crook 굽은 지팡이 머리, beak 새부리(세이버), spike 뾰족한 끝(구) */

@@ -34,7 +34,13 @@ import { SwordRelief } from '@snb/sword-art';
 import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
 
-import { normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from '../model/normalize-art';
+import {
+  mergeArt,
+  normalizeArt,
+  normalizeImages,
+  normalizeStories,
+  normalizeTranslation,
+} from '../model/normalize-art';
 import { ImagesField } from './images-field';
 
 import type { Color } from 'antd/es/color-picker';
@@ -56,6 +62,7 @@ const GUARD_LABEL: Record<SwordArt['guard']['type'], string> = {
   crescent: '초승달(호두구)',
   ring: '총구 고리(총검)',
   ganja: '비대칭 받침(크리스)',
+  plate: '두툼한 원판(쌍수도)',
 };
 const WRAP_LABEL: Record<SwordArt['grip']['wrap'], string> = {
   diamond: '마름모 끈 감기',
@@ -208,7 +215,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           id: initial?.id,
           stories: normalizeStories(values.stories),
           images: normalizeImages(values.images),
-          art: normalizeArt(values.art, values.specs.bladeLength),
+          art: normalizeArt(mergeArt(initial?.art, values.art), values.specs.bladeLength),
         };
         const en = normalizeTranslation(values.translations?.en);
         // 비우면 빈 객체로 저장해 '일부러 지움'을 남깁니다(쇼핑몰이 시드 번역으로 되돌아가지 않음).

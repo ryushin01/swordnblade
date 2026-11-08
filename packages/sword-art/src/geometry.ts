@@ -197,6 +197,8 @@ export function guardThickness(art: SwordArt): number {
   switch (art.guard.type) {
     case 'disc':
       return Math.max(14, art.guard.width * 0.22);
+    case 'plate':
+      return Math.max(12, art.guard.width * 0.2);
     case 'cross':
     case 'quillon':
       return 18;
@@ -330,22 +332,47 @@ export function squareViewBox(art: SwordArt, frame: 'fit' | 'catalog', padding =
   return `${(cx - side / 2).toFixed(1)} ${(cy - side / 2).toFixed(1)} ${side.toFixed(1)} ${side.toFixed(1)}`;
 }
 
-export type ReliefFocus = 'full' | 'hilt' | 'tip';
+export type ReliefFocus = 'full' | 'hilt' | 'tip' | 'guard' | 'mid' | 'sleeve';
 
 /**
  * 상세 갤러리의 확대 보기용 정사각 viewBox.
  * - hilt: 칼날 밑동부터 손잡이 끝까지
  * - tip: 칼끝 쪽 3할(짧은 칼은 칼날 너비의 7배 이상)
+ * - guard: 코등이와 그 앞뒤
+ * - mid: 칼날 가운데
+ * - sleeve: 칼날 밑동의 덧쇠(덧쇠가 없으면 코등이 쪽 밑동)
  */
 export function focusViewBox(art: SwordArt, focus: ReliefFocus): string {
   if (focus === 'full') return squareViewBox(art, 'fit');
   const full = localBounds(art);
   const { length, width } = art.blade;
   const sleeve = art.blade.sleeve ? art.blade.sleeve.length : 0;
-  const bounds: Bounds =
-    focus === 'hilt'
-      ? { ...full, minY: -Math.max(width * 2.5, sleeve + width) }
-      : { ...full, maxY: -length + Math.max(length * 0.3, width * 7) };
+  const guardHalf = Math.max(art.guard.width / 2, width * 1.5, 30);
+  const midHalf = Math.min(Math.max(length * 0.14, width * 3.5), length * 0.3);
+  const midX = bladeCenterX(art, 0.5);
+  const regions: Record<Exclude<ReliefFocus, 'full'>, Bounds> = {
+    hilt: { ...full, minY: -Math.max(width * 2.5, sleeve + width) },
+    tip: { ...full, maxY: -length + Math.max(length * 0.3, width * 7) },
+    guard: {
+      minX: -guardHalf,
+      maxX: guardHalf,
+      minY: -Math.max(width * 1.2, guardHalf * 0.5),
+      maxY: guardThickness(art) + Math.max(width * 1.2, guardHalf * 0.5),
+    },
+    mid: {
+      minX: midX - midHalf / 2,
+      maxX: midX + midHalf / 2,
+      minY: -length / 2 - midHalf,
+      maxY: -length / 2 + midHalf,
+    },
+    sleeve: {
+      minX: -width * 2,
+      maxX: width * 2,
+      minY: -(Math.max(sleeve, width * 3) + width),
+      maxY: width,
+    },
+  };
+  const bounds = regions[focus];
   const b = rotatedBounds(bounds);
   const cx = (b.minX + b.maxX) / 2;
   const cy = (b.minY + b.maxY) / 2;

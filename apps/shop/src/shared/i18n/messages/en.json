@@ -229,7 +229,11 @@
     "hilt": "Hilt close-up",
     "tip": "Tip close-up",
     "photo": "Photo {n}",
-    "thumb": "Image {n}: {label}"
+    "thumb": "Image {n}: {label}",
+    "guard": "Guard close-up",
+    "bladeBase": "Blade base close-up",
+    "mid": "Mid-blade close-up",
+    "sleeve": "Blade sleeve close-up"
   },
   "Auth": {
     "loginTitle": "Log in",

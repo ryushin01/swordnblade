@@ -100,7 +100,7 @@ test('어드민에서 올린 사진이 쇼핑몰 상세 갤러리에 대체 텍�
 
   await page.goto('/swords/uchigatana');
   const gallery = page.getByRole('region', { name: '이미지' });
-  await gallery.getByRole('button', { name: '이미지 4: 사진 1' }).click();
+  await gallery.getByRole('button', { name: '이미지 6: 사진 1' }).click();
   const photo = gallery.getByRole('img', { name: '칼날을 따라 흐르는 하몬 무늬를 가까이 찍은 사진' });
   await expect(photo).toBeVisible();
   // Mock API(서비스 워커)가 실제 이미지를 돌려줬는지 확인합니다.
