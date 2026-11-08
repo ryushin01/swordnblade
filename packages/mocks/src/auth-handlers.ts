@@ -60,6 +60,7 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
 
   return [
     // 어드민 회원 목록. 비밀번호 해시는 내보내지 않습니다.
+    // Mock에는 어드민 계정이 없어(/api/orders와 같이) 권한을 검사하지 않습니다. 실제 서비스라면 서버에서 어드민 권한을 확인해야 합니다.
     http.get('*/api/users', async () => {
       await wait();
       const { users = [], orders } = db.read();
