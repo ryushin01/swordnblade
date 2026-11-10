@@ -7,9 +7,10 @@ base="${VERCEL_GIT_PREVIOUS_SHA:-}"
 if [ -z "$base" ] || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
   exit 1
 fi
-changed=$(git diff --name-only "$base" HEAD)
+# 이름을 바꾼 파일은 옛 경로도 보도록 --no-renames를 씁니다. 비교가 실패하면 변경이 없다고 보지 않고 빌드합니다.
+changed=$(git diff --no-renames --name-only "$base" HEAD) || exit 1
 [ -z "$changed" ] && exit 0
-if echo "$changed" | grep -qvE '(^docs/|^README\.md$|^CHANGELOG\.md$|\.md$|/e2e/|\.test\.tsx?$|\.stories\.tsx?$|^\.github/)'; then
+if echo "$changed" | grep -qvE '(^docs/|\.md$|/e2e/|\.test\.tsx?$|\.stories\.tsx$|^\.github/)'; then
   exit 1
 fi
 exit 0

@@ -73,4 +73,25 @@ describe('migrateSeed (시드 버전)', () => {
     expect(ids).toContain('custom-1');
     expect(ids.length).toBe(fresh.swords.length + 1);
   });
+
+  it('출처를 바로잡은 도검은 예전 데이터의 원어·영어 이름과 출고국도 바꾸고, 뺀 도검은 지운다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const legacy = {
+      ...fresh,
+      seedVersion: 5,
+      swords: [
+        ...fresh.swords.map((sword) =>
+          sword.id === 'sw-kuruchi' ? { ...sword, origin: 'IQ' as const, nameEn: 'Kuruchi', price: 1 } : sword,
+        ),
+        { ...fresh.swords[0]!, id: 'sw-hwer', slug: 'hwer' },
+      ],
+    };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+    const swords = createDb({ storageKey: 'test-db' }).read().swords;
+    const kuruchi = swords.find((sword) => sword.id === 'sw-kuruchi')!;
+    expect(kuruchi.origin).toBe('TR');
+    expect(kuruchi.nameEn).toBe('Copper Cutter of Heaven and Earth');
+    expect(kuruchi.price).toBe(1);
+    expect(swords.some((sword) => sword.id === 'sw-hwer')).toBe(false);
+  });
 });

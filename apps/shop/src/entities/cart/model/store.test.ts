@@ -31,5 +31,14 @@ describe('toValidLines', () => {
     expect(toValidLines([{ swordId: 'a', quantity: 1 }, { swordId: 1 }, null, { swordId: 'b', quantity: 0 }])).toEqual([
       { swordId: 'a', quantity: 1 },
     ]);
+    expect(
+      toValidLines([
+        { swordId: 'a', quantity: 99 },
+        { swordId: 'b', quantity: 1.4 },
+      ]),
+    ).toEqual([
+      { swordId: 'a', quantity: MAX_QUANTITY },
+      { swordId: 'b', quantity: 1 },
+    ]);
   });
 });

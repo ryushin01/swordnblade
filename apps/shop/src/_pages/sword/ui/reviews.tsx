@@ -4,7 +4,7 @@ import { type FormEvent, useId, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
-import { useMe, useMyOrders } from '@/entities/session';
+import { useMe, useMyOrders, useSessionHydrated, useSessionStore } from '@/entities/session';
 import { Link, usePathname } from '@/shared/i18n';
 import { Avatar, Button } from '@/shared/ui';
 
@@ -114,7 +114,9 @@ function ReviewForm({ slug }: { slug: string }) {
 export function Reviews({ slug, swordId }: { slug: string; swordId: string }) {
   const t = useTranslations('Reviews');
   const pathname = usePathname();
-  const { data: reviews } = useReviews(slug);
+  const { data: reviews, isPending: reviewsPending } = useReviews(slug);
+  const token = useSessionStore((state) => state.token);
+  const sessionReady = useSessionHydrated();
   const me = useMe();
   const orders = useMyOrders();
   const purchased = orders.data?.some(
@@ -133,7 +135,15 @@ export function Reviews({ slug, swordId }: { slug: string; swordId: string }) {
       </Link>
     </p>
   );
-  if (me.data) {
+  // 로그인 여부와 구매 내역을 알기 전에는 엇갈린 안내가 깜빡이지 않게 불러오는 중으로 둡니다.
+  const settling = !sessionReady || reviewsPending || (token && (me.isPending || (me.data && orders.isPending)));
+  if (settling) {
+    action = (
+      <p role="status" className="text-sm text-ink-muted">
+        {t('loading')}
+      </p>
+    );
+  } else if (me.data) {
     if (written) action = <p className="text-sm text-ink-muted">{t('already')}</p>;
     else if (purchased) action = <ReviewForm slug={slug} />;
     else action = <p className="text-sm text-ink-muted">{t('needPurchase')}</p>;

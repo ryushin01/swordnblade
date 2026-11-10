@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
@@ -162,6 +163,8 @@ function ColorField({ name, label, optional }: { name: (string | number)[]; labe
 export function ProductForm({ initial }: { initial?: Sword }) {
   const router = useRouter();
   const [form] = Form.useForm<SwordInput>();
+  // 폼에 칸이 없는 그림 값을 지킬 기준. 다른 도검의 형태를 본뜨면 그 도검의 그림으로 바꿔, 원래 덧쇠 등이 남지 않게 합니다.
+  const [artBase, setArtBase] = useState(initial?.art);
   const swords = useSwords();
   const save = useSaveSword((sword) => router.push(`/products/${sword.id}`));
   // preserve: 화면에 칸이 없는 값(칼끝 모양, 코등이 너비 등)까지 포함해 미리보기에 씁니다.
@@ -215,7 +218,7 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           id: initial?.id,
           stories: normalizeStories(values.stories),
           images: normalizeImages(values.images),
-          art: normalizeArt(mergeArt(initial?.art, values.art), values.specs.bladeLength),
+          art: normalizeArt(mergeArt(artBase, values.art), values.specs.bladeLength),
         };
         const en = normalizeTranslation(values.translations?.en);
         // 비우면 빈 객체로 저장해 '일부러 지움'을 남깁니다(쇼핑몰이 시드 번역으로 되돌아가지 않음).
@@ -388,7 +391,10 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 options={(swords.data ?? []).map((sword) => ({ value: sword.id, label: sword.name }))}
                 onChange={(id: string) => {
                   const source = swords.data?.find((sword) => sword.id === id);
-                  if (source) form.setFieldValue('art', source.art);
+                  if (source) {
+                    form.setFieldValue('art', source.art);
+                    setArtBase(source.art);
+                  }
                 }}
               />
             </Form.Item>

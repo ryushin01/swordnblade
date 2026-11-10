@@ -352,7 +352,8 @@
     "saved": "Your review was posted.",
     "errorRating": "Choose a rating.",
     "errorText": "Enter your review.",
-    "failed": "We could not post your review. Please try again."
+    "failed": "We could not post your review. Please try again.",
+    "loading": "Loading reviews."
   },
   "Recent": {
     "title": "Recently viewed"

@@ -24,10 +24,13 @@ const clamp = (value: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.round(v
 
 export const toValidLines = (value: unknown): CartLine[] =>
   Array.isArray(value)
-    ? value.filter(
-        (line): line is CartLine =>
-          typeof line?.swordId === 'string' && Number.isFinite(line?.quantity) && line.quantity > 0,
-      )
+    ? value
+        .filter(
+          (line): line is CartLine =>
+            typeof line?.swordId === 'string' && Number.isFinite(line?.quantity) && line.quantity > 0,
+        )
+        // 저장값이 1~MAX_QUANTITY를 벗어나도 담기·바꾸기와 같은 범위로 맞춥니다.
+        .map((line) => ({ swordId: line.swordId, quantity: clamp(line.quantity) }))
     : [];
 
 export const useCartStore = create<CartState>()(

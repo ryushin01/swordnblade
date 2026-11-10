@@ -119,4 +119,13 @@ describe('mergeArt', () => {
   it('새 상품은 폼 값을 그대로 쓴다', () => {
     expect(mergeArt(undefined, saved)).toBe(saved);
   });
+
+  it('다른 도검을 본뜬 뒤에는 그 도검의 그림을 기준으로 해, 원래 덧쇠가 남지 않는다', () => {
+    const template = { ...saved, blade: { ...saved.blade }, grip: { ...saved.grip } } as SwordArt;
+    delete template.blade.sleeve;
+    delete template.grip.ferrule;
+    const merged = mergeArt(template, template);
+    expect(merged.blade.sleeve).toBeUndefined();
+    expect(merged.grip.ferrule).toBeUndefined();
+  });
 });

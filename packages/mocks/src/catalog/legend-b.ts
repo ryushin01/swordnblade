@@ -252,7 +252,7 @@ export const LEGEND_B: CatalogEntry[] = [
     name: ['아달라드스나우트', 'Aðalráðsnautr', 'Aðalráðsnautr'],
     origin: 'GB',
     source: SOURCE.norseSaga,
-summary: ['애설레드 왕이 시인 군라우그에게 내린 명검.', 'The sword King Æthelred gave the poet Gunnlaugr.'],
+    summary: ['애설레드 왕이 시인 군라우그에게 내린 명검.', 'The sword King Æthelred gave the poet Gunnlaugr.'],
     description: [
       '왕이 하사한 검답게 금실을 감은 손잡이와 왕관 모양 끝장식을 달았습니다.',
       'A royal gift, with a gold-wire grip and crown-shaped pommel.',
@@ -458,7 +458,10 @@ summary: ['애설레드 왕이 시인 군라우그에게 내린 명검.', 'The s
     kind: 'curved',
     origin: 'GB',
     source: ['중세 로맨스 「에거와 그라임」', 'Medieval romance Eger and Grime'],
-    summary: ['그라함 경이 빌려 싸움에 나선 초자연의 검.', 'The sword of supernatural power that Sir Graham borrowed for his duel.'],
+    summary: [
+      '그라함 경이 빌려 싸움에 나선 초자연의 검.',
+      'The sword of supernatural power that Sir Graham borrowed for his duel.',
+    ],
     description: [
       '이 세상 것이 아닌 솜씨로 벼렸다는 묘사를 따라 살짝 휜 칼날과 보석을 줄지어 박은 코등이를 달았습니다.',
       'Said to be wrought beyond ordinary skill: a gently curved blade with gems set along the guard.',
@@ -774,7 +777,10 @@ summary: ['애설레드 왕이 시인 군라우그에게 내린 명검.', 'The s
     kind: 'curved',
     origin: 'JP',
     source: SOURCE.japaneseLegend,
-    summary: ['귀신 슈텐도지를 베었다고 전하는 일본의 국보 칼.', 'The Japanese National Treasure said to have slain the demon Shuten-dōji.'],
+    summary: [
+      '귀신 슈텐도지를 베었다고 전하는 일본의 국보 칼.',
+      'The Japanese National Treasure said to have slain the demon Shuten-dōji.',
+    ],
     description: [
       '호키의 도공 야스츠나의 작품으로 전하는 타치를 바탕으로, 크게 휜 칼날과 물결 무늬를 살렸습니다.',
       'Based on the tachi attributed to the smith Yasutsuna of Hōki, with a deep curve and a wavy temper line.',

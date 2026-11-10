@@ -929,7 +929,10 @@ export const LEGEND_C: CatalogEntry[] = [
     kind: 'great',
     origin: 'GB',
     source: ['스코틀랜드 전승', 'Scottish tradition'],
-    summary: ['스코틀랜드의 영웅 월리스의 것으로 전하는 양손 대검.', 'A two-handed greatsword traditionally linked to the Scottish hero William Wallace.'],
+    summary: [
+      '스코틀랜드의 영웅 월리스의 것으로 전하는 양손 대검.',
+      'A two-handed greatsword traditionally linked to the Scottish hero William Wallace.',
+    ],
     description: [
       '스털링의 월리스 기념탑에 전하는 대검의 비례를 따라 긴 칼날과 아래로 처진 코등이를 달았습니다.',
       'Following the proportions of the greatsword at the Wallace Monument in Stirling, with a long blade and sloping quillons.',

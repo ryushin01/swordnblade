@@ -23,19 +23,41 @@ export const safeJsonStorage = createJSONStorage(() => {
   } catch {
     storage = memoryStorage();
   }
+  // 처음에 쓸 수 있었어도 나중에 용량 초과 등으로 실패할 수 있으므로, 실패해도 화면 동작이 멈추지 않게 삼킵니다.
   return {
     getItem: (key) => {
-      const raw = storage.getItem(key) as string | null;
+      let raw: string | null;
+      try {
+        raw = storage.getItem(key) as string | null;
+      } catch {
+        return null;
+      }
       if (raw === null) return null;
       try {
         JSON.parse(raw);
         return raw;
       } catch {
-        void storage.removeItem(key);
+        try {
+          void storage.removeItem(key);
+        } catch {
+          // 지우지 못해도 없는 것으로 봅니다.
+        }
         return null;
       }
     },
-    setItem: (key, value) => storage.setItem(key, value),
-    removeItem: (key) => storage.removeItem(key),
+    setItem: (key, value) => {
+      try {
+        void storage.setItem(key, value);
+      } catch {
+        // 저장하지 못하면 이번 탭의 메모리 상태만 유지합니다.
+      }
+    },
+    removeItem: (key) => {
+      try {
+        void storage.removeItem(key);
+      } catch {
+        // 지우지 못해도 화면 동작은 이어 갑니다.
+      }
+    },
   };
 });

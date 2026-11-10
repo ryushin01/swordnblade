@@ -19,6 +19,12 @@ export function WishlistSync() {
   const token = useSessionStore((state) => state.token);
   const userId = useMe().data?.id ?? null;
   const syncedUser = useRef<string | null>(null);
+  // 동기화가 실패했어도 로그아웃할 때 비우도록, 로그인한 회원을 본 적이 있는지 따로 기억합니다.
+  const seenUser = useRef(false);
+
+  useEffect(() => {
+    if (userId) seenUser.current = true;
+  }, [userId]);
 
   useEffect(() => {
     if (!wishlistReady || !userId || syncedUser.current === userId) return;
@@ -47,7 +53,8 @@ export function WishlistSync() {
   );
 
   useEffect(() => {
-    if (!sessionReady || token || !syncedUser.current) return;
+    if (!sessionReady || token || !seenUser.current) return;
+    seenUser.current = false;
     syncedUser.current = null;
     useWishlistStore.getState().setIds([]);
   }, [sessionReady, token]);
