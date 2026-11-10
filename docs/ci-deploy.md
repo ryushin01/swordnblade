@@ -24,10 +24,10 @@ pnpm 12는 허용하지 않은 의존성의 빌드 스크립트가 있으면 CI 
 
 | 앱 | 프로젝트 | Root Directory | 주소 |
 |---|---|---|---|
-| 쇼핑몰 | `swordnblade` | `apps/shop` | https://swordnblade.vercel.app/ |
-| 어드민 | `swordnblade-admin` | `apps/admin` | https://swordnblade.vercel.app/admin |
+| 쇼핑몰 | `swordnblade` | `apps/shop` | https://swordnblade-ryushin01.vercel.app/ |
+| 어드민 | `swordnblade-admin` | `apps/admin` | https://swordnblade-ryushin01.vercel.app/admin |
 
-- 어드민은 쇼핑몰 주소의 `/admin`으로 엽니다. 쇼핑몰이 `/admin` 요청을 `swordnblade-admin.vercel.app/admin`으로 넘깁니다(multi-zones). 어드민 단독 주소(`swordnblade-admin.vercel.app`)도 열리지만, 출처가 달라 쇼핑몰과 데이터를 공유하지 않습니다.
+- 어드민은 쇼핑몰 주소의 `/admin`으로 엽니다. 쇼핑몰이 `/admin` 요청을 `swordnblade-admin-ryushin01.vercel.app/admin`으로 넘깁니다(multi-zones). 어드민 단독 주소(`swordnblade-admin-ryushin01.vercel.app`)도 열리지만, 출처가 달라 쇼핑몰과 데이터를 공유하지 않습니다.
 - 쇼핑몰의 미리보기 배포도 `/admin`을 프로덕션 어드민으로 넘깁니다.
 - Storybook은 앱 빌드에 포함되어 `/storybook`(쇼핑몰)과 `/admin/storybook`(어드민)에서 열립니다. 폴더 주소는 `index.html`로 보냅니다(상대 경로 파일 때문).
 
@@ -40,13 +40,13 @@ pnpm 12는 허용하지 않은 의존성의 빌드 스크립트가 있으면 CI 
 `main`에 푸시하면 Vercel 배포가 끝나기를 기다렸다가 실제 사이트에 같은 E2E를 돌립니다.
 
 1. 두 앱의 `/version.txt`(빌드한 커밋, `VERCEL_GIT_COMMIT_SHA`)가 이번 커밋과 같아질 때까지 최대 10분 기다립니다.
-2. `E2E_BASE_URL=https://swordnblade.vercel.app`으로 쇼핑몰·어드민 E2E를 실행합니다.
+2. `E2E_BASE_URL=https://swordnblade-ryushin01.vercel.app`으로 쇼핑몰·어드민 E2E를 실행합니다.
 
 손으로 돌릴 때는 Actions에서 **Run workflow**를 누르거나 다음을 실행합니다.
 
 ```bash
-E2E_BASE_URL=https://swordnblade.vercel.app pnpm --filter @snb/shop e2e
-E2E_BASE_URL=https://swordnblade.vercel.app pnpm --filter @snb/admin e2e
+E2E_BASE_URL=https://swordnblade-ryushin01.vercel.app pnpm --filter @snb/shop e2e
+E2E_BASE_URL=https://swordnblade-ryushin01.vercel.app pnpm --filter @snb/admin e2e
 ```
 
 ## Dependabot (`.github/dependabot.yml`)

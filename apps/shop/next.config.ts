@@ -10,7 +10,7 @@ const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
  */
 const ADMIN_ORIGIN =
   process.env.ADMIN_ORIGIN ??
-  (process.env.NODE_ENV === 'production' ? 'https://swordnblade-admin.vercel.app' : 'http://localhost:3001');
+  (process.env.NODE_ENV === 'production' ? 'https://swordnblade-admin-ryushin01.vercel.app' : 'http://localhost:3001');
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@snb/domain', '@snb/mocks', '@snb/sword-art'],

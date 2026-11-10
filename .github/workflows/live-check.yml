@@ -15,7 +15,7 @@ concurrency:
 
 env:
   # 어드민은 쇼핑몰 주소의 /admin에서 열리므로 주소 하나로 두 앱을 검사합니다.
-  LIVE_URL: https://swordnblade.vercel.app
+  LIVE_URL: https://swordnblade-ryushin01.vercel.app
 
 jobs:
   verify:
