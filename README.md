@@ -6,7 +6,7 @@
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
 
-**[쇼핑몰 보기](https://swordnblade.vercel.app/)** · **[English](https://swordnblade.vercel.app/en)** · **[어드민 보기](https://swordnblade.vercel.app/admin)** · **[Storybook](https://swordnblade.vercel.app/storybook)** · 로그인 없이 바로 쓸 수 있습니다. 어드민에서 바꾼 가격·재고·관세율은 같은 브라우저의 쇼핑몰에 바로 반영됩니다.
+**[쇼핑몰 보기](https://swordnblade-ryushin01.vercel.app/)** · **[English](https://swordnblade-ryushin01.vercel.app/en)** · **[어드민 보기](https://swordnblade-ryushin01.vercel.app/admin)** · **[Storybook](https://swordnblade-ryushin01.vercel.app/storybook)** · 로그인 없이 바로 쓸 수 있습니다. 어드민에서 바꾼 가격·재고·관세율은 같은 브라우저의 쇼핑몰에 바로 반영됩니다.
 
 > **프로젝트 상태:** 실제로 판매하지 않는 **포트폴리오 프로젝트**입니다. 백엔드 없이 Mock API(MSW)로 동작하며, 상품·공방·가격·주문은 모두 가상 데이터입니다. 세율과 환율은 예시 값입니다.
 

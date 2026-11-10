@@ -15,7 +15,7 @@
 ## 쇼핑몰과 어드민을 한 주소로 (multi-zones)
 
 - 어드민은 `basePath: '/admin'`으로 빌드하고, 쇼핑몰이 `/admin` 요청을 어드민 앱으로 넘깁니다(`apps/shop/next.config.ts`의 rewrites). 그래서 두 앱이 **같은 출처(origin)** 에서 열립니다.
-- 넘길 주소는 빌드할 때 `ADMIN_ORIGIN`으로 정합니다. 기본값은 개발 `http://localhost:3001`, 프로덕션 `https://swordnblade-admin.vercel.app`입니다.
+- 넘길 주소는 빌드할 때 `ADMIN_ORIGIN`으로 정합니다. 기본값은 개발 `http://localhost:3001`, 프로덕션 `https://swordnblade-admin-ryushin01.vercel.app`입니다.
 - `pnpm dev`로 두 앱을 함께 띄우고 `http://localhost:3000/admin`으로 엽니다. 어드민만 따로 열려면 `http://localhost:3001/admin`입니다.
 - 쇼핑몰과 어드민 사이의 이동은 다른 앱으로 넘어가므로 `next/link`가 아닌 일반 `a` 링크를 씁니다.
 
@@ -97,7 +97,7 @@ E2E는 `next start`(프로덕션 빌드)를 띄워 데스크톱·모바일(Pixel
 | 쌍수도 상세(영어) | 95 | 100 | 100 | 100 |
 | 장바구니 | 98 | 100 | 100 | 100 |
 
-운영 주소(https://swordnblade.vercel.app)에서 2026-11-08에 잰 값입니다. 한글 웹 글꼴(Noto Serif KR)을 쓸 때는 한 화면에 조각 파일 10여 개(약 700KB)를 받아 성능이 62~70, 첫 화면 표시(FCP)가 4~5초였습니다. 그래서 한글은 운영체제 명조체를 씁니다. 권장사항은 사이트 아이콘이 없어 `/favicon.ico` 404가 콘솔 오류로 잡혀 96이었다가, 아이콘을 넣어 100이 되었습니다. 어드민은 검색 노출을 막아(noindex) SEO 점수가 낮은 것이 정상입니다.
+운영 주소(https://swordnblade-ryushin01.vercel.app)에서 2026-11-08에 잰 값입니다. 한글 웹 글꼴(Noto Serif KR)을 쓸 때는 한 화면에 조각 파일 10여 개(약 700KB)를 받아 성능이 62~70, 첫 화면 표시(FCP)가 4~5초였습니다. 그래서 한글은 운영체제 명조체를 씁니다. 권장사항은 사이트 아이콘이 없어 `/favicon.ico` 404가 콘솔 오류로 잡혀 96이었다가, 아이콘을 넣어 100이 되었습니다. 어드민은 검색 노출을 막아(noindex) SEO 점수가 낮은 것이 정상입니다.
 
 ## 접근성 점검 (KWCAG 2.2)
 
