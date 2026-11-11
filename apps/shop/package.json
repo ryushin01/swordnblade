@@ -1,9 +1,10 @@
 {
   "name": "@snb/shop",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "type": "module",
   "scripts": {
+    "subset:sword-brush": "python3 scripts/subset-sword-brush.py",
     "dev": "next dev -p 3000",
     "build": "storybook build -o public/storybook --quiet && next build",
     "start": "next start -p 3000",

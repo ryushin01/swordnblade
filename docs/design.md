@@ -11,6 +11,8 @@
 
 한글은 웹 글꼴 대신 운영체제 명조체(맥 AppleMyungjo, 안드로이드 Noto Serif CJK, 윈도 바탕)를 씁니다. 한글 웹 글꼴은 모바일 첫 화면을 4~5초 늦췄습니다([개발 가이드](development.md#성능-lighthouse-모바일)). 한글은 낱말 중간에서 줄을 바꾸지 않습니다(`word-break: keep-all`).
 
+칼 이름의 한글만은 나눔손글씨 붓(Nanum Brush Script)으로 씁니다. 이름에 쓰인 247자만 남긴 66KB 파일(`apps/shop/src/_app/fonts/sword-brush.woff2`)이라 첫 화면을 늦추지 않습니다. 붓글씨가 작아 보여 `size-adjust: 125%`로 키우고, 파일에 없는 글자는 명조로 이어집니다. 이름이 바뀌면 `sword-brush.test.ts`가 실패하며, 테스트 맨 위의 방법으로 글자 목록과 파일을 다시 만듭니다.
+
 참고 사이트의 보조 글자(약 2.6:1)는 명도 대비 기준에 못 미쳐 진하게 바꿨습니다.
 
 어드민은 디자인 참고 없이 Ant Design 기본 테마를 쓰고, 명도 대비가 모자란 토큰만 바꿨습니다.

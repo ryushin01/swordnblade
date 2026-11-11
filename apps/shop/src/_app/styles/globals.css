@@ -34,6 +34,9 @@
 }
 
 @theme inline {
+  /* 칼 이름: 한글은 붓글씨, 나머지는 본문 명조 */
+  --font-sword: var(--font-sword-brush), var(--font-serif);
+
   --color-wall: var(--wall);
   --color-wall-raised: var(--wall-raised);
   --color-wall-sunk: var(--wall-sunk);
@@ -69,7 +72,9 @@
    * 한글은 웹 글꼴 없이 운영체제의 명조체를 씁니다(맥 AppleMyungjo, 안드로이드 Noto Serif CJK, 윈도 바탕).
    * Noto Serif KR 웹 글꼴은 한 화면에 조각 파일을 10여 개(약 700KB) 받아 모바일 첫 화면을 4~5초 늦췄습니다.
    */
-  --font-serif: var(--font-cormorant), AppleMyungjo, 'Noto Serif CJK KR', 'Nanum Myeongjo', Batang, serif;
+  /* 영문은 Cormorant를 받지 못하면 운영체제의 올드스타일 세리프(맥 Baskerville, 윈도 Garamond)로 잇습니다. */
+  --font-serif:
+    var(--font-cormorant), Baskerville, Garamond, AppleMyungjo, 'Noto Serif CJK KR', 'Nanum Myeongjo', Batang, serif;
 }
 
 @layer base {
