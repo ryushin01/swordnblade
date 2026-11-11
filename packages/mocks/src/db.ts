@@ -65,7 +65,7 @@ export function seedAddedIn(id: string): number {
 /** 출처 대조로 원어·영어 이름과 출고국을 바로잡은 도검. 예전 데이터에서도 새 값으로 바꿉니다(한국어 이름·가격은 둠). */
 const IDENTITY_FIXED_IDS = ['sw-kuruchi'];
 
-const REMOVED_SEED_IDS = ['sw-ings-sword', 'sw-hwer', 'sw-ecke-king'];
+const REMOVED_SEED_IDS = ['sw-ings-sword', 'sw-hwer', 'sw-ecke-king', 'sw-samingeom'];
 
 const clone = <T>(value: T): T => structuredClone(value);
 
@@ -105,7 +105,12 @@ export function migrateSeed(state: DbState): DbState {
   });
   // 저장된 데이터보다 나중 시드 버전에 들어온 도검만 더합니다. 어드민에서 지운 예전 시드 도검은 되살리지 않습니다.
   const storedVersion = state.seedVersion ?? 1;
-  const added = SEED_SWORDS.filter((seed) => !byId.has(seed.id) && seedAddedIn(seed.id) > storedVersion).map(clone);
+  // 삼인검이 남아 있으면 본국검으로 바꾸기 전 데이터라, 그때 없던 본국검을 채웁니다(지운 것이 아님).
+  const beforeBongukgeom = byId.has('sw-samingeom');
+  const added = SEED_SWORDS.filter(
+    (seed) =>
+      !byId.has(seed.id) && (seedAddedIn(seed.id) > storedVersion || (beforeBongukgeom && seed.id === 'sw-bongukgeom')),
+  ).map(clone);
   const kept = swords.filter((sword) => !REMOVED_SEED_IDS.includes(sword.id));
   return { ...state, swords: [...kept, ...added], seedVersion: SEED_VERSION };
 }

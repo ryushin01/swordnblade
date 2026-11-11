@@ -111,4 +111,22 @@ describe('migrateSeed (시드 버전)', () => {
     expect(ids).not.toContain('sw-tachi');
     expect(ids).toContain('sw-dojigiri');
   });
+
+  it('삼인검이 남은 예전 데이터는 삼인검을 지우고 본국검을 채운다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const legacy = {
+      ...fresh,
+      seedVersion: 4,
+      swords: [
+        ...fresh.swords.filter((sword) => sword.id !== 'sw-bongukgeom'),
+        { ...fresh.swords[0]!, id: 'sw-samingeom', slug: 'samingeom' },
+      ],
+    };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+    const ids = createDb({ storageKey: 'test-db' })
+      .read()
+      .swords.map((sword) => sword.id);
+    expect(ids).toContain('sw-bongukgeom');
+    expect(ids).not.toContain('sw-samingeom');
+  });
 });
