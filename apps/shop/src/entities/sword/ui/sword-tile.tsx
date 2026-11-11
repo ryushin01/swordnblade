@@ -35,7 +35,7 @@ export function SwordTile({ sword, className }: { sword: SwordTileData; classNam
         className="relative min-h-0 w-full flex-1 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
       />
       <span className="relative grid justify-items-center gap-0.5 text-center">
-        <span className="text-carved text-sm sm:text-base">{sword.name}</span>
+        <span className="font-sword text-carved text-sm sm:text-base">{sword.name}</span>
         {locale === 'ko' ? (
           <span lang="en" className="small-caps hidden text-xs text-ink-muted sm:block">
             {sword.nameEn}

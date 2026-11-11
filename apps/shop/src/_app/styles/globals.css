@@ -34,6 +34,9 @@
 }
 
 @theme inline {
+  /* 칼 이름: 한글은 붓글씨, 나머지는 본문 명조 */
+  --font-sword: var(--font-sword-brush), var(--font-serif);
+
   --color-wall: var(--wall);
   --color-wall-raised: var(--wall-raised);
   --color-wall-sunk: var(--wall-sunk);

@@ -1,4 +1,5 @@
 import { Cormorant_Garamond } from 'next/font/google';
+import localFont from 'next/font/local';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -15,6 +16,17 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import '../styles/globals.css';
+
+/**
+ * 칼 이름의 한글만 붓글씨(나눔손글씨 붓)로 씁니다. 이름에 쓰인 247자만 담은 66KB 파일이라 본문 한글 웹 글꼴과 달리 가볍습니다.
+ * 붓글씨는 글자가 작아 보여 크기를 키우고, 없는 글자(영문, 새로 더한 이름의 글자)는 아래 명조로 이어집니다.
+ */
+const swordBrush = localFont({
+  src: '../fonts/sword-brush.woff2',
+  variable: '--font-sword-brush',
+  display: 'swap',
+  declarations: [{ prop: 'size-adjust', value: '125%' }],
+});
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -65,7 +77,7 @@ export async function RootLayout({ children, params }: { children: ReactNode; pa
   const t = await getTranslations('Common');
 
   return (
-    <html lang={locale} className={`${cormorant.variable}`}>
+    <html lang={locale} className={`${cormorant.variable} ${swordBrush.variable}`}>
       <body>
         <a
           href="#main"

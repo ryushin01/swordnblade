@@ -77,7 +77,7 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
             <OrnamentHeading as="p" className="w-full">
               {categoryLabel(sword.category, locale)}
             </OrnamentHeading>
-            <h1 className="text-4xl text-carved">{sword.name}</h1>
+            <h1 className="font-sword text-4xl text-carved">{sword.name}</h1>
             <p className="small-caps text-ink-muted">
               {locale === 'ko' ? <span lang="en">{sword.nameEn}</span> : <span lang="ko">{source.name}</span>} ·{' '}
               <span>{sword.nameOriginal}</span>
