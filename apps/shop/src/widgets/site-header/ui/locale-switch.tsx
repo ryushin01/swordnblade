@@ -30,6 +30,8 @@ export function LocaleSwitch({ className }: { className?: string }) {
             <Link
               href={{ pathname, query }}
               locale={value}
+              // 언어별 주소를 미리 불러오면 /ko/... 리디렉션이 생겨 페이지가 다시 열리면서 Mock API 시작이 끊길 수 있어 끕니다.
+              prefetch={false}
               lang={value}
               hrefLang={value}
               aria-current={value === locale ? 'true' : undefined}
