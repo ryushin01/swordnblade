@@ -60,8 +60,10 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(closest-side,var(--glow)_0%,transparent_75%)]"
         />
-        {/* 스크롤하면 해가 지나가듯 비스듬한 빛이 부조를 훑습니다(globals.css의 .relief-light). */}
-        <div aria-hidden="true" className="relief-light pointer-events-none absolute inset-0 z-10" />
+        {/* 스크롤하면 해가 지나가듯 비스듬한 빛이 부조를 훑습니다(globals.css의 .relief-light). 사진에는 얹지 않습니다. */}
+        {current.kind === 'relief' ? (
+          <div aria-hidden="true" className="relief-light pointer-events-none absolute inset-0 z-10" />
+        ) : null}
         {current.kind === 'relief' ? (
           <SwordRelief
             art={sword.art}
