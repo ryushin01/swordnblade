@@ -2,6 +2,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
 async function expectNoA11yViolations(page: Page) {
+  // 화면 전환 직후에는 문서 제목이 잠시 비어 있어 document-title로 잘못 잡히므로 제목이 채워진 뒤에 검사합니다.
+  await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze();
@@ -105,4 +107,110 @@ test('로그인 뒤 돌아갈 주소는 사이트 안 주소만 따른다', asyn
   await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
   await page.getByRole('button', { name: '로그인' }).click();
   await expect(page).toHaveURL(/\/cart$/);
+});
+
+const signUp = async (page: Page, email: string) => {
+  await page.goto('/signup');
+  await page.getByLabel(/^이름/).fill('김가상');
+  await page.getByLabel(/^이메일/).fill(email);
+  await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
+  await page.getByLabel(/^비밀번호 확인/).fill('sword1234');
+  await page.getByRole('button', { name: '가입하기' }).click();
+  await expect(page).toHaveURL(/\/account$/);
+};
+
+test('찜 목록은 계정에 남는다: 로그아웃하면 비고, 다시 로그인하면 돌아온다', async ({ page }) => {
+  await signUp(page, 'wish@example.com');
+  await header(page).getByRole('link', { name: '내 계정' }).waitFor();
+  await page.goto('/swords/ssangsudo');
+  const saved = page.waitForResponse((r) => r.url().endsWith('/api/me/wishlist') && r.request().method() === 'PUT');
+  await page.getByRole('button', { name: '찜하기' }).click();
+  await saved;
+
+  await header(page).getByRole('link', { name: '내 계정' }).click();
+  await page.getByRole('button', { name: '로그아웃' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(header(page).getByRole('link', { name: /찜 목록\s*0점/ })).toBeVisible();
+
+  await page.goto('/login');
+  await page.getByLabel(/^이메일/).fill('wish@example.com');
+  await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
+  await page.getByRole('button', { name: '로그인' }).click();
+  await expect(page).toHaveURL(/\/account$/);
+  await expect(header(page).getByRole('link', { name: /찜 목록\s*1점/ })).toBeVisible();
+});
+
+test('내 주문 취소: 한 번 더 확인하고, 취소하면 재고가 돌아온다', async ({ page }) => {
+  await signUp(page, 'cancel@example.com');
+  const stockText = page.getByText(/남은 수량 \d+점/);
+  await page.goto('/swords/uchigatana');
+  const before = await stockText.innerText();
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await expect(page.getByRole('link', { name: /장바구니\s*1점/ })).toBeVisible();
+  await page.goto('/checkout');
+  await expect(page.getByLabel(/^받는 분/)).toHaveValue('김가상');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /신용카드/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-/);
+
+  await page.goto('/swords/uchigatana');
+  await expect(stockText).not.toHaveText(before);
+
+  await page.goto('/account');
+  await page.getByRole('button', { name: '주문 취소' }).click();
+  await expect(page.getByRole('button', { name: '취소 확정' })).toBeFocused();
+  await expectNoA11yViolations(page);
+  await page.getByRole('button', { name: '취소 확정' }).click();
+  await expect(page.getByRole('button', { name: '주문 취소' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '내 주문' })).toBeFocused();
+
+  await page.goto('/swords/uchigatana');
+  await expect(stockText).toHaveText(before);
+});
+
+test('구매 후기와 프로필 사진: 산 회원만 쓰고, 사진이 원형으로 보인다', async ({ page }) => {
+  await signUp(page, 'review@example.com');
+  await page.getByLabel('프로필 사진').setInputFiles({
+    name: 'me.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVR4nGP4z8DwHwyBDBgAAH7lB/m0mfTcAAAAAElFTkSuQmCC',
+      'base64',
+    ),
+  });
+  await expect(page.getByRole('button', { name: '사진 지우기' })).toBeVisible();
+
+  await page.goto('/swords/uchigatana');
+  await expect(page.getByText('이 도검을 구매하면 후기를 쓸 수 있습니다.')).toBeVisible();
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await expect(page.getByRole('link', { name: /장바구니\s*1점/ })).toBeVisible();
+  await page.goto('/checkout');
+  await expect(page.getByLabel(/^받는 분/)).toHaveValue('김가상');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /신용카드/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-/);
+
+  await page.goto('/swords/uchigatana');
+  const section = page.getByRole('region', { name: /구매 후기/ });
+  await section.getByRole('button', { name: '후기 등록' }).click();
+  await expect(section.getByRole('alert')).toContainText('별점을 골라 주세요.');
+  await section.getByRole('radio', { name: '5점' }).check();
+  await section.getByLabel('후기 내용').fill('균형이 좋고 손잡이 감기가 단단합니다.');
+  await section.getByRole('button', { name: '후기 등록' }).click();
+
+  await expect(section.getByText('균형이 좋고 손잡이 감기가 단단합니다.')).toBeVisible();
+  await expect(section.getByText('김*상')).toBeVisible();
+  await expect(section.getByText('이 도검의 후기를 이미 썼습니다.')).toBeVisible();
+  const avatar = section.getByRole('listitem').locator('img');
+  await expect(avatar).toHaveClass(/rounded-full/);
+  await expect.poll(() => avatar.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
+  await expectNoA11yViolations(page);
 });

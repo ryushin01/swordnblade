@@ -9,7 +9,10 @@
     "sword": "도검",
     "login": "로그인",
     "signup": "회원가입",
-    "account": "내 계정"
+    "account": "내 계정",
+    "wishlist": "찜 목록",
+    "compare": "도검 비교",
+    "timeline": "도검 연표"
   },
   "Common": {
     "skipToContent": "본문 바로가기",
@@ -26,7 +29,9 @@
     "korean": "한국어",
     "english": "English",
     "login": "로그인",
-    "account": "내 계정"
+    "account": "내 계정",
+    "wishlist": "찜 목록",
+    "wishlistCount": "{count}점"
   },
   "Footer": {
     "disclaimer": "포트폴리오용 가상 쇼핑몰입니다. 상품, 공방, 가격, 주문은 모두 지어낸 것이며 실제로 판매하거나 배송하지 않습니다.",
@@ -225,7 +230,11 @@
     "hilt": "손잡이 확대",
     "tip": "칼끝 확대",
     "photo": "사진 {n}",
-    "thumb": "이미지 {n}: {label}"
+    "thumb": "이미지 {n}: {label}",
+    "guard": "코등이 확대",
+    "bladeBase": "칼날 밑동 확대",
+    "mid": "칼날 중간 확대",
+    "sleeve": "덧쇠 확대"
   },
   "Auth": {
     "loginTitle": "로그인",
@@ -267,6 +276,103 @@
     "orderSummary": "{date} · {items} · {total}",
     "itemsCount": "{name} 외 {rest}점",
     "loadError": "계정 정보를 불러오지 못했습니다.",
+    "retry": "다시 불러오기",
+    "cancelOpen": "주문 취소",
+    "cancelQuestion": "이 주문을 취소할까요? 취소하면 직접 되돌릴 수 없습니다.",
+    "cancelConfirm": "취소 확정",
+    "cancelBack": "그대로 두기",
+    "cancelDone": "주문을 취소했습니다.",
+    "cancelFailed": "주문을 취소하지 못했습니다. 출고가 시작됐을 수 있으니 주문 상태를 확인해 주세요.",
+    "avatarLabel": "프로필 사진",
+    "avatarHint": "후기에 원형으로 표시됩니다. 이미지 파일을 골라 주세요.",
+    "avatarChange": "사진 고르기",
+    "avatarRemove": "사진 지우기",
+    "avatarSaved": "프로필 사진을 바꿨습니다.",
+    "avatarFailed": "사진을 올리지 못했습니다. 다시 시도해 주세요."
+  },
+  "Wishlist": {
+    "title": "찜 목록",
+    "button": "찜하기",
+    "empty": "아직 찜한 도검이 없습니다.",
+    "browse": "도검의 벽 둘러보기",
+    "count": "{count}점",
+    "remove": "{name} 찜 해제",
+    "loading": "찜 목록을 불러오는 중입니다.",
+    "loadError": "찜 목록을 불러오지 못했습니다.",
     "retry": "다시 불러오기"
+  },
+  "Related": {
+    "title": "함께 볼 도검"
+  },
+  "Compare": {
+    "title": "도검 비교",
+    "intro": "도검을 세 점까지 골라 같은 축척으로 나란히 봅니다.",
+    "formLabel": "비교할 도검 고르기",
+    "slot": "{n}번째 도검",
+    "none": "고르지 않음",
+    "submit": "비교하기",
+    "needPick": "비교할 도검을 골라 주세요.",
+    "tableCaption": "고른 도검의 제원 비교",
+    "scrollLabel": "도검 제원 비교 표",
+    "specHeader": "항목",
+    "region": "지역",
+    "type": "형태",
+    "era": "시대",
+    "blade": "칼날 길이",
+    "total": "전체 길이",
+    "weight": "무게",
+    "material": "소재",
+    "edge": "날",
+    "price": "가격",
+    "sharp": "진검",
+    "blunt": "날 없음",
+    "scaleNote": "그림은 모두 같은 축척입니다.",
+    "link": "다른 도검과 비교",
+    "navLink": "도검 비교",
+    "loadError": "도검 목록을 불러오지 못했습니다.",
+    "retry": "다시 불러오기",
+    "timelineLink": "도검 연표"
+  },
+  "Reviews": {
+    "title": "구매 후기",
+    "count": "{count}개",
+    "empty": "아직 후기가 없습니다.",
+    "needLogin": "구매한 회원만 후기를 쓸 수 있습니다.",
+    "login": "로그인",
+    "needPurchase": "이 도검을 구매하면 후기를 쓸 수 있습니다.",
+    "already": "이 도검의 후기를 이미 썼습니다.",
+    "formTitle": "후기 쓰기",
+    "rating": "별점",
+    "ratingOption": "{n}점",
+    "ratingOf": "5점 만점에 {n}점",
+    "text": "후기 내용",
+    "hint": "500자까지 쓸 수 있습니다. 이 브라우저의 Mock 데이터에만 저장됩니다.",
+    "submit": "후기 등록",
+    "submitting": "등록 중…",
+    "saved": "후기를 등록했습니다.",
+    "errorRating": "별점을 골라 주세요.",
+    "errorText": "후기 내용을 입력해 주세요.",
+    "failed": "후기를 등록하지 못했습니다. 다시 시도해 주세요.",
+    "loading": "후기를 불러오는 중입니다."
+  },
+  "Recent": {
+    "title": "최근 본 도검"
+  },
+  "Timeline": {
+    "title": "도검 연표",
+    "intro": "역사 도검을 시대와 지역에 따라 펼쳐 봅니다. 신화·전설의 검은 연대가 없어 뺐습니다.",
+    "caption": "시대와 지역별 역사 도검",
+    "scrollLabel": "도검 연표 표",
+    "period": "시대",
+    "unknown": "시기 미상",
+    "bc2000": "기원전 2천년기",
+    "bc1000": "기원전 1천년기",
+    "ad1": "1~5세기",
+    "ad500": "6~10세기",
+    "ad1000": "11~13세기",
+    "ad1300": "14~15세기",
+    "ad1500": "16~17세기",
+    "ad1700": "18~19세기",
+    "ad1900": "20세기 이후"
   }
 }

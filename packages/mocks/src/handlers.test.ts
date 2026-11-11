@@ -90,6 +90,33 @@ describe('Mock API', () => {
 });
 
 describe('상품 사진 Mock API', () => {
+  it('어드민이 주문을 취소하면 재고가 돌아오고, 되살리면 다시 빠진다', async () => {
+    const order = db.read().orders[0]!;
+    const line = order.lines[0]!;
+    const before = db.read().swords.find((s) => s.id === line.swordId)!.stock;
+    const patch = (status: string) =>
+      fetch(`${BASE}/api/orders/${order.id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+    const stock = () => db.read().swords.find((s) => s.id === line.swordId)!.stock;
+
+    await patch('cancelled');
+    expect(stock()).toBe(before + line.quantity);
+    await patch('cancelled');
+    expect(stock()).toBe(before + line.quantity);
+    await patch('paid');
+    expect(stock()).toBe(before);
+  });
+
+  it('재고가 모자라면 취소한 주문을 되살리지 못한다', async () => {
+    const order = db.read().orders[0]!;
+    await fetch(`${BASE}/api/orders/${order.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'cancelled' }) });
+    db.write((state) => ({ ...state, swords: state.swords.map((s) => ({ ...s, stock: 0 })) }));
+    const response = await fetch(`${BASE}/api/orders/${order.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'paid' }),
+    });
+    expect(response.status).toBe(409);
+  });
+
   it('사진을 올리면 주소를 돌려주고, 그 주소로 같은 바이트를 받는다', async () => {
     const bytes = new Uint8Array([137, 80, 78, 71, 1, 2, 3]);
     const form = new FormData();

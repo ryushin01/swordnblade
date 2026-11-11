@@ -1,9 +1,10 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 
 import { SITE } from '@/shared/config';
+import { safeJsonStorage } from '@/shared/lib/safe-storage';
 
 import type { CartLine, CountryCode } from '@snb/domain';
 
@@ -21,22 +22,16 @@ interface CartState {
 
 const clamp = (value: number) => Math.min(MAX_QUANTITY, Math.max(1, Math.round(value)));
 
-/** localStorage를 쓸 수 없으면 메모리에만 담습니다. */
-const safeStorage = createJSONStorage(() => {
-  try {
-    const probe = '__snb_probe__';
-    window.localStorage.setItem(probe, probe);
-    window.localStorage.removeItem(probe);
-    return window.localStorage;
-  } catch {
-    const memory = new Map<string, string>();
-    return {
-      getItem: (key: string) => memory.get(key) ?? null,
-      setItem: (key: string, value: string) => void memory.set(key, value),
-      removeItem: (key: string) => void memory.delete(key),
-    };
-  }
-});
+export const toValidLines = (value: unknown): CartLine[] =>
+  Array.isArray(value)
+    ? value
+        .filter(
+          (line): line is CartLine =>
+            typeof line?.swordId === 'string' && Number.isFinite(line?.quantity) && line.quantity > 0,
+        )
+        // 저장값이 1~MAX_QUANTITY를 벗어나도 담기·바꾸기와 같은 범위로 맞춥니다.
+        .map((line) => ({ swordId: line.swordId, quantity: clamp(line.quantity) }))
+    : [];
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -63,7 +58,20 @@ export const useCartStore = create<CartState>()(
       setDestination: (destination) => set({ destination }),
       clear: () => set({ lines: [] }),
     }),
-    { name: SITE.cartStorageKey, storage: safeStorage, skipHydration: true },
+    {
+      name: SITE.cartStorageKey,
+      storage: safeJsonStorage,
+      skipHydration: true,
+      // 저장값 형태가 어긋나도 머리글(모든 화면)이 멈추지 않게 맞는 줄만 받습니다.
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<CartState> | undefined;
+        return {
+          ...current,
+          lines: toValidLines(saved?.lines),
+          destination: typeof saved?.destination === 'string' ? saved.destination : current.destination,
+        };
+      },
+    },
   ),
 );
 

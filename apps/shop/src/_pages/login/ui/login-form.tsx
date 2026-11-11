@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { isValidEmail } from '@snb/domain';
@@ -8,7 +8,7 @@ import { isValidEmail } from '@snb/domain';
 import { useLogin } from '@/entities/session';
 import { ApiRequestError } from '@/shared/api';
 import { Link, useRouter } from '@/shared/i18n';
-import { Button, PasswordField, TextField } from '@/shared/ui';
+import { Button, ErrorSummary, PasswordField, TextField, useErrorFocus } from '@/shared/ui';
 
 type Field = 'email' | 'password';
 
@@ -18,19 +18,13 @@ export function LoginForm({ next }: { next: string }) {
   const login = useLogin();
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [message, setMessage] = useState<string | null>(null);
-  const summaryRef = useRef<HTMLDivElement>(null);
+  const { ref: summaryRef, moveFocus } = useErrorFocus();
   const lockRef = useRef(false);
-  const [focusTick, setFocusTick] = useState(0);
-
-  // 오류 요약이 화면에 그려진 뒤에 초점을 옮깁니다. 같은 오류가 반복돼도 다시 옮기도록 횟수로 구분합니다.
-  useEffect(() => {
-    if (focusTick > 0) summaryRef.current?.focus();
-  }, [focusTick]);
 
   const show = (nextErrors: Partial<Record<Field, string>>, nextMessage: string) => {
     setErrors(nextErrors);
     setMessage(nextMessage);
-    setFocusTick((tick) => tick + 1);
+    moveFocus();
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -62,28 +56,12 @@ export function LoginForm({ next }: { next: string }) {
   return (
     <form noValidate onSubmit={handleSubmit} className="grid gap-5" aria-busy={login.isPending}>
       {message ? (
-        <div
-          ref={summaryRef}
-          tabIndex={-1}
-          role="alert"
-          aria-labelledby="login-error-title"
-          className="rounded-sm border-2 border-danger bg-wall-raised p-4 text-danger"
-        >
-          <h2 id="login-error-title" className="text-base">
-            {message}
-          </h2>
-          {fieldList.length > 0 ? (
-            <ul className="mt-2 grid list-disc gap-1 pl-5 text-sm">
-              {fieldList.map((field) => (
-                <li key={field}>
-                  <a href={`#login-${field}`} className="inline-block min-h-6 py-0.5 underline underline-offset-4">
-                    {t(field)}: {errors[field]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+        <ErrorSummary
+          id="login-error-title"
+          summaryRef={summaryRef}
+          message={message}
+          items={fieldList.map((field) => ({ fieldId: `login-${field}`, text: `${t(field)}: ${errors[field]}` }))}
+        />
       ) : null}
       <TextField
         id="login-email"

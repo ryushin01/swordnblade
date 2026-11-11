@@ -4,18 +4,17 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { SwordRelief } from '@snb/sword-art';
+import { type ReliefFocus, SwordRelief } from '@snb/sword-art';
 
 import { cn } from '@/shared/lib';
 
 import type { Locale, Sword } from '@snb/domain';
 
 type GalleryItem =
-  | { kind: 'relief'; focus: 'full' | 'hilt' | 'tip'; label: string }
-  | { kind: 'photo'; url: string; alt: string; label: string };
+  { kind: 'relief'; focus: ReliefFocus; label: string } | { kind: 'photo'; url: string; alt: string; label: string };
 
 /**
- * 상품 이미지 갤러리: 부조 그림(전체·손잡이·칼끝 확대) 뒤에 어드민에서 올린 사진을 이어 붙입니다.
+ * 상품 이미지 갤러리: 부조 그림 다섯 시점 뒤에 어드민에서 올린 사진을 이어 붙입니다.
  * 이전·다음 버튼과 썸네일 버튼으로 넘기고, 위치를 화면낭독기에 알립니다. 자동으로 넘기지 않습니다.
  */
 export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel: string }) {
@@ -27,6 +26,15 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
     { kind: 'relief', focus: 'full', label: t('full') },
     { kind: 'relief', focus: 'hilt', label: t('hilt') },
     { kind: 'relief', focus: 'tip', label: t('tip') },
+    {
+      kind: 'relief',
+      focus: 'guard',
+      label: sword.art.guard.type === 'none' ? t('bladeBase') : t('guard'),
+    },
+    // 덧쇠가 있는 도검은 그 자리를 덧쇠 확대로 바꿔, 모든 도검을 다섯 시점으로 맞춥니다.
+    sword.art.blade.sleeve
+      ? { kind: 'relief', focus: 'sleeve', label: t('sleeve') }
+      : { kind: 'relief', focus: 'mid', label: t('mid') },
     ...(sword.images ?? []).map((image, n) => ({
       kind: 'photo' as const,
       url: image.url,

@@ -5,6 +5,8 @@ const tiles = (page: Page) =>
   page.getByRole('list', { name: /도검의 벽|신화·전설|동양 도검|서양 도검/ }).getByRole('link');
 
 async function expectNoA11yViolations(page: Page) {
+  // 화면 전환 직후에는 문서 제목이 잠시 비어 있어 document-title로 잘못 잡히므로 제목이 채워진 뒤에 검사합니다.
+  await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze();
@@ -149,8 +151,8 @@ test('찾기와 정렬: 주소에 남고 결과 수를 알려 준다', async ({ 
   await expect(page.getByRole('link', { name: /롱소드/ })).toBeVisible();
 
   await page.goto('/?sort=price-desc');
-  const prices = await page.locator('ul a[href^="/swords/"]').allInnerTexts();
-  expect(prices[0]).toContain('쿠사나기노츠루기');
+  // 이동 중에 글자를 한 번에 읽으면 실패할 수 있어, 다시 시도하는 단언으로 확인합니다.
+  await expect(page.locator('ul a[href^="/swords/"]').first()).toContainText('쿠사나기노츠루기');
 
   await page.goto('/?q=없는이름');
   await expect(page.getByText('‘없는이름’에 맞는 도검이 없습니다.', { exact: false })).toBeVisible();
@@ -168,6 +170,9 @@ test('서버가 상품 목록을 HTML로 먼저 그린다(자바스크립트 없
 });
 
 test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 넘치지 않는다', async ({ page }) => {
+  await page.goto('/admin/login');
+  await page.getByRole('button', { name: '데모 계정으로 로그인' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: '대시보드' })).toBeVisible();
   await page.goto('/admin/products/sw-005');
   await page.getByLabel('이름', { exact: true }).fill('아주아주긴이름의와키자시짧은칼특별한정판재현품');
   await page.getByRole('button', { name: '변경 저장' }).click();
@@ -180,13 +185,106 @@ test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 
 test('상세 갤러리: 이전·다음 버튼과 썸네일로 넘기고 위치를 알린다', async ({ page }) => {
   await page.goto('/swords/ssangsudo');
   const gallery = page.getByRole('region', { name: '이미지' });
-  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await expect(gallery.getByText('1 / 5: 전체 모습')).toBeVisible();
   await gallery.getByRole('button', { name: '다음 이미지' }).click();
-  await expect(gallery.getByText('2 / 3: 손잡이 확대')).toBeVisible();
+  await expect(gallery.getByText('2 / 5: 손잡이 확대')).toBeVisible();
   await expect(gallery.getByRole('button', { name: '이미지 2: 손잡이 확대' })).toHaveAttribute('aria-current', 'true');
   await gallery.getByRole('button', { name: '이미지 3: 칼끝 확대' }).click();
   await expect(gallery.getByRole('img', { name: /칼끝 확대/ })).toBeVisible();
+  await expect(gallery.getByRole('button', { name: /^이미지 \d/ })).toHaveCount(5);
   await gallery.getByRole('button', { name: '다음 이미지' }).click();
-  await expect(gallery.getByText('1 / 3: 전체 모습')).toBeVisible();
+  await expect(gallery.getByText('4 / 5: 코등이 확대')).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('5 / 5: 덧쇠 확대')).toBeVisible();
+  await gallery.getByRole('button', { name: '다음 이미지' }).click();
+  await expect(gallery.getByText('1 / 5: 전체 모습')).toBeVisible();
   await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('찜하기: 상세에서 찜하고 찜 목록에서 보고 뺀다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  const button = page.getByRole('button', { name: '찜하기' });
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await button.click();
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
+
+  await page
+    .getByRole('banner')
+    .getByRole('link', { name: /찜 목록/ })
+    .click();
+  await expect(page.getByRole('heading', { level: 1, name: '찜 목록' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /쌍수도/ })).toBeVisible();
+  await expect(page).toHaveTitle(/찜 목록/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+
+  await page.getByRole('button', { name: '쌍수도 찜 해제' }).click();
+  await expect(page.getByText('아직 찜한 도검이 없습니다.')).toBeVisible();
+});
+
+test('함께 볼 도검: 상세 아래에 같은 지역의 도검을 보여 준다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  const related = page.getByRole('list', { name: '함께 볼 도검' });
+  await expect(related.getByRole('link')).toHaveCount(4);
+  await expect(related.getByRole('link', { name: /쌍수도/ })).toHaveCount(0);
+});
+
+test('도검 비교: 상세에서 넘어와 도검을 더 고르면 주소에 남고 제원 표로 본다', async ({ page }) => {
+  await page.goto('/swords/ssangsudo');
+  await page.getByRole('link', { name: '다른 도검과 비교' }).click();
+  await expect(page).toHaveURL(/\/compare\?a=ssangsudo/);
+  await expect(page.getByLabel('1번째 도검')).toHaveValue('ssangsudo');
+
+  await page.getByLabel('2번째 도검').selectOption('wakizashi');
+  await page.getByRole('button', { name: '비교하기' }).click();
+  await expect(page).toHaveURL(/a=ssangsudo.*b=wakizashi/);
+  const table = page.getByRole('table', { name: '고른 도검의 제원 비교' });
+  await expect(table.getByRole('columnheader', { name: '와키자시' })).toBeVisible();
+  await expect(table.getByRole('rowheader', { name: '칼날 길이' })).toBeVisible();
+  await expect(page).toHaveTitle(/도검 비교/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('검색 엔진: sitemap, robots, 공유 정보, 상품 구조화 데이터', async ({ page, request }) => {
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).toContain('/en/swords/ssangsudo');
+  expect(sitemap).toContain('/swords/bongukgeom');
+  expect(await (await request.get('/robots.txt')).text()).toContain('sitemap.xml');
+  expect((await request.get('/og.jpg')).status()).toBe(200);
+  expect((await request.get('/og/swords/ssangsudo.jpg')).status()).toBe(200);
+
+  await page.goto('/swords/ssangsudo');
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', '쌍수도');
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/swords\/ssangsudo\.jpg/);
+  const product = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+  ) as Record<string, unknown>;
+  expect(product['@type']).toBe('Product');
+  expect(product).not.toHaveProperty('offers');
+});
+
+test('도검 연표: 시대와 지역 표로 역사 도검을 본다', async ({ page }) => {
+  await page.goto('/timeline');
+  await expect(page.getByRole('heading', { level: 1, name: '도검 연표' })).toBeVisible();
+  const table = page.getByRole('table', { name: '시대와 지역별 역사 도검' });
+  await expect(table.getByRole('rowheader', { name: '18~19세기' })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: '동양 도검' })).toBeVisible();
+  await table.getByRole('link', { name: '쌍수도' }).click();
+  await expect(page).toHaveURL(/\/swords\/ssangsudo$/);
+  await page.goto('/timeline');
+  await expect(page).toHaveTitle(/도검 연표/);
+  await expectNoA11yViolations(page);
+  await expectNoHorizontalOverflow(page);
+});
+
+test('최근 본 도검: 앞서 본 도검을 상세 아래에 보여 준다', async ({ page }) => {
+  await page.goto('/swords/hwando');
+  await expect(page.getByRole('heading', { name: '최근 본 도검' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1, name: '환도' })).toBeVisible();
+  await page.goto('/swords/ssangsudo');
+  const recent = page.getByRole('list', { name: '최근 본 도검' });
+  await expect(recent.getByRole('link', { name: /환도/ })).toBeVisible();
+  await expect(recent.getByRole('link', { name: /쌍수도/ })).toHaveCount(0);
 });

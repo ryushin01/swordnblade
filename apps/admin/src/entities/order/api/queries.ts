@@ -12,7 +12,7 @@ export function useUpdateOrderStatus() {
   return useSaveMutation<{ id: string; status: OrderStatus }, Order>({
     mutationFn: ({ id, status }) =>
       apiFetch<Order>(`/api/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }),
-    invalidate: [['orders'], ['stats']],
+    invalidate: [['orders'], ['stats'], ['swords']],
     successMessage: '주문 상태를 바꿨습니다.',
   });
 }

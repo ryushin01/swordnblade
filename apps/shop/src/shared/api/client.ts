@@ -41,7 +41,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const response = await fetch(path, {
     ...init,
     headers: {
-      'Content-Type': 'application/json',
+      // FormData(사진 올리기)는 브라우저가 경계값을 넣은 Content-Type을 직접 붙입니다.
+      ...(init?.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...init?.headers,
     },

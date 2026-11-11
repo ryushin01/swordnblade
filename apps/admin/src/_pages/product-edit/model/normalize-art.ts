@@ -23,6 +23,21 @@ export function normalizeArt(art: SwordArt, bladeLength?: number): SwordArt {
   };
 }
 
+/**
+ * 폼에 칸이 없는 그림 값(덧쇠, 물결 칼날, 재질, 쇠 깃 등)은 antd가 돌려주지 않으므로, 저장된 값 위에 폼 값을 덮어 지키지 않으면 사라집니다.
+ */
+export function mergeArt(saved: SwordArt | undefined, form: SwordArt): SwordArt {
+  if (!saved) return form;
+  return {
+    ...saved,
+    ...form,
+    blade: { ...saved.blade, ...form.blade },
+    guard: { ...saved.guard, ...form.guard },
+    grip: { ...saved.grip, ...form.grip },
+    pommel: { ...saved.pommel, ...form.pommel },
+  };
+}
+
 /** 내용이 빈 이야기 줄은 버리고(쇼핑몰에 빈 항목이 보이지 않게) 앞뒤 공백을 지웁니다. */
 export function normalizeStories(stories: Array<Partial<SwordStory>> | undefined): SwordStory[] {
   return (stories ?? [])

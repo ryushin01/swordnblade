@@ -3,6 +3,7 @@ import {
   CATEGORY_LABEL_EN,
   KIND_LABEL,
   KIND_LABEL_EN,
+  normalizeSearchText,
   type Sword,
   SWORD_KINDS,
   type SwordKind,
@@ -49,8 +50,7 @@ export function paginate<T>(items: T[], page: number, size = PAGE_SIZE) {
  * 화면 언어로 바꾼 도검을 넘기면 그 언어의 시대 표기로도 찾습니다.
  */
 export function filterSwords(swords: Sword[], options: { q?: string; sort?: SwordSort; kind?: SwordKind }): Sword[] {
-  // 맥 등에서 입력한 한글은 자모가 나뉜 NFD로 올 수 있어 NFC로 맞춘 뒤 비교합니다.
-  const normalize = (text: string) => text.normalize('NFC').toLowerCase().replace(/\s+/g, '');
+  const normalize = normalizeSearchText;
   const q = normalize(options.q ?? '');
   const byKind = options.kind ? swords.filter((sword) => sword.kind === options.kind) : swords;
   const matched = q

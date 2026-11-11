@@ -54,3 +54,7 @@ E2E_BASE_URL=https://swordnblade-ryushin01.vercel.app pnpm --filter @snb/admin e
 - npm: 매주 월요일, 같은 메이저 안의 패치·마이너만, 출시 후 14일이 지난 버전만 제안합니다. 운영·개발 의존성을 나눠 PR 하나씩 엽니다.
 - TypeScript는 6.1 이상, `@types/node`는 23 이상을 제안하지 않습니다.
 - GitHub Actions: 매월, 메이저 제외.
+
+## 빌드 건너뛰기
+
+두 앱의 `vercel.json`이 `scripts/vercel-ignore.sh`를 Ignored Build Step으로 씁니다. 직전에 배포한 커밋(`VERCEL_GIT_PREVIOUS_SHA`)부터 문서, 테스트, 스토리, `.github`만 바뀌었으면 빌드를 건너뛰어 무료 요금제의 하루 배포 횟수를 아낍니다. 비교할 커밋을 찾지 못하면 빌드합니다.

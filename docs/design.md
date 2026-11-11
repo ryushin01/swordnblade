@@ -45,3 +45,13 @@ shadcn/ui 변수(`--primary` 등)는 이 토큰을 가리킵니다.
 ## 로고
 
 `BladeMark`: 가는 양날 칼날이 원을 위에서 아래로 꿰뚫고, 칼날 가운데 홈을 선으로 새겼습니다. 글자는 `SWORD & BLADE` 스몰 캡스이고 `&`만 테라코타색입니다.
+
+## 화면
+
+| 영어 상세 | 영어 모바일 |
+|---|---|
+| ![영어 화면의 쌍수도 상세, 영어 제원과 허가 안내](images/shop-en-detail.jpg) | <img src="images/shop-en-mobile.jpg" alt="모바일 영어 화면의 언어 전환, 검색, 도검 벽" width="240"> |
+
+| 모바일 신화·전설 | 모바일 상세 |
+|---|---|
+| <img src="images/shop-mobile-legend.jpg" alt="모바일 2열 벽에 엑스칼리버, 뒤랑달, 그람, 하르페" width="240"> | <img src="images/shop-mobile-detail.jpg" alt="모바일에서 붉은 끈 손잡이의 쌍수도 부조와 이름" width="240"> |

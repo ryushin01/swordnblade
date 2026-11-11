@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 
-import { EMAIL_RULE, PASSWORD_RULE, type User } from '@snb/domain';
+import { canCustomerCancel, EMAIL_RULE, PASSWORD_RULE, type User } from '@snb/domain';
+
+import { isAdmin } from './admin-handlers';
+import { cancelOrderInState } from './order-stock';
 
 import type { Db, Session, StoredUser } from './db';
 
@@ -28,11 +31,17 @@ export async function hashPassword(email: string, password: string): Promise<str
 }
 
 /** 응답에는 비밀번호 해시를 넣지 않습니다. */
+/** 어드민 회원 목록의 한 줄 */
+export interface AdminUser extends User {
+  orderCount: number;
+}
+
 const publicUser = (user: StoredUser): User => ({
   id: user.id,
   email: user.email,
   name: user.name,
   createdAt: user.createdAt,
+  ...(user.avatarUrl ? { avatarUrl: user.avatarUrl } : {}),
 });
 
 /** Authorization: Bearer <token>에서 로그인한 회원을 찾습니다. */
@@ -44,7 +53,11 @@ export function findSessionUser(db: Db, request: Request): StoredUser | undefine
   return session ? state.users?.find((user) => user.id === session.userId) : undefined;
 }
 
-export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => Promise.resolve()) {
+export function createAuthHandlers(
+  db: Db,
+  wait: () => Promise<unknown> = () => Promise.resolve(),
+  requireAdmin = false,
+) {
   const unauthorized = () => HttpResponse.json({ message: '로그인이 필요합니다.' }, { status: 401 });
 
   const startSession = (user: StoredUser): AuthResponse => {
@@ -54,6 +67,69 @@ export function createAuthHandlers(db: Db, wait: () => Promise<unknown> = () => 
   };
 
   return [
+    http.put('*/api/me/profile', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      const body = (await request.json().catch(() => null)) as { avatarUrl?: unknown } | null;
+      const avatarUrl = body?.avatarUrl;
+      if (avatarUrl !== null && !(typeof avatarUrl === 'string' && avatarUrl.startsWith('/api/images/'))) {
+        return HttpResponse.json({ message: '프로필 사진 주소가 맞지 않습니다.' }, { status: 400 });
+      }
+      const updated: StoredUser = { ...user };
+      if (avatarUrl) updated.avatarUrl = avatarUrl;
+      else delete updated.avatarUrl;
+      db.write((state) => ({ ...state, users: state.users?.map((item) => (item.id === user.id ? updated : item)) }));
+      return HttpResponse.json(publicUser(updated));
+    }),
+
+    http.get('*/api/me/wishlist', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      return user ? HttpResponse.json(user.wishlist ?? []) : unauthorized();
+    }),
+
+    http.put('*/api/me/wishlist', async ({ request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      const body = (await request.json().catch(() => null)) as unknown;
+      if (!Array.isArray(body) || !body.every((id) => typeof id === 'string')) {
+        return HttpResponse.json({ message: '찜 목록 형식이 맞지 않습니다.' }, { status: 400 });
+      }
+      const wishlist = [...new Set(body as string[])];
+      db.write((state) => ({
+        ...state,
+        users: state.users?.map((item) => (item.id === user.id ? { ...item, wishlist } : item)),
+      }));
+      return HttpResponse.json(wishlist);
+    }),
+
+    http.post<{ id: string }>('*/api/me/orders/:id/cancel', async ({ params, request }) => {
+      await wait();
+      const user = findSessionUser(db, request);
+      if (!user) return unauthorized();
+      // 다른 회원의 주문은 있는지도 알리지 않습니다.
+      const order = db.read().orders.find((item) => item.id === params.id && item.userId === user.id);
+      if (!order) return HttpResponse.json({ message: '주문을 찾을 수 없습니다.' }, { status: 404 });
+      if (!canCustomerCancel(order.status))
+        return HttpResponse.json({ message: '출고된 주문은 취소할 수 없습니다.' }, { status: 409 });
+      const next = db.write((state) => cancelOrderInState(state, order));
+      return HttpResponse.json(next.orders.find((item) => item.id === params.id));
+    }),
+
+    // 어드민 회원 목록. 비밀번호 해시는 내보내지 않습니다.
+    http.get('*/api/users', async ({ request }) => {
+      await wait();
+      if (requireAdmin && !isAdmin(db, request)) return unauthorized();
+      const { users = [], orders } = db.read();
+      const list: AdminUser[] = users.map((user) => ({
+        ...publicUser(user),
+        orderCount: orders.filter((order) => order.userId === user.id).length,
+      }));
+      return HttpResponse.json(list);
+    }),
+
     http.post('*/api/auth/signup', async ({ request }) => {
       await wait();
       const body = (await request.json().catch(() => ({}))) as Partial<SignupBody>;

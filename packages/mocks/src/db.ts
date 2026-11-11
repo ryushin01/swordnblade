@@ -12,10 +12,25 @@ export interface DbState {
   users?: StoredUser[];
   /** 로그인 세션 */
   sessions?: Session[];
+  /** 어드민 데모 로그인 토큰 */
+  adminSessions?: string[];
+  /** 구매한 회원의 후기 */
+  reviews?: StoredReview[];
 }
 
 export interface StoredUser extends User {
   passwordHash: string;
+  /** 찜한 도검 id */
+  wishlist?: string[];
+}
+
+export interface StoredReview {
+  id: string;
+  swordId: string;
+  userId: string;
+  rating: number;
+  text: string;
+  createdAt: string;
 }
 
 export interface Session {
@@ -29,6 +44,12 @@ export interface Db {
   write: (update: (state: DbState) => DbState) => DbState;
   reset: () => void;
 }
+
+/** 출처를 확인하지 못해 시드에서 뺀 도검. 예전 데이터에서도 지웁니다. */
+/** 출처 대조로 원어·영어 이름과 출고국을 바로잡은 도검. 예전 데이터에서도 새 값으로 바꿉니다(한국어 이름·가격은 둠). */
+const IDENTITY_FIXED_IDS = ['sw-kuruchi'];
+
+const REMOVED_SEED_IDS = ['sw-ings-sword', 'sw-hwer', 'sw-ecke-king'];
 
 const clone = <T>(value: T): T => structuredClone(value);
 
@@ -52,6 +73,9 @@ export function migrateSeed(state: DbState): DbState {
     if (!seed) return sword;
     return {
       ...sword,
+      ...(IDENTITY_FIXED_IDS.includes(sword.id)
+        ? { nameOriginal: seed.nameOriginal, nameEn: seed.nameEn, origin: seed.origin }
+        : {}),
       kind: seed.kind,
       category: seed.category,
       era: seed.era,
@@ -64,7 +88,8 @@ export function migrateSeed(state: DbState): DbState {
     };
   });
   const added = SEED_SWORDS.filter((seed) => !byId.has(seed.id)).map(clone);
-  return { ...state, swords: [...swords, ...added], seedVersion: SEED_VERSION };
+  const kept = swords.filter((sword) => !REMOVED_SEED_IDS.includes(sword.id));
+  return { ...state, swords: [...kept, ...added], seedVersion: SEED_VERSION };
 }
 
 /**

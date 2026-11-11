@@ -1,14 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { PlusOutlined } from '@ant-design/icons';
-import { Badge, Button, Flex, Popconfirm, Table, Typography } from 'antd';
+import { Badge, Button, Flex, Input, Popconfirm, Table, Typography } from 'antd';
 
 import {
   CATEGORY_LABEL,
   COUNTRY_NAME,
   formatKRW,
   KIND_LABEL,
+  normalizeSearchText,
   requiresPossessionPermit,
   type Sword,
   SWORD_CATEGORIES,
@@ -23,6 +25,13 @@ import { ScrollRegion } from '@/shared/ui';
 export function ProductsPage() {
   const { data, isPending } = useSwords();
   const remove = useDeleteSword();
+  const [query, setQuery] = useState('');
+  const needle = normalizeSearchText(query);
+  const swords = needle
+    ? data?.filter((sword) =>
+        [sword.name, sword.nameEn, sword.nameOriginal].some((name) => normalizeSearchText(name).includes(needle)),
+      )
+    : data;
 
   return (
     <>
@@ -35,11 +44,23 @@ export function ProductsPage() {
           상품 등록
         </Button>
       </Flex>
+      <Flex align="center" wrap gap={12} style={{ marginBottom: 16 }}>
+        <label htmlFor="product-search">이름으로 찾기</label>
+        <Input
+          id="product-search"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="한글·영문·원어 이름"
+          style={{ maxWidth: 320 }}
+        />
+        <span role="status">{swords ? `${swords.length}점` : ''}</span>
+      </Flex>
       <ScrollRegion label="상품 목록 표">
         <Table<Sword>
           rowKey="id"
           loading={isPending}
-          dataSource={data}
+          dataSource={swords}
 
           pagination={{ pageSize: 10, showSizeChanger: false }}
           columns={[

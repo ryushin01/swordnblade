@@ -1,4 +1,6 @@
+export { Avatar } from './avatar';
 export { Button, buttonVariants } from './button';
+export { ErrorSummary, type ErrorSummaryItem, useErrorFocus } from './error-summary';
 export { TextField, type TextFieldProps } from './form-field';
 export { LiveTotal } from './live-total';
 export { OrnamentHeading } from './ornament-heading';

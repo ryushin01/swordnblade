@@ -10,7 +10,7 @@ export const SEED_TRANSLATIONS_EN: Record<string, SwordTranslation> = {
     summary:
       'A long two-handed sword of Joseon, with a copper sleeve over the blade root and a long grip wound tightly in red cord.',
     description:
-      'Recreated from the ssangsudo recorded in the Muyedobotongji. The unfullered single-edged blade curves gently toward the tip, with a wave-shaped temper line along the edge. A riveted copper sleeve covers the blade root, followed by a small, thick brass guard, a long grip wound tightly in red cord and a flat brass end cap.',
+      'Recreated from the ssangsudo recorded in the Muyedobotongji. The unfullered single-edged blade curves gently toward the tip, with a wave-shaped temper line along the edge. A riveted copper sleeve covers the blade root, followed by a thick, plain round brass guard with a cylindrical brass collar, a long grip wound tightly in red cord and a flat brass end cap.',
     material: 'High-carbon steel, copper sleeve, brass guard and cap, red cord',
     stories: [
       {
