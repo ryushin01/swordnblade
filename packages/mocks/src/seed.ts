@@ -53,7 +53,7 @@ const SWORDS_KO: Sword[] = [
         hamon: true,
         sleeve: { length: 190, color: '#b8734f' },
       },
-      guard: { type: 'plate', width: 72, color: '#d4af57', accent: '#a8823a' },
+      guard: { type: 'plate', width: 96, color: '#d4af57', accent: '#a8823a' },
       grip: {
         length: 330,
         color: '#5a1410',
@@ -502,7 +502,7 @@ const SWORDS_KO: Sword[] = [
  * 시드 내용(그림·설명·번역·도검 목록)이 바뀔 때마다 올립니다.
  * 브라우저에 저장된 Mock 데이터가 이 값보다 낮으면 db.ts의 migrateSeed가 새 시드에 맞춥니다.
  */
-export const SEED_VERSION = 7;
+export const SEED_VERSION = 8;
 
 /** 영어 번역을 붙인 시드 도검 */
 export const SEED_SWORDS: Sword[] = [
