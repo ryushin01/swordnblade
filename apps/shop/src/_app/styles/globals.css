@@ -136,6 +136,70 @@
   }
 }
 
+/*
+ * 도검 상세의 스크롤 연출 (애플 제품 페이지식): 오른쪽 설명을 읽어 내려가는 동안
+ * 고정된 부조가 천천히 돌며 다가오고, 비스듬한 빛이 해가 지나가듯 부조를 훑습니다.
+ * 넓은 화면에서 부조가 고정될 때만, 스크롤 타임라인을 지원하고 동작 줄이기를 끄지 않은 경우에만 움직입니다.
+ */
+.relief-light {
+  opacity: 0;
+}
+
+@keyframes relief-turn {
+  from {
+    transform: rotate(-3deg) scale(0.96);
+  }
+  to {
+    transform: rotate(3deg) scale(1.08);
+  }
+}
+
+@keyframes relief-sweep {
+  0% {
+    opacity: 0;
+    background-position: 0% 0%;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    background-position: 100% 100%;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .relief-scroll {
+      view-timeline: --relief block;
+    }
+
+    .relief-turn {
+      animation: relief-turn linear both;
+      animation-timeline: --relief;
+      animation-range: contain 0% contain 100%;
+    }
+
+    .relief-light {
+      background: linear-gradient(
+          120deg,
+          transparent 40%,
+          rgb(255 250 235 / 0.55) 48%,
+          rgb(255 255 255 / 0.75) 50%,
+          rgb(255 250 235 / 0.55) 52%,
+          transparent 60%
+        )
+        0 0 / 300% 300% no-repeat;
+      mix-blend-mode: soft-light;
+      mask-image: radial-gradient(closest-side, #000 55%, transparent);
+      animation: relief-sweep linear both;
+      animation-timeline: --relief;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

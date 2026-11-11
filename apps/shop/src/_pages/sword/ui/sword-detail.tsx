@@ -67,7 +67,7 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
 
   return (
     <>
-      <article className="mx-auto grid max-w-[90rem] lg:grid-cols-[minmax(0,1fr)_28rem] lg:gap-8">
+      <article className="relief-scroll mx-auto grid max-w-[90rem] lg:grid-cols-[minmax(0,1fr)_28rem] lg:gap-8">
         <div className="relative py-4 lg:sticky lg:top-0 lg:h-[calc(100dvh-4.5rem)]">
           <SwordGallery sword={sword} reliefLabel={t('reliefLabel', { name: sword.name, summary: sword.summary })} />
         </div>
