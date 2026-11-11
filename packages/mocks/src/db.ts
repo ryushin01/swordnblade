@@ -45,6 +45,22 @@ export interface Db {
   reset: () => void;
 }
 
+/** 도검이 처음 들어온 시드 버전. 처음 16점은 1, 도검 목록 확장은 3이고, 그 뒤에 더한 것만 따로 적습니다. */
+const ADDED_IN: Record<string, number> = {
+  'sw-sajingeom': 4,
+  'sw-chilseonggeom': 4,
+  'sw-byeorungeom': 4,
+  'sw-yedo': 4,
+  'sw-bongukgeom': 4,
+  'sw-egeking': 6,
+  'sw-dojigiri': 6,
+  'sw-wallace-sword': 6,
+};
+
+export function seedAddedIn(id: string): number {
+  return ADDED_IN[id] ?? (/^sw-\d{3}$/.test(id) ? 1 : 3);
+}
+
 /** 출처를 확인하지 못해 시드에서 뺀 도검. 예전 데이터에서도 지웁니다. */
 /** 출처 대조로 원어·영어 이름과 출고국을 바로잡은 도검. 예전 데이터에서도 새 값으로 바꿉니다(한국어 이름·가격은 둠). */
 const IDENTITY_FIXED_IDS = ['sw-kuruchi'];
@@ -87,7 +103,9 @@ export function migrateSeed(state: DbState): DbState {
       ...(seed.translations ? { translations: clone(seed.translations) } : {}),
     };
   });
-  const added = SEED_SWORDS.filter((seed) => !byId.has(seed.id)).map(clone);
+  // 저장된 데이터보다 나중 시드 버전에 들어온 도검만 더합니다. 어드민에서 지운 예전 시드 도검은 되살리지 않습니다.
+  const storedVersion = state.seedVersion ?? 1;
+  const added = SEED_SWORDS.filter((seed) => !byId.has(seed.id) && seedAddedIn(seed.id) > storedVersion).map(clone);
   const kept = swords.filter((sword) => !REMOVED_SEED_IDS.includes(sword.id));
   return { ...state, swords: [...kept, ...added], seedVersion: SEED_VERSION };
 }

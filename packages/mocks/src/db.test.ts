@@ -64,7 +64,8 @@ describe('migrateSeed (시드 버전)', () => {
   it('새 시드에만 있는 도검은 더하고, 어드민에서 만든 도검은 남긴다', () => {
     const fresh = createDb({ storageKey: 'test-db' }).read();
     const custom = { ...fresh.swords[1]!, id: 'custom-1', slug: 'custom' };
-    const legacy = { ...fresh, seedVersion: 1, swords: [fresh.swords[0]!, custom] };
+    // 버전 1 데이터에는 처음 16점이 있었습니다. 그 뒤 시드에 들어온 도검은 모두 더해져야 합니다.
+    const legacy = { ...fresh, seedVersion: 1, swords: [...fresh.swords.slice(0, 16), custom] };
     localStorage.setItem('test-db', JSON.stringify(legacy));
 
     const ids = createDb({ storageKey: 'test-db' })
@@ -93,5 +94,21 @@ describe('migrateSeed (시드 버전)', () => {
     expect(kuruchi.nameEn).toBe('Copper Cutter of Heaven and Earth');
     expect(kuruchi.price).toBe(1);
     expect(swords.some((sword) => sword.id === 'sw-hwer')).toBe(false);
+  });
+
+  it('어드민에서 지운 시드 도검은 되살리지 않고, 그 뒤 시드 버전에 들어온 도검만 더한다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const legacy = {
+      ...fresh,
+      seedVersion: 5,
+      swords: fresh.swords.filter((sword) => !['sw-002', 'sw-tachi', 'sw-dojigiri'].includes(sword.id)),
+    };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+    const ids = createDb({ storageKey: 'test-db' })
+      .read()
+      .swords.map((sword) => sword.id);
+    expect(ids).not.toContain('sw-002');
+    expect(ids).not.toContain('sw-tachi');
+    expect(ids).toContain('sw-dojigiri');
   });
 });
