@@ -55,21 +55,33 @@ function withStartTimeout<T>(start: Promise<T>, timeout: number): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const limit = new Promise<never>((_, reject) => {
     timer = setTimeout(() => {
-      const reloaded = safeSession(() => sessionStorage.getItem(RELOAD_FLAG));
-      if (!reloaded) {
-        safeSession(() => sessionStorage.setItem(RELOAD_FLAG, '1'));
-        window.location.reload();
-        return;
-      }
       started = null;
+      // 새로고침은 한 번만 합니다. 표시를 남기지 못하는 환경(세션 저장소 사용 불가)에서는 새로고침이 반복될 수 있어 하지 않습니다.
+      const firstTimeout = safeSession(() => sessionStorage.getItem(RELOAD_FLAG)) === null;
+      const marked =
+        firstTimeout &&
+        safeSession(() => {
+          sessionStorage.setItem(RELOAD_FLAG, '1');
+          return sessionStorage.getItem(RELOAD_FLAG);
+        }) === '1';
+      if (marked) window.location.reload();
+      // 새로고침이 일어나지 않아도 화면이 다시 불러오기를 보여 줄 수 있게 언제나 실패로 알립니다.
       reject(new Error('Mock API를 시작하지 못했습니다.'));
     }, timeout);
   });
-  return Promise.race([start, limit]).then((value) => {
-    clearTimeout(timer);
-    safeSession(() => sessionStorage.removeItem(RELOAD_FLAG));
-    return value;
-  });
+  return Promise.race([start, limit]).then(
+    (value) => {
+      clearTimeout(timer);
+      safeSession(() => sessionStorage.removeItem(RELOAD_FLAG));
+      return value;
+    },
+    (error: unknown) => {
+      // 먼저 실패했으면 타이머를 멈추고, 다음 요청에서 다시 시작하도록 비웁니다. 새로고침 표시는 성공할 때까지 둡니다.
+      clearTimeout(timer);
+      started = null;
+      throw error;
+    },
+  );
 }
 
 function safeSession<T>(read: () => T): T | null {
