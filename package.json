@@ -18,6 +18,8 @@
     "test:storybook": "turbo run test:storybook"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.16.0",
+    "@size-limit/file": "^14.3.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.4.5",
     "eslint-config-prettier": "^10.1.8",
@@ -25,6 +27,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
+    "size-limit": "^14.3.0",
     "turbo": "^2.11.10",
     "typescript": "~6.0.3",
     "vitest": "^5.1.0"
