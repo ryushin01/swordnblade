@@ -11,7 +11,7 @@ const sword = SEED_SWORDS[0]!;
 describe('SwordTile', () => {
   it('이름과 가격이 링크 이름이 되고 상세로 이동한다', () => {
     renderWithProviders(<SwordTile sword={sword} />);
-    const link = screen.getByRole('link', { name: /쌍수도.*6,800,000원/ });
+    const link = screen.getByRole('link', { name: /쌍수도.*17,600,000원/ });
     expect(link).toHaveAttribute('href', '/swords/ssangsudo');
   });
 
@@ -29,7 +29,7 @@ describe('SwordTile', () => {
 describe('SwordTile (영어)', () => {
   it('영어 화면에서는 원화를 ₩로 쓰고 원어 이름을 부제로 보여 준다', () => {
     renderWithProviders(<SwordTile sword={{ ...sword, name: sword.nameEn }} />, { locale: 'en' });
-    expect(screen.getByRole('link', { name: /Ssangsudo.*雙手刀.*₩6,800,000/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ssangsudo.*雙手刀.*₩17,600,000/ })).toHaveAttribute(
       'href',
       '/en/swords/ssangsudo',
     );

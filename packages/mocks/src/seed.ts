@@ -41,7 +41,7 @@ const SWORDS_KO: Sword[] = [
       material: '고탄소강, 구리 덧쇠, 황동 코등이·끝마개, 홍색 끈',
       edge: 'sharp',
     },
-    price: 6_800_000,
+    price: 17_600_000,
     stock: 3,
     art: {
       blade: {
@@ -502,7 +502,7 @@ const SWORDS_KO: Sword[] = [
  * 시드 내용(그림·설명·번역·도검 목록)이 바뀔 때마다 올립니다.
  * 브라우저에 저장된 Mock 데이터가 이 값보다 낮으면 db.ts의 migrateSeed가 새 시드에 맞춥니다.
  */
-export const SEED_VERSION = 8;
+export const SEED_VERSION = 9;
 
 /** 영어 번역을 붙인 시드 도검 */
 export const SEED_SWORDS: Sword[] = [

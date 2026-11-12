@@ -10,7 +10,7 @@ describe('createDb (localStorage 공유)', () => {
   it('같은 키를 쓰는 다른 앱(DB 인스턴스)이 바꾼 내용을 다음 읽기에서 본다', () => {
     const shop = createDb({ storageKey: 'test-db' });
     const admin = createDb({ storageKey: 'test-db' });
-    expect(shop.read().swords[0]?.price).toBe(6_800_000);
+    expect(shop.read().swords[0]?.price).toBe(17_600_000);
 
     admin.write((state) => ({
       ...state,
@@ -128,5 +128,18 @@ describe('migrateSeed (시드 버전)', () => {
       .swords.map((sword) => sword.id);
     expect(ids).toContain('sw-bongukgeom');
     expect(ids).not.toContain('sw-samingeom');
+  });
+
+  it('쌍수도 가격은 옛 기본값일 때만 새 가격으로 바꾸고, 어드민에서 고친 가격은 둔다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const legacy = (price: number) => ({
+      ...fresh,
+      seedVersion: 8,
+      swords: fresh.swords.map((sword) => (sword.id === 'sw-001' ? { ...sword, price } : sword)),
+    });
+    localStorage.setItem('test-db', JSON.stringify(legacy(6_800_000)));
+    expect(createDb({ storageKey: 'test-db' }).read().swords[0]?.price).toBe(17_600_000);
+    localStorage.setItem('test-db', JSON.stringify(legacy(7_000_000)));
+    expect(createDb({ storageKey: 'test-db' }).read().swords[0]?.price).toBe(7_000_000);
   });
 });
