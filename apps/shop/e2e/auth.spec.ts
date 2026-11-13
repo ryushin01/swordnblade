@@ -84,7 +84,7 @@ test('회원가입 → 주문서 자동 채우기 → 내 계정에서 주문 �
   await expect(page.getByRole('link', { name: `${orderId} 주문 보기` })).toBeVisible();
 });
 
-test('로그인 뒤 돌아갈 주소는 사이트 안 주소만 따른다', async ({ page }) => {
+test('로그인 뒤 돌아갈 주소는 사이트 안 주소만 따른다', async ({ page, baseURL }) => {
   await page.goto('/signup');
   await page.getByLabel(/^이름/).fill('김가상');
   await page.getByLabel(/^이메일/).fill('next@example.com');
@@ -99,7 +99,8 @@ test('로그인 뒤 돌아갈 주소는 사이트 안 주소만 따른다', asyn
   await page.getByLabel(/^이메일/).fill('next@example.com');
   await page.getByLabel(/^비밀번호 \(/).fill('sword1234');
   await page.getByRole('button', { name: '로그인' }).click();
-  await expect(page).toHaveURL(/localhost:\d+\/account$/);
+  // 로컬과 운영 주소 어디서 돌려도, 외부 주소가 아닌 같은 사이트의 /account로 와야 합니다.
+  await expect(page).toHaveURL(new URL('/account', baseURL!).href);
 
   await page.getByRole('button', { name: '로그아웃' }).click();
   await page.goto('/login?next=/cart');

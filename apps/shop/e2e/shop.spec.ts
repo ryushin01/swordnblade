@@ -152,7 +152,7 @@ test('찾기와 정렬: 주소에 남고 결과 수를 알려 준다', async ({ 
 
   await page.goto('/?sort=price-desc');
   // 이동 중에 글자를 한 번에 읽으면 실패할 수 있어, 다시 시도하는 단언으로 확인합니다.
-  await expect(page.locator('ul a[href^="/swords/"]').first()).toContainText('쿠사나기노츠루기');
+  await expect(page.locator('ul a[href^="/swords/"]').first()).toContainText('쌍수도');
 
   await page.goto('/?q=없는이름');
   await expect(page.getByText('‘없는이름’에 맞는 도검이 없습니다.', { exact: false })).toBeVisible();
