@@ -35,7 +35,7 @@ export function bladeWidthAt(art: SwordArt, t: number): number {
   return width * taper * flareFactor * bulgeFactor;
 }
 
-export function tipLength(art: SwordArt): number {
+function tipLength(art: SwordArt): number {
   const { width, tip } = art.blade;
   switch (tip) {
     case 'kissaki':
@@ -193,7 +193,7 @@ export interface HiltLayout {
   pommelEnd: number;
 }
 
-export function guardThickness(art: SwordArt): number {
+function guardThickness(art: SwordArt): number {
   switch (art.guard.type) {
     case 'disc':
       return Math.max(14, art.guard.width * 0.22);
@@ -227,7 +227,7 @@ export function guardThickness(art: SwordArt): number {
   }
 }
 
-export function pommelHeight(art: SwordArt): number {
+function pommelHeight(art: SwordArt): number {
   switch (art.pommel.type) {
     case 'cap':
       return 20;
@@ -299,7 +299,7 @@ export function localBounds(art: SwordArt): Bounds {
 
 export const ROTATION_DEG = 45;
 
-export function rotatedBounds(bounds: Bounds, deg = ROTATION_DEG): Bounds {
+function rotatedBounds(bounds: Bounds, deg = ROTATION_DEG): Bounds {
   const rad = (deg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);

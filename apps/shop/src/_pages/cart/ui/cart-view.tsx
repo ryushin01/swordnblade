@@ -2,20 +2,11 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  countryName,
-  estimateCustoms,
-  findCountryRule,
-  formatKRW,
-  type Locale,
-  permitNote,
-  requiresPossessionPermit,
-} from '@snb/domain';
+import { countryName, formatKRW, type Locale, permitNote } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
-import { useCartHydrated, useCartStore } from '@/entities/cart';
-import { localizeForLocale, useSwords } from '@/entities/sword';
-import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
+import { CustomsBreakdown } from '@/entities/tariff';
+import { useCartQuote } from '@/features/cart-quote';
 import { DestinationSelect } from '@/features/choose-destination';
 import { Link } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
@@ -28,13 +19,9 @@ export function CartView() {
   const common = useTranslations('Common');
   const customs = useTranslations('Customs');
   const locale = useLocale() as Locale;
-  const hydrated = useCartHydrated();
-  const lines = useCartStore((state) => state.lines);
-  const destination = useCartStore((state) => state.destination);
-  const swords = useSwords();
-  const config = useCustomsConfig();
+  const quote = useCartQuote();
 
-  if (!hydrated || swords.isPending || config.isPending) {
+  if (quote.status === 'loading') {
     return (
       <p aria-busy="true" className="py-24 text-center">
         {t('loading')}
@@ -42,7 +29,7 @@ export function CartView() {
     );
   }
 
-  if (swords.isError || config.isError) {
+  if (quote.status === 'error') {
     return (
       <p role="alert" className="py-24 text-center">
         {t('loadError')}
@@ -50,10 +37,7 @@ export function CartView() {
     );
   }
 
-  const items = lines.flatMap((line) => {
-    const sword = swords.data.find((item) => item.id === line.swordId);
-    return sword ? [{ line, sword: localizeForLocale(sword, locale) }] : [];
-  });
+  const { items, estimate, needsPermit, rule, config } = quote;
 
   if (items.length === 0) {
     return (
@@ -65,14 +49,6 @@ export function CartView() {
       </div>
     );
   }
-
-  const estimate = estimateCustoms(
-    items.map(({ line, sword }) => ({ origin: sword.origin, unitPrice: sword.price, quantity: line.quantity })),
-    destination,
-    config.data,
-  );
-  const needsPermit = items.some(({ sword }) => requiresPossessionPermit(sword.specs));
-  const rule = findCountryRule(config.data, destination);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_26rem]">
@@ -139,9 +115,9 @@ export function CartView() {
 
       <section aria-labelledby="cart-summary-title" className="grid content-start gap-5">
         <OrnamentHeading id="cart-summary-title">{t('summaryTitle')}</OrnamentHeading>
-        <DestinationSelect config={config.data} />
+        <DestinationSelect config={config} />
         <LiveTotal label={customs('total')} total={estimate.totals.total} />
-        <CustomsBreakdown estimate={estimate} config={config.data} />
+        <CustomsBreakdown estimate={estimate} config={config} />
         <Link href="/checkout" className={cn(buttonVariants({ size: 'lg' }), 'h-12 rounded-sm text-base small-caps')}>
           {t('checkout')}
         </Link>

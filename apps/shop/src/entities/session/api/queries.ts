@@ -10,7 +10,7 @@ import { useSessionHydrated } from '../model/use-session-hydration';
 import type { Order, User } from '@snb/domain';
 import type { AuthResponse, LoginBody, SignupBody } from '@snb/mocks';
 
-export const sessionKeys = {
+const sessionKeys = {
   me: (token: string | null) => ['session', 'me', token] as const,
   orders: (token: string | null) => ['session', 'orders', token] as const,
 };

@@ -22,7 +22,7 @@ export const toSwordKind = (value: string | undefined): SwordKind | undefined =>
   SWORD_KINDS.includes(value as SwordKind) ? (value as SwordKind) : undefined;
 
 /** 한 쪽에 보여 줄 도검 수 */
-export const PAGE_SIZE = 24;
+const PAGE_SIZE = 24;
 
 /** 주소의 쪽 번호(1부터). 숫자가 아니거나 1보다 작으면 1쪽 */
 export const toPage = (value: string | undefined): number => {

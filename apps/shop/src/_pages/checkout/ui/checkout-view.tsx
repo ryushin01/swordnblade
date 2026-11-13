@@ -3,20 +3,11 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  countryName,
-  estimateCustoms,
-  findCountryRule,
-  formatKRW,
-  type Locale,
-  type Order,
-  permitNote,
-  requiresPossessionPermit,
-} from '@snb/domain';
+import { countryName, formatKRW, type Locale, type Order, permitNote } from '@snb/domain';
 
-import { useCartHydrated, useCartStore } from '@/entities/cart';
-import { localizeForLocale, useSwords } from '@/entities/sword';
-import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
+import { useCartStore } from '@/entities/cart';
+import { CustomsBreakdown } from '@/entities/tariff';
+import { useCartQuote } from '@/features/cart-quote';
 import { Link, useRouter } from '@/shared/i18n';
 import { OrnamentHeading } from '@/shared/ui';
 
@@ -27,12 +18,8 @@ export function CheckoutView() {
   const common = useTranslations('Common');
   const locale = useLocale() as Locale;
   const router = useRouter();
-  const hydrated = useCartHydrated();
-  const lines = useCartStore((state) => state.lines);
-  const destination = useCartStore((state) => state.destination);
   const clear = useCartStore((state) => state.clear);
-  const swords = useSwords();
-  const config = useCustomsConfig();
+  const quote = useCartQuote();
   const [placedId, setPlacedId] = useState<string | null>(null);
 
   if (placedId) {
@@ -43,14 +30,14 @@ export function CheckoutView() {
     );
   }
 
-  if (!hydrated || swords.isPending || config.isPending) {
+  if (quote.status === 'loading') {
     return (
       <p aria-busy="true" className="py-24 text-center">
         {t('preparing')}
       </p>
     );
   }
-  if (swords.isError || config.isError) {
+  if (quote.status === 'error') {
     return (
       <p role="alert" className="py-24 text-center">
         {t('loadError')}
@@ -58,10 +45,7 @@ export function CheckoutView() {
     );
   }
 
-  const items = lines.flatMap((line) => {
-    const sword = swords.data.find((item) => item.id === line.swordId);
-    return sword ? [{ line, sword: localizeForLocale(sword, locale) }] : [];
-  });
+  const { destination, items, estimate, needsPermit, rule, config } = quote;
 
   if (items.length === 0) {
     return (
@@ -73,14 +57,6 @@ export function CheckoutView() {
       </div>
     );
   }
-
-  const estimate = estimateCustoms(
-    items.map(({ line, sword }) => ({ origin: sword.origin, unitPrice: sword.price, quantity: line.quantity })),
-    destination,
-    config.data,
-  );
-  const rule = findCountryRule(config.data, destination);
-  const needsPermit = items.some(({ sword }) => requiresPossessionPermit(sword.specs));
 
   const handlePlaced = (order: Order) => {
     setPlacedId(order.id);
@@ -120,7 +96,7 @@ export function CheckoutView() {
             </li>
           ))}
         </ul>
-        <CustomsBreakdown estimate={estimate} config={config.data} />
+        <CustomsBreakdown estimate={estimate} config={config} />
       </aside>
     </div>
   );

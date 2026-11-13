@@ -6,7 +6,7 @@ import { apiFetch } from '@/shared/api';
 
 import type { Sword, SwordCategory } from '@snb/domain';
 
-export const swordKeys = {
+const swordKeys = {
   all: ['swords'] as const,
   list: (category?: SwordCategory) => ['swords', 'list', category ?? 'all'] as const,
   detail: (slug: string) => ['swords', 'detail', slug] as const,

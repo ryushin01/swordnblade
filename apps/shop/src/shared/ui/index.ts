@@ -1,10 +1,10 @@
 export { Avatar } from './avatar';
 export { Button, buttonVariants } from './button';
-export { ErrorSummary, type ErrorSummaryItem, useErrorFocus } from './error-summary';
-export { TextField, type TextFieldProps } from './form-field';
+export { ErrorSummary, useErrorFocus } from './error-summary';
+export { TextField } from './form-field';
 export { LiveTotal } from './live-total';
 export { OrnamentHeading } from './ornament-heading';
-export { PasswordField, type PasswordFieldProps } from './password-field';
+export { PasswordField } from './password-field';
 export { selectClassName } from './select';
 export { Toaster } from './sonner';
 export { Wordmark } from './wordmark';

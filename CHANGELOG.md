@@ -1,5 +1,11 @@
 # 버전 기록
 
+## 0.10.2 - 2026-11-13
+
+- 공통화(쇼핑몰): 장바구니와 주문서가 따로 하던 '장바구니 품목을 상품 정보와 합치고 배송지 기준 관세·소지 허가 계산'을 `features/cart-quote`의 `useCartQuote`로 모아 두 화면의 금액이 늘 같게 함(+테스트)
+- 모니터링(쇼핑몰): Sentry를 페이지를 다 받은 뒤(load) 한가할 때 받음. load가 10초 안에 오지 않으면 그때 바로 받음. Error가 아닌 일반 객체로 거부된 Promise의 필드 값(`extra.__serialized__`)도 보내기 전에 지움(+테스트)
+- 정리: `@snb/sword-art`가 쓰지 않는 `react-dom`·`@testing-library/react`·`@types/react-dom`·`jsdom`, 슬라이스 공개 API의 쓰지 않는 내보내기(쿼리 키, `PAGE_SIZE`, 폼 타입 등), 파일 안에서만 쓰는 도검 치수 함수의 export, README 버전 표시(0.10.0에 머물러 있던 것)
+
 ## 0.10.1 - 2026-11-12
 
 - 접근성 린트: eslint-plugin-jsx-a11y의 recommended 규칙을 모두 켬(eslint-config-next가 등록한 플러그인 사용)
