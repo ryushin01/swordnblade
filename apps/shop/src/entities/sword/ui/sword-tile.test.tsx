@@ -20,6 +20,16 @@ describe('SwordTile', () => {
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('부조에 상세의 큰 부조로 날아가는 화면 전환 키를 단다', () => {
+    const { container } = renderWithProviders(<SwordTile sword={sword} />);
+    expect(container.querySelector('svg')).toHaveAttribute('data-hero-exit-key', 'ssangsudo');
+  });
+
+  it('heroSource를 끄면 화면 전환 키를 달지 않는다(같은 도검이 두 번 나오는 목록)', () => {
+    const { container } = renderWithProviders(<SwordTile sword={sword} heroSource={false} />);
+    expect(container.querySelector('svg')).not.toHaveAttribute('data-hero-exit-key');
+  });
+
   it('재고가 없으면 품절로 보인다', () => {
     renderWithProviders(<SwordTile sword={{ ...sword, stock: 0 }} />);
     expect(screen.getByRole('link', { name: /품절/ })).toBeInTheDocument();

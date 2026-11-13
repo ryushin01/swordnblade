@@ -13,7 +13,19 @@ export type SwordTileData = Pick<Sword, 'id' | 'slug' | 'name' | 'nameEn' | 'nam
  * 석고 벽의 한 칸. 부조는 장식이고, 이름과 가격 글자가 링크 이름이 됩니다.
  * 마우스를 올리거나 초점을 받으면 따뜻한 빛이 번집니다. sword는 화면 언어로 바꾼 값을 받습니다.
  */
-export function SwordTile({ sword, className }: { sword: SwordTileData; className?: string }) {
+export function SwordTile({
+  sword,
+  className,
+  heroSource = true,
+}: {
+  sword: SwordTileData;
+  className?: string;
+  /**
+   * 상세 화면의 큰 부조로 날아가는 화면 전환의 출발점으로 쓸지. SSGOI는 같은 키의 첫 요소에서 출발하므로,
+   * 한 화면에 같은 도검이 두 번 나올 수 있는 목록(최근 본 도검)은 끕니다.
+   */
+  heroSource?: boolean;
+}) {
   const t = useTranslations('Tile');
   const locale = useLocale() as Locale;
   const soldOut = sword.stock <= 0;
@@ -31,7 +43,7 @@ export function SwordTile({ sword, className }: { sword: SwordTileData; classNam
       <SwordRelief
         art={sword.art}
         // 상세 화면의 큰 부조로 날아가는 화면 전환의 출발점
-        transition={{ side: 'exit', key: sword.slug }}
+        transition={heroSource ? { side: 'exit', key: sword.slug } : undefined}
         frame="catalog"
         pigment={0.72}
         className="relative min-h-0 w-full flex-1 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
