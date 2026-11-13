@@ -41,12 +41,18 @@ jobs:
       - run: pnpm build
       # 프로덕션 빌드(next start)에서 업무 흐름, 접근성(axe), 화면 넘침을 검사
       - run: pnpm --filter @snb/shop e2e
+      # 쇼핑몰의 번들 크기와 Lighthouse 점수
+      - run: pnpm --filter @snb/shop size
+      - run: pnpm --filter @snb/shop lhci
       - run: pnpm --filter @snb/admin e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: reports
+          # .lighthouseci는 숨김 폴더라 따로 켜야 올라갑니다.
+          include-hidden-files: true
           path: |
             apps/*/playwright-report/
             apps/*/test-results/
+            apps/shop/.lighthouseci/
           retention-days: 7

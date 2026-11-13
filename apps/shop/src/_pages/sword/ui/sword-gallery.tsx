@@ -55,11 +55,15 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
       <h2 id="gallery-title" className="sr-only">
         {t('title')}
       </h2>
-      <div className="relative min-h-0">
+      <div className="relief-stage relative min-h-0">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(closest-side,var(--glow)_0%,transparent_75%)]"
         />
+        {/* 스크롤하면 해가 지나가듯 비스듬한 빛이 부조를 훑습니다(globals.css의 .relief-light). 사진에는 얹지 않습니다. */}
+        {current.kind === 'relief' ? (
+          <div aria-hidden="true" className="relief-light pointer-events-none absolute inset-0 z-10" />
+        ) : null}
         {current.kind === 'relief' ? (
           <SwordRelief
             art={sword.art}
@@ -67,7 +71,7 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
             pigment={0.86}
             depth={1.1}
             label={`${reliefLabel} (${current.label})`}
-            className="relative mx-auto aspect-square h-full max-h-[calc(100dvh-12rem)] w-full max-w-full object-contain"
+            className="relief-turn relative mx-auto aspect-square h-full max-h-[calc(100dvh-12rem)] w-full max-w-full object-contain"
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element -- Mock API가 브라우저에서 돌려주는 사진이라 next/image 최적화를 쓸 수 없습니다.

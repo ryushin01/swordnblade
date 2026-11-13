@@ -1,7 +1,7 @@
 # Sword & Blade - 도검의 벽
 
 [![CI](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml/badge.svg)](https://github.com/ryushin01/swordnblade/actions/workflows/ci.yml)
-![version](https://img.shields.io/badge/version-0.9.1-7a4a35)
+![version](https://img.shields.io/badge/version-0.10.0-7a4a35)
 ![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
 
 동양 도검부터 신화 속 검까지, 석고 벽에 새긴 부조처럼 진열한 도검 쇼핑몰과 관리자 화면입니다. 배송 국가에 따라 관세·부가세를 미리 계산합니다.
@@ -44,7 +44,7 @@
 |---|---|
 | 도검의 벽 | 동양·서양·중동·아프리카·신대륙의 역사 도검 101점과 신화·전설의 검 112점, 모두 213점. 같은 축척으로 그려 길이 차이가 보입니다. 지역과 형태로 거르고, 이름(한글·원어·영문)으로 찾고, 가격·길이로 정렬하며 24점씩 나눠 봅니다. |
 | 석고 부조 일러스트 | 칼날·코등이·손잡이 감기·끝장식·술을 매개변수로 그리고 SVG 조명 필터로 부조처럼 보이게 합니다. |
-| 상세 갤러리 | 부조 그림 다섯 시점(전체·손잡이·칼끝·코등이·칼날 중간 또는 덧쇠)과 어드민에서 올린 사진을 썸네일과 이전·다음 버튼으로 넘겨 봅니다. |
+| 상세 갤러리 | 부조 그림 다섯 시점(전체·손잡이·칼끝·코등이·칼날 중간 또는 덧쇠)과 어드민에서 올린 사진을 썸네일과 이전·다음 버튼으로 넘겨 봅니다. 넓은 화면에서는 설명을 스크롤하는 동안 부조가 천천히 돌며 다가오고 빛이 부조를 훑습니다(CSS 스크롤 타임라인). |
 | 관세 계산 | 출고지별로 묶어 계산합니다. 해외 → 한국(면세 150달러, 미국발 200달러, 관세 8%, 부가세 10%)과 한국 → 해외(국가별 CIF·FOB, 부가세)를 모두 지원합니다. |
 | 한국어·영어 | 한국어는 `/`, 영어는 `/en`. 화면 글, 도검 213점의 설명과 이야기, 국가별 허가 안내를 영어로 옮겼고, 머리글에서 언어를 바꿉니다. 어드민은 한국어만 제공합니다. |
 | 허가 안내 | 칼날 15cm 이상 진검은 소지허가 대상으로 표시하고, 주문할 때 허가 안내를 확인받습니다. |
@@ -77,7 +77,8 @@
 | 쇼핑몰 UI | Tailwind CSS 4, shadcn/ui(Button, Sonner), lucide-react, Cormorant Garamond(영문), 운영체제 명조체(한글), 나눔손글씨 붓(칼 이름에 쓰인 247자만) |
 | 어드민 UI | Ant Design 6, @ant-design/icons |
 | 상태·데이터 | TanStack Query 5, Zustand 5, MSW 3 (Mock API), next-intl 4 (한국어·영어) |
-| 품질 | ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged, Vitest 5 + Testing Library, Storybook 10 스토리 테스트(실제 브라우저 + axe), Playwright + axe(프로덕션 빌드·배포 사이트 E2E) |
+| 품질 | ESLint(Next.js 규칙, import 정렬), Prettier, husky + lint-staged, Vitest 5 + Testing Library, Storybook 10 스토리 테스트(실제 브라우저 + axe), Playwright + axe(프로덕션 빌드·배포 사이트 E2E), eslint-plugin-jsx-a11y, size-limit, Lighthouse CI |
+| 모니터링 | Sentry(DSN이 있을 때만), web-vitals |
 | 배포 | Vercel(앱별 프로젝트, Git 연동), GitHub Actions, Dependabot |
 
 ## 시작하기
@@ -97,6 +98,7 @@ pnpm dev    # 쇼핑몰 http://localhost:3000 · 어드민 http://localhost:3000
 | `pnpm test:storybook` | 모든 스토리를 실제 브라우저에서 렌더링하고 접근성 검사 |
 | `pnpm typecheck` / `pnpm lint` | 타입 검사 / ESLint와 FSD 규칙 검사(Steiger) |
 | `pnpm format` | Prettier로 서식 정리 (커밋할 때 바뀐 파일은 자동 정리) |
+| `pnpm --filter @snb/shop size` / `lhci` | 쇼핑몰 번들 크기 / Lighthouse 기준 검사 (먼저 `build` 필요) |
 | `pnpm --filter @snb/shop e2e` | 쇼핑몰 프로덕션 빌드 E2E (먼저 `build` 필요, `E2E_BASE_URL`을 주면 배포된 사이트 검사) |
 | `pnpm --filter @snb/shop storybook` | 쇼핑몰 Storybook (`http://localhost:6006`) |
 
