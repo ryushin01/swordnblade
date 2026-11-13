@@ -10,7 +10,7 @@ import { selectClassName } from '@/shared/ui';
 import type { SwordCategory } from '@snb/domain';
 
 /**
- * 도검 찾기·형태 거르기·정렬. GET 폼이라 자바스크립트 없이도 동작하고, 결과는 주소(?q=&sort=)에 남습니다.
+ * 도검 찾기·형태 거르기·할인 거르기·정렬. GET 폼이라 자바스크립트 없이도 동작하고, 결과는 주소(?q=&sort=)에 남습니다.
  * 형태·정렬을 바꿔도 바로 이동하지 않고 [찾기]를 눌러야 적용합니다(사용자 요구에 따른 실행).
  */
 interface SearchFormProps {
@@ -18,9 +18,10 @@ interface SearchFormProps {
   q: string;
   sort: SwordSort;
   kind?: SwordKind;
+  sale: boolean;
 }
 
-export function SearchForm({ category, q, sort, kind }: SearchFormProps) {
+export function SearchForm({ category, q, sort, kind, sale }: SearchFormProps) {
   const t = useTranslations('Home');
   const locale = useLocale();
   return (
@@ -69,6 +70,19 @@ export function SearchForm({ category, q, sort, kind }: SearchFormProps) {
             </option>
           ))}
         </select>
+      </div>
+      <div className="flex min-h-11 items-center gap-2">
+        <input
+          id="sword-sale"
+          type="checkbox"
+          name="sale"
+          value="1"
+          defaultChecked={sale}
+          className="size-5 shrink-0 accent-ink"
+        />
+        <label htmlFor="sword-sale" className="text-sm">
+          {t('saleOnly')}
+        </label>
       </div>
       <button type="submit" className="h-11 rounded-sm bg-ink px-6 text-primary-foreground small-caps hover:bg-ink/90">
         {t('submit')}

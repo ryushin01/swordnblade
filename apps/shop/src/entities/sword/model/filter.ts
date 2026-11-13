@@ -4,6 +4,7 @@ import {
   KIND_LABEL,
   KIND_LABEL_EN,
   normalizeSearchText,
+  priceOf,
   type Sword,
   SWORD_KINDS,
   type SwordKind,
@@ -20,6 +21,9 @@ export const toSwordSort = (value: string | undefined): SwordSort =>
 /** 모르는 형태 값은 거르지 않음(undefined)으로 봅니다. */
 export const toSwordKind = (value: string | undefined): SwordKind | undefined =>
   SWORD_KINDS.includes(value as SwordKind) ? (value as SwordKind) : undefined;
+
+/** 주소의 sale=1이면 할인 중인 도검만 봅니다. */
+export const toSale = (value: string | undefined): boolean => value === '1';
 
 /** 한 쪽에 보여 줄 도검 수 */
 const PAGE_SIZE = 24;
@@ -48,11 +52,19 @@ export function paginate<T>(items: T[], page: number, size = PAGE_SIZE) {
 /**
  * 형태로 거르고, 이름(한글·원어·영문), 시대, 분류·형태 이름(한·영)에서 찾아 정렬합니다. 대소문자와 띄어쓰기는 가리지 않습니다.
  * 화면 언어로 바꾼 도검을 넘기면 그 언어의 시대 표기로도 찾습니다.
+ * 가격 정렬과 할인 거르기는 now(ms) 시각의 판매가로 합니다.
  */
-export function filterSwords(swords: Sword[], options: { q?: string; sort?: SwordSort; kind?: SwordKind }): Sword[] {
+export function filterSwords(
+  swords: Sword[],
+  options: { q?: string; sort?: SwordSort; kind?: SwordKind; sale?: boolean; now?: number },
+): Sword[] {
   const normalize = normalizeSearchText;
   const q = normalize(options.q ?? '');
-  const byKind = options.kind ? swords.filter((sword) => sword.kind === options.kind) : swords;
+  const now = options.now ?? Date.now();
+  const price = (sword: Sword) => priceOf(sword, now).price;
+  const byKind = swords.filter(
+    (sword) => (!options.kind || sword.kind === options.kind) && (!options.sale || priceOf(sword, now).rate > 0),
+  );
   const matched = q
     ? byKind.filter((sword) =>
         [
@@ -71,9 +83,9 @@ export function filterSwords(swords: Sword[], options: { q?: string; sort?: Swor
   const sorted = [...matched];
   switch (options.sort ?? 'recommended') {
     case 'price-asc':
-      return sorted.sort((a, b) => a.price - b.price);
+      return sorted.sort((a, b) => price(a) - price(b));
     case 'price-desc':
-      return sorted.sort((a, b) => b.price - a.price);
+      return sorted.sort((a, b) => price(b) - price(a));
     case 'length-desc':
       return sorted.sort((a, b) => b.specs.totalLength - a.specs.totalLength);
     case 'recommended':

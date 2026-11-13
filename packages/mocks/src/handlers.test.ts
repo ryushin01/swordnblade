@@ -80,6 +80,53 @@ describe('Mock API', () => {
     expect(response.status).toBe(409);
   });
 
+  it('할인 중인 도검은 할인가로 주문하고 정가를 함께 남긴다', async () => {
+    db.write((state) => ({
+      ...state,
+      swords: state.swords.map((sword) =>
+        sword.id === 'sw-003'
+          ? { ...sword, discount: { rate: 20 } }
+          : sword.id === 'sw-007'
+            ? { ...sword, discount: { rate: 30, startsAt: '2999-01-01' } }
+            : sword,
+      ),
+    }));
+    const listPrice = (id: string) => db.read().swords.find((sword) => sword.id === id)!.price;
+    const response = await fetch(`${BASE}/api/orders`, {
+      method: 'POST',
+      body: JSON.stringify({
+        destination: 'KR',
+        customer,
+        lines: [
+          { swordId: 'sw-003', quantity: 1 },
+          { swordId: 'sw-007', quantity: 1 },
+        ],
+        paymentMethod: 'card',
+        permitConfirmed: true,
+      }),
+    });
+    expect(response.status).toBe(201);
+    const order = (await response.json()) as Order;
+    expect(order.lines[0]).toMatchObject({ unitPrice: 7_840_000, listPrice: 9_800_000 });
+    // 시작 전인 할인은 적용하지 않습니다.
+    expect(order.lines[1]?.unitPrice).toBe(listPrice('sw-007'));
+    expect(order.lines[1]).not.toHaveProperty('listPrice');
+    expect(order.amounts.goods).toBe(7_840_000 + listPrice('sw-007'));
+  });
+
+  it('할인 값이 맞지 않으면 상품을 저장하지 않고 422', async () => {
+    const sword = db.read().swords.find((item) => item.id === 'sw-003')!;
+    const save = (discount: unknown) =>
+      fetch(`${BASE}/api/swords/${sword.id}`, { method: 'PUT', body: JSON.stringify({ ...sword, discount }) });
+    const tooMuch = await save({ rate: 95 });
+    expect(tooMuch.status).toBe(422);
+    expect(((await tooMuch.json()) as { fields: Record<string, string> }).fields.discount).toMatch(/90/);
+    expect((await save({ rate: 10, startsAt: '2027-02-01', endsAt: '2027-01-01' })).status).toBe(422);
+    expect(db.read().swords.find((item) => item.id === 'sw-003')?.discount).toBeUndefined();
+    expect((await save({ rate: 10, endsAt: '2027-01-31' })).status).toBe(200);
+    expect(db.read().swords.find((item) => item.id === 'sw-003')?.discount).toEqual({ rate: 10, endsAt: '2027-01-31' });
+  });
+
   it('주문 상태를 바꾼다', async () => {
     const response = await fetch(`${BASE}/api/orders/SNB-20261103-0002`, {
       method: 'PATCH',

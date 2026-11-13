@@ -1,5 +1,5 @@
 import type { CatalogEntry, Pair, StoryRow } from './build';
-import type { CountryCode, SwordArt, SwordKind } from '@snb/domain';
+import type { CountryCode, SwordArt, SwordDiscount, SwordKind } from '@snb/domain';
 
 export const GOLD = '#b48a3c';
 export const GOLD_LIGHT = '#d9b65a';
@@ -61,6 +61,7 @@ export interface LegendSpec {
   price: number;
   stock?: number;
   material?: Pair;
+  discount?: SwordDiscount;
   art: SwordArt;
 }
 
@@ -81,6 +82,7 @@ export function legend(spec: LegendSpec): CatalogEntry {
     edge: 'blunt',
     price: spec.price,
     stock: spec.stock ?? 2,
+    ...(spec.discount ? { discount: spec.discount } : {}),
     art: spec.art,
   };
 }

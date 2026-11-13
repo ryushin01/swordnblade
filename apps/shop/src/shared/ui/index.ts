@@ -5,6 +5,7 @@ export { TextField } from './form-field';
 export { LiveTotal } from './live-total';
 export { OrnamentHeading } from './ornament-heading';
 export { PasswordField } from './password-field';
+export { PriceTag } from './price-tag';
 export { selectClassName } from './select';
 export { Toaster } from './sonner';
 export { Wordmark } from './wordmark';

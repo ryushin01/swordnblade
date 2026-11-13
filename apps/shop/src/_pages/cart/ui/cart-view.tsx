@@ -10,7 +10,7 @@ import { useCartQuote } from '@/features/cart-quote';
 import { DestinationSelect } from '@/features/choose-destination';
 import { Link } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
-import { buttonVariants, LiveTotal, OrnamentHeading } from '@/shared/ui';
+import { buttonVariants, LiveTotal, OrnamentHeading, PriceTag } from '@/shared/ui';
 
 import { QuantitySelect, RemoveLineButton } from './cart-line-controls';
 
@@ -78,7 +78,7 @@ export function CartView() {
             </tr>
           </thead>
           <tbody>
-            {items.map(({ line, sword }) => (
+            {items.map(({ line, sword, pricing }) => (
               <tr key={sword.id} className="border-b border-line align-middle">
                 <th scope="row" className="py-3 pr-2 font-normal">
                   <span className="flex items-center gap-3">
@@ -87,7 +87,12 @@ export function CartView() {
                       <Link href={`/swords/${sword.slug}`} className="text-lg underline-offset-4 hover:underline">
                         {sword.name}
                       </Link>
-                      <span className="text-sm text-ink-muted">{formatKRW(sword.price, locale)}</span>
+                      <PriceTag
+                        price={pricing.price}
+                        listPrice={pricing.listPrice}
+                        rate={pricing.rate}
+                        className="text-sm text-ink-muted"
+                      />
                       <span className="text-sm text-ink-muted sm:hidden">
                         {t('shippedFrom', { country: countryName(sword.origin, locale) })}
                       </span>
@@ -98,7 +103,7 @@ export function CartView() {
                 <td className="py-3">
                   <QuantitySelect swordId={sword.id} name={sword.name} quantity={line.quantity} stock={sword.stock} />
                 </td>
-                <td className="py-3 text-right tabular-nums">{formatKRW(sword.price * line.quantity, locale)}</td>
+                <td className="py-3 text-right tabular-nums">{formatKRW(pricing.price * line.quantity, locale)}</td>
                 <td className="py-3 text-right">
                   <RemoveLineButton swordId={sword.id} name={sword.name} />
                 </td>

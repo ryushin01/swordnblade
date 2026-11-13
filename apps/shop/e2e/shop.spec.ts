@@ -159,6 +159,28 @@ test('찾기와 정렬: 주소에 남고 결과 수를 알려 준다', async ({ 
   await expectNoA11yViolations(page);
 });
 
+test('할인: 할인 중인 도검만 거르고, 상세에 정가·할인가·할인율을 보여 준다', async ({ page }) => {
+  await page.goto('/');
+  const search = page.getByRole('search', { name: '도검 찾기' });
+  await search.getByLabel('할인 중인 도검만').check();
+  await search.getByRole('button', { name: '찾기' }).click();
+  await expect(page).toHaveURL(/sale=1/);
+  // 기한 없는 시드 할인(바이킹 소드 15%)으로 확인합니다. 줄 그은 정가는 화면 낭독기에 '정가'로 읽힙니다.
+  const viking = page.getByRole('link', { name: /바이킹 소드.*정가 3,100,000원 할인가 2,635,000원 15% 할인/ });
+  await expect(viking).toBeVisible();
+  // 시작 전인 할인(오오타치)은 빠지고, 보이는 칸은 모두 할인 중입니다.
+  await expect(tiles(page).filter({ hasText: '오오타치' })).toHaveCount(0);
+  for (const text of await tiles(page).allTextContents()) expect(text).toMatch(/\d+% 할인/);
+  await expectNoA11yViolations(page);
+
+  await viking.click();
+  const buy = page.getByRole('region', { name: '구매', exact: true });
+  await expect(buy.locator('del')).toContainText('3,100,000원');
+  await expect(buy).toContainText('2,635,000원');
+  await expect(buy).toContainText('15% 할인');
+  await expectNoA11yViolations(page);
+});
+
 test('서버가 상품 목록을 HTML로 먼저 그린다(자바스크립트 없이도 보임)', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();

@@ -601,6 +601,7 @@ export const EAST_ENTRIES: CatalogEntry[] = [
     edge: 'sharp',
     price: 1_250_000,
     stock: 4,
+    discount: { rate: 10 },
     art: {
       blade: { length: 360, width: 34, curve: 0, edge: 'double', tip: 'spear', wave: 7, waves: 7 },
       guard: { type: 'ganja', width: 60, color: '#5a4636' },
@@ -666,6 +667,7 @@ export const EAST_ENTRIES: CatalogEntry[] = [
     edge: 'sharp',
     price: 5_200_000,
     stock: 3,
+    discount: { rate: 10, endsAt: '2027-12-31' },
     art: {
       blade: { length: 780, width: 30, curve: 26, edge: 'single', tip: 'kissaki', hamon: true },
       collar: { color: GOLD },
@@ -699,6 +701,7 @@ export const EAST_ENTRIES: CatalogEntry[] = [
     edge: 'sharp',
     price: 7_400_000,
     stock: 1,
+    discount: { rate: 10, startsAt: '2027-01-01', endsAt: '2027-03-31' },
     art: {
       blade: { length: 1200, width: 34, curve: 34, edge: 'single', tip: 'kissaki', hamon: true },
       guard: { type: 'disc', width: 84, color: IRON, accent: BRASS },

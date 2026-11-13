@@ -132,6 +132,7 @@ export const WEST_ENTRIES: CatalogEntry[] = [
     edge: 'sharp',
     price: 2_800_000,
     stock: 3,
+    discount: { rate: 20, endsAt: '2027-06-30' },
     art: {
       blade: { length: 1000, width: 24, curve: 0, edge: 'double', tip: 'needle', ridge: true },
       guard: { type: 'swept', width: 170, color: STEEL_DARK },

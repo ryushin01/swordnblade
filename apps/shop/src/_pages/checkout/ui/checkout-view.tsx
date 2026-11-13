@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { countryName, formatKRW, type Locale, type Order, permitNote } from '@snb/domain';
+import { countryName, type Locale, type Order, permitNote } from '@snb/domain';
 
 import { useCartStore } from '@/entities/cart';
 import { CustomsBreakdown } from '@/entities/tariff';
 import { useCartQuote } from '@/features/cart-quote';
 import { Link, useRouter } from '@/shared/i18n';
-import { OrnamentHeading } from '@/shared/ui';
+import { OrnamentHeading, PriceTag } from '@/shared/ui';
 
 import { CheckoutForm } from './checkout-form';
 
@@ -87,12 +87,16 @@ export function CheckoutView() {
       <aside aria-labelledby="checkout-summary-title" className="grid content-start gap-5">
         <OrnamentHeading id="checkout-summary-title">{t('summaryTitle')}</OrnamentHeading>
         <ul className="grid gap-2">
-          {items.map(({ line, sword }) => (
+          {items.map(({ line, sword, pricing }) => (
             <li key={sword.id} className="flex justify-between gap-4">
               <span>
                 {sword.name} × {line.quantity}
               </span>
-              <span className="tabular-nums">{formatKRW(sword.price * line.quantity, locale)}</span>
+              <PriceTag
+                price={pricing.price * line.quantity}
+                listPrice={pricing.listPrice * line.quantity}
+                className="justify-end"
+              />
             </li>
           ))}
         </ul>

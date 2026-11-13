@@ -12,6 +12,7 @@ import {
   useSwords,
 } from '@/entities/sword';
 import { Link } from '@/shared/i18n';
+import { useNow } from '@/shared/lib/use-now';
 import { Button } from '@/shared/ui';
 
 import { Pagination } from './pagination';
@@ -37,6 +38,8 @@ interface SwordWallProps {
   q: string;
   sort: SwordSort;
   kind?: SwordKind;
+  /** 할인 중인 도검만 */
+  sale: boolean;
   /** 1부터 시작하는 쪽 번호 */
   page: number;
   /** 서버가 시드로 먼저 그린 지금 쪽. Mock API 값이 오면 바뀝니다. */
@@ -44,16 +47,17 @@ interface SwordWallProps {
   labelledBy: string;
 }
 
-export function SwordWall({ category, q, sort, kind, page, initialView, labelledBy }: SwordWallProps) {
+export function SwordWall({ category, q, sort, kind, sale, page, initialView, labelledBy }: SwordWallProps) {
   const t = useTranslations('Home');
   const compare = useTranslations('Compare');
   const locale = useLocale() as Locale;
   const { data, isError, refetch } = useSwords(category);
+  const now = useNow();
   const shown: WallView | undefined = data
     ? paginate(
         filterSwords(
           data.map((sword) => localizeForLocale(sword, locale)),
-          { q, sort, kind },
+          { q, sort, kind, sale, now },
         ),
         page,
       )
@@ -85,6 +89,7 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
   const withoutQuery: Record<string, string> = {
     ...(category ? { category } : {}),
     ...(kind ? { kind } : {}),
+    ...(sale ? { sale: '1' } : {}),
     ...(sort !== 'recommended' ? { sort } : {}),
   };
   const query = q ? { ...withoutQuery, q } : withoutQuery;
@@ -126,7 +131,9 @@ export function SwordWall({ category, q, sort, kind, page, initialView, labelled
         </span>
       </div>
       {shown.total === 0 ? (
-        <p className="px-4 py-24 text-center">{q ? t('emptyQuery', { q }) : t('emptyCategory')}</p>
+        <p className="px-4 py-24 text-center">
+          {q ? t('emptyQuery', { q }) : sale ? t('emptySale') : t('emptyCategory')}
+        </p>
       ) : (
         <ul aria-labelledby={labelledBy} className={`${GRID} border-l border-t border-line`}>
           {shown.items.map((sword) => (
