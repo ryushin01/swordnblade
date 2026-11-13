@@ -6,7 +6,7 @@ import { apiFetch, useSaveMutation } from '@/shared/api';
 
 import type { Sword } from '@snb/domain';
 
-export const swordKeys = { all: ['swords'] as const, detail: (id: string) => ['swords', id] as const };
+const swordKeys = { all: ['swords'] as const, detail: (id: string) => ['swords', id] as const };
 
 export const useSwords = () => useQuery({ queryKey: swordKeys.all, queryFn: () => apiFetch<Sword[]>('/api/swords') });
 
