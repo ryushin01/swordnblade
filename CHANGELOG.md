@@ -1,5 +1,11 @@
 # 버전 기록
 
+## 0.10.1 - 2026-11-12
+
+- 접근성 린트: eslint-plugin-jsx-a11y의 recommended 규칙을 모두 켬(eslint-config-next가 등록한 플러그인 사용)
+- 모니터링(쇼핑몰): `NEXT_PUBLIC_SENTRY_DSN`이 있으면 처리하지 못한 오류와 나쁜 Web Vitals를 Sentry로 보냄. 오류 내용만 보내고, Sentry(약 31 kB gzip)와 web-vitals는 첫 화면 뒤에 따로 받음
+- 성능 예산(쇼핑몰): CI에서 size-limit(전체 JS 520 kB, CSS 10 kB)과 Lighthouse CI(첫 화면·도검 상세·연표·영문 상세가 데스크톱 기준 성능 90·접근성 100·권장 사항 95·SEO 90점)로 검사
+
 ## 0.10.0 - 2026-11-12
 
 - 도검 상세의 스크롤 연출(애플 제품 페이지식): 넓은 화면에서 오른쪽 설명을 읽어 내려가는 동안 고정된 부조가 천천히 돌며 다가오고, 비스듬한 빛이 해가 지나가듯 부조를 훑음

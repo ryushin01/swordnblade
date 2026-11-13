@@ -140,3 +140,23 @@ VoiceOver로 직접 들어 보는 점검은 사람이 해야 합니다. 다음�
 - 찾기 결과 수, 장바구니 담기 알림, 결제 예정 금액이 바뀔 때 읽히는가
 - 주문서 오류 요약으로 초점이 옮겨지고, 링크를 누르면 해당 칸으로 가는가
 - 어드민 표(상품·주문)의 머리글이 칸마다 함께 읽히는가
+
+## 품질 예산
+
+- **접근성 린트:** `eslint-config-next`는 jsx-a11y 규칙을 몇 개만 켭니다. 루트 `eslint.config.mjs`에서 이미 등록된 플러그인의 recommended 규칙을 모두 켭니다. 가로 스크롤용 `role="region"` + `tabIndex={0}`은 허용합니다.
+- **번들 크기:** `pnpm --filter @snb/shop size`가 쇼핑몰 전체 JS 520 kB, CSS 10 kB(gzip)를 넘으면 실패합니다. 기준은 `apps/shop/.size-limit.json`에 있습니다.
+- **Lighthouse:** `pnpm --filter @snb/shop lhci`가 첫 화면·도검 상세·연표·영문 상세를 데스크톱 기준 3번씩 재서 성능 90·접근성 100·권장 사항 95·SEO 90점, LCP 2.5초·TBT 200ms·CLS 0.1 이하인지 확인합니다. 기준은 `apps/shop/lighthouserc.json`에 있습니다. 로컬에서는 canonical이 배포 주소를 가리켜 SEO가 92점으로 나옵니다.
+
+두 검사 모두 프로덕션 빌드가 먼저 있어야 하며, CI는 E2E 뒤에 돌립니다.
+
+## 모니터링
+
+쇼핑몰(`apps/shop`)은 `instrumentation-client.ts`에서 `_app/monitoring`을 켜고, Sentry와 web-vitals는 나중에 따로 받습니다.
+
+| 환경 변수 | 내용 |
+| --- | --- |
+| `NEXT_PUBLIC_SENTRY_DSN` | 있으면 처리하지 못한 오류와 나쁜(poor) Web Vitals를 Sentry로 보냅니다. 없으면 Sentry를 번들에 넣지 않고, 개발 모드에서 Web Vitals를 콘솔에만 찍습니다 |
+
+- Sentry에는 오류 내용만 보내고 사용자 정보·쿠키·헤더·쿼리 문자열, 방문 기록(세션), 이동·클릭 기록(브레드크럼), 콘솔 기록은 모으지 않습니다. Sentry를 받기 전에 난 오류는 최대 20개까지 모아 두었다가 처리되지 않은 오류로 보냅니다.
+- 쓰는 함수만 `sentry.ts`에서 다시 내보내 약 31 kB(gzip)로 받습니다. 모듈 전체를 불러오면 리플레이·피드백까지 들어가 140 kB가 됩니다.
+- 브라우저 오류만 모읍니다. 서버에서 난 오류는 Vercel 로그로 확인합니다.
