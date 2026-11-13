@@ -30,6 +30,8 @@ export function SwordTile({ sword, className }: { sword: SwordTileData; classNam
     >
       <SwordRelief
         art={sword.art}
+        // 상세 화면의 큰 부조로 날아가는 화면 전환의 출발점
+        transition={{ side: 'exit', key: sword.slug }}
         frame="catalog"
         pigment={0.72}
         className="relative min-h-0 w-full flex-1 transition-transform duration-700 ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"

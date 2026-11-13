@@ -56,6 +56,11 @@ export interface SwordReliefProps {
   /** 상세 갤러리 확대 보기: 전체, 손잡이, 칼끝 */
   focus?: ReliefFocus;
   className?: string;
+  /**
+   * 화면 전환(SSGOI hero)의 짝 표시. 목록의 그림(exit)과 상세의 그림(enter)에 같은 key를 달면
+   * 화면을 옮길 때 그림이 그 자리로 날아갑니다.
+   */
+  transition?: { side: 'exit' | 'enter'; key: string };
 }
 
 export function SwordRelief({
@@ -66,6 +71,7 @@ export function SwordRelief({
   depth = 1,
   focus = 'full',
   className,
+  transition,
 }: SwordReliefProps) {
   const rawId = useId();
   const id = (name: string) => `snb${rawId.replace(/[^a-zA-Z0-9]/g, '')}-${name}`;
@@ -80,6 +86,7 @@ export function SwordRelief({
       viewBox={viewBox}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
+      {...(transition ? { [`data-hero-${transition.side}-key`]: transition.key } : {})}
       {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true, focusable: false })}
     >
       <defs>

@@ -4,7 +4,20 @@ import { expect, type Page, test } from '@playwright/test';
 const tiles = (page: Page) =>
   page.getByRole('list', { name: /도검의 벽|신화·전설|동양 도검|서양 도검/ }).getByRole('link');
 
+/** 화면 전환(SSGOI)이 끝날 때까지 기다립니다. 전환 중에는 떠나는 화면과 들어오는 화면이 겹치고 투명도가 바뀝니다. */
+async function waitForPageTransition(page: Page) {
+  await expect(page.locator('[data-ssgoi-transition]')).toHaveCount(1);
+  // SSGOI는 Element.animate로 움직입니다. 스크롤에 묶인 CSS 애니메이션(상세의 부조 연출 등)은 계속 도므로 세지 않습니다.
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .filter((a) => !(a instanceof CSSAnimation) && !(a instanceof CSSTransition))
+      .every((a) => a.playState !== 'running'),
+  );
+}
+
 async function expectNoA11yViolations(page: Page) {
+  await waitForPageTransition(page);
   // 화면 전환 직후에는 문서 제목이 잠시 비어 있어 document-title로 잘못 잡히므로 제목이 채워진 뒤에 검사합니다.
   await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
@@ -287,4 +300,65 @@ test('최근 본 도검: 앞서 본 도검을 상세 아래에 보여 준다', a
   const recent = page.getByRole('list', { name: '최근 본 도검' });
   await expect(recent.getByRole('link', { name: /환도/ })).toBeVisible();
   await expect(recent.getByRole('link', { name: /쌍수도/ })).toHaveCount(0);
+});
+
+test.describe('화면 전환', () => {
+  /** 화면에 보이는 라우트 경계 수의 최댓값을 그려진 프레임마다 기록합니다. 전환 중에는 두 화면이 겹칩니다. */
+  async function trackOverlap(page: Page) {
+    await page.evaluate(() => {
+      const w = window as unknown as { __maxPages: number };
+      w.__maxPages = 0;
+      const tick = () => {
+        const visible = [...document.querySelectorAll('[data-ssgoi-transition]')].filter(
+          (el) => el.getClientRects().length > 0,
+        );
+        w.__maxPages = Math.max(w.__maxPages, visible.length);
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+  }
+  const maxPages = (page: Page) => page.evaluate(() => (window as unknown as { __maxPages: number }).__maxPages);
+
+  async function openFirstSword(page: Page) {
+    await page.goto('/');
+    const art = page.locator('[data-hero-exit-key]').first();
+    await expect(art).toBeVisible();
+    const slug = await art.getAttribute('data-hero-exit-key');
+    await trackOverlap(page);
+    await page.locator(`a[href$="/swords/${slug}"]`).first().click();
+    await expect(page).toHaveURL(new RegExp(`/swords/${slug}$`));
+    // 카드 부조와 같은 키를 단 상세의 큰 부조로 날아갑니다.
+    await expect(page.locator(`[data-hero-enter-key="${slug}"]`)).toBeVisible();
+    await waitForPageTransition(page);
+  }
+
+  test('도검 카드를 누르면 두 화면이 겹쳐 움직이고, 끝나면 하나만 남는다', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openFirstSword(page);
+    expect(await maxPages(page)).toBe(2);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+    await waitForPageTransition(page);
+  });
+
+  test('동작 줄이기를 켜면 화면 전환 없이 바로 바뀐다', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openFirstSword(page);
+    expect(await maxPages(page)).toBe(1);
+  });
+
+  test('언어를 바꾸면 문서를 새로 받아 화면이 하나만 남는다', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    await page.getByRole('navigation', { name: '언어' }).getByRole('link', { name: 'English' }).click();
+    await expect(page).toHaveURL(/\/en$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('[data-ssgoi-transition]')).toHaveCount(1);
+  });
+
+  test('없는 주소는 화면 전환 영역 밖에서 404로 응답한다', async ({ request }) => {
+    expect((await request.get('/no/such/page')).status()).toBe(404);
+    expect((await request.get('/en/no/such/page')).status()).toBe(404);
+  });
 });

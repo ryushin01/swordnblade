@@ -1,6 +1,6 @@
 {
   "name": "@snb/shop",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -23,6 +23,7 @@
     "@snb/domain": "workspace:*",
     "@snb/mocks": "workspace:*",
     "@snb/sword-art": "workspace:*",
+    "@ssgoi/react": "7.5.0",
     "@tanstack/react-query": "^5.106.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
