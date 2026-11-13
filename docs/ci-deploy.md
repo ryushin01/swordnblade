@@ -20,7 +20,7 @@ pnpm 12는 허용하지 않은 의존성의 빌드 스크립트가 있으면 CI 
 
 ## Vercel
 
-앱마다 Vercel 프로젝트를 하나씩 두고 GitHub 저장소와 연결했습니다. `main`에 푸시하면 두 앱이 프로덕션으로 배포되고, PR에는 미리보기 배포가 붙습니다.
+앱마다 Vercel 프로젝트를 하나씩 두고 GitHub 저장소와 연결했습니다. `main`에 푸시하면 두 앱이 프로덕션으로 배포됩니다. 하루 배포 한도를 아끼려고 PR 미리보기 배포는 껐습니다(앱마다 `vercel.json`의 `git.deploymentEnabled`).
 
 | 앱 | 프로젝트 | Root Directory | 주소 |
 |---|---|---|---|
