@@ -14,11 +14,21 @@ import { cn } from '@/shared/lib';
  * 링크 글자는 그 언어로 쓰고 lang·hrefLang을 붙여 화면낭독기가 그 언어로 읽게 합니다.
  */
 export function LocaleSwitch({ className }: { className?: string }) {
+  const params = useSearchParams();
+  return <LocaleLinks query={Object.fromEntries(params.entries())} className={className} />;
+}
+
+/**
+ * 언어 링크. 검색 조건(useSearchParams)은 정적으로 그리는 화면에서 브라우저에서만 읽히므로,
+ * 서버 HTML(Suspense 대기 화면)에는 검색 조건 없이 같은 모양으로 그려 둡니다.
+ * 대기 화면이 비어 있으면 hydrate 뒤에 링크가 생기며 모바일 머리글이 두 줄이 되어 본문이 밀립니다(CLS).
+ */
+export function LocaleLinks({ query = {}, className }: { query?: Record<string, string>; className?: string }) {
   const t = useTranslations('Header');
   const locale = useLocale();
   const pathname = usePathname();
-  const params = useSearchParams();
-  const query = Object.fromEntries(params.entries());
+  // 빈 검색 조건을 넘기면 주소가 '/en?'처럼 물음표로 끝나므로, 조건이 있을 때만 붙입니다.
+  const href = Object.keys(query).length > 0 ? { pathname, query } : pathname;
 
   return (
     <nav aria-label={t('languageNav')} className={className}>
@@ -31,7 +41,7 @@ export function LocaleSwitch({ className }: { className?: string }) {
               </span>
             ) : null}
             <a
-              href={getPathname({ href: { pathname, query }, locale: value })}
+              href={getPathname({ href, locale: value })}
               lang={value}
               hrefLang={value}
               aria-current={value === locale ? 'true' : undefined}

@@ -53,12 +53,17 @@ test('언어 전환: 주소와 검색 조건을 그대로 두고 언어만 바�
   await page.goto('/?category=legend');
   const languages = page.getByRole('navigation', { name: '언어' });
   await expect(languages.getByRole('link', { name: '한국어' })).toHaveAttribute('aria-current', 'true');
-  await languages.getByRole('link', { name: 'English' }).click();
+  // 서버 HTML의 링크는 검색 조건 없이 언어만 바꾸고, hydrate 뒤에 검색 조건이 붙습니다.
+  const english = languages.getByRole('link', { name: 'English' });
+  await expect(english).toHaveAttribute('href', /category=legend/);
+  await english.click();
   await expect(page).toHaveURL(/\/en\?category=legend$/);
   await waitForPageTransition(page);
   await expect(page.getByRole('heading', { level: 1, name: 'Myth & Legend' })).toBeVisible();
 
-  await page.getByRole('navigation', { name: 'Language' }).getByRole('link', { name: '한국어' }).click();
+  const korean = page.getByRole('navigation', { name: 'Language' }).getByRole('link', { name: '한국어' });
+  await expect(korean).toHaveAttribute('href', /category=legend/);
+  await korean.click();
   await expect(page).toHaveURL(/\/\?category=legend$/);
   await waitForPageTransition(page);
   await expect(page.getByRole('heading', { level: 1, name: '신화·전설' })).toBeVisible();

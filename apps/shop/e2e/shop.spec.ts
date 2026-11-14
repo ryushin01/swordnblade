@@ -244,9 +244,29 @@ test('서버가 상품 목록을 HTML로 먼저 그린다(자바스크립트 없
   const page = await context.newPage();
   await page.goto('/swords/ssangsudo');
   await expect(page.getByRole('heading', { level: 1, name: '쌍수도' })).toBeVisible();
+  // 언어 전환도 서버 HTML에 있어야 hydrate 뒤에 머리글이 넓어지며 본문을 밀지 않습니다.
+  await expect(page.getByRole('navigation', { name: '언어' }).getByRole('link', { name: 'English' })).toHaveAttribute(
+    'href',
+    '/en/swords/ssangsudo',
+  );
   await page.goto('/?q=쌍수');
   await expect(page.getByRole('link', { name: /쌍수도/ })).toBeVisible();
   await context.close();
+});
+
+test('상세 화면을 열 때 머리글이나 본문이 밀리지 않는다(CLS 0.1 미만)', async ({ page }) => {
+  await page.addInitScript(() => {
+    const store = window as unknown as { __cls: number };
+    store.__cls = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries() as unknown as Array<{ value: number }>) store.__cls += entry.value;
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+  await page.goto('/swords/ssangsudo');
+  await expect(page.getByRole('heading', { level: 1, name: '쌍수도' })).toBeVisible();
+  // hydrate와 Mock API 응답까지 끝난 뒤의 누적 값을 봅니다.
+  await page.waitForLoadState('networkidle');
+  expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(0.1);
 });
 
 test('어드민에서 아주 긴 이름을 붙여도 상세 화면이 가로로 넘치지 않는다', async ({ page }) => {
