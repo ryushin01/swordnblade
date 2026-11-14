@@ -71,6 +71,8 @@ export function SwordGallery({ sword, reliefLabel }: { sword: Sword; reliefLabel
             pigment={0.86}
             depth={1.1}
             label={`${reliefLabel} (${current.label})`}
+            // 목록 카드의 부조에서 날아오는 화면 전환의 도착점. 전체 보기일 때만 짝이 맞습니다.
+            transition={current.focus === 'full' ? { side: 'enter', key: sword.slug } : undefined}
             className="relief-turn relative mx-auto aspect-square h-full max-h-[calc(100dvh-12rem)] w-full max-w-full object-contain"
           />
         ) : (

@@ -39,7 +39,8 @@ export function RecentSwords({ swordId }: { swordId: string }) {
       <ul aria-labelledby="recent-title" className="grid grid-cols-2 border-l border-t border-line xl:grid-cols-4">
         {swords.map((sword) => (
           <li key={sword.id} className="border-b border-r border-line">
-            <SwordTile sword={localizeForLocale(sword, locale)} />
+            {/* 함께 볼 도검에 같은 도검이 있을 수 있어 화면 전환의 출발점으로 쓰지 않습니다(그쪽이 먼저 잡힘). */}
+            <SwordTile sword={localizeForLocale(sword, locale)} heroSource={false} />
           </li>
         ))}
       </ul>

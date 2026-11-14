@@ -154,7 +154,13 @@ VoiceOver로 직접 들어 보는 점검은 사람이 해야 합니다. 다음�
 ## 품질 예산
 
 - **접근성 린트:** `eslint-config-next`는 jsx-a11y 규칙을 몇 개만 켭니다. 루트 `eslint.config.mjs`에서 이미 등록된 플러그인의 recommended 규칙을 모두 켭니다. 가로 스크롤용 `role="region"` + `tabIndex={0}`은 허용합니다.
-- **번들 크기:** `pnpm --filter @snb/shop size`가 쇼핑몰 전체 JS 520 kB, CSS 10 kB(gzip)를 넘으면 실패합니다. 기준은 `apps/shop/.size-limit.json`에 있습니다. 슬라이스 공개 API(`index.ts`)로 내보낸 모듈은 그 슬라이스를 가져오는 화면 묶음마다 들어가므로, 한 화면에서만 쓰는 컴포넌트는 그 페이지 슬라이스에 두고, 화면에 들어가는 공통 모듈에는 다른 곳에서만 쓰는 코드(예: 할인 입력 검증 `discount-validation.ts`)를 섞지 않습니다.
+- **번들 크기:** `pnpm --filter @snb/shop size`가 쇼핑몰 전체 JS 550 kB, CSS 10 kB(gzip)를 넘으면 실패합니다. 기준은 `apps/shop/.size-limit.json`에 있습니다. 0.12.0에서 화면 전환(SSGOI, 약 31 kB)을 넣으며 520 kB에서 올렸습니다. 슬라이스 공개 API(`index.ts`)로 내보낸 모듈은 그 슬라이스를 가져오는 화면 묶음마다 들어가므로, 한 화면에서만 쓰는 컴포넌트는 그 페이지 슬라이스에 두고, 화면에 들어가는 공통 모듈에는 다른 곳에서만 쓰는 코드(예: 할인 입력 검증 `discount-validation.ts`)를 섞지 않습니다.
+- **화면 전환(SSGOI):** 제공자는 `_app/transitions/page-transitions.tsx`, 규칙은 `config.ts`, 경계는 라우트 그룹 `(site)`의 레이아웃이 `RouteBoundary`로 둡니다.
+  - 경계는 Suspense 없이 직접 만듭니다. `@ssgoi/react/nextjs`의 `SsgoiRouteBoundary`는 Suspense를 품어, 자바스크립트 없이 열면 비동기로 그리는 화면이 숨은 채로 남습니다(이 앱은 `cacheComponents`를 쓰지 않아 `usePathname`이 멈추지 않음).
+  - 없는 주소(`[...rest]`)는 `(site)` 밖에 둡니다. 경계 안에서 `notFound()`가 스트리밍 뒤에 나면 404 대신 200이 됩니다.
+  - 언어 바꾸기는 `<a>`로 문서를 새로 받습니다. 클라이언트 이동이면 루트 레이아웃과 함께 제공자가 다시 만들어지며 떠나는 화면이 남습니다. 같은 이유로 규칙에서 언어 접두어를 떼는 middleware를 쓰지 않고 `/en/...`을 규칙에 그대로 적습니다.
+  - SSGOI는 `prefers-reduced-motion`을 스스로 읽지 않으므로, 동작 줄이기면 전환이 없는 설정으로 바꿉니다.
+  - E2E의 접근성 검사는 전환이 끝난 뒤(`waitForPageTransition`) 합니다. 전환 중에는 두 화면이 겹치고 투명도가 바뀝니다.
 - **Lighthouse:** `pnpm --filter @snb/shop lhci`가 첫 화면·도검 상세·연표·영문 상세를 데스크톱 기준 3번씩 재서 성능 90·접근성 100·권장 사항 95·SEO 90점, LCP 2.5초·TBT 200ms·CLS 0.1 이하인지 확인합니다. 기준은 `apps/shop/lighthouserc.json`에 있습니다. 로컬에서는 canonical이 배포 주소를 가리켜 SEO가 92점으로 나옵니다.
 
 두 검사 모두 프로덕션 빌드가 먼저 있어야 하며, CI는 E2E 뒤에 돌립니다.

@@ -11,6 +11,7 @@ import { SiteFooter } from '@/widgets/site-footer';
 import { SiteHeader } from '@/widgets/site-header';
 
 import { Providers } from '../query-client/providers';
+import { PageTransitions } from '../transitions/page-transitions';
 
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
@@ -87,12 +88,14 @@ export async function RootLayout({ children, params }: { children: ReactNode; pa
         </a>
         <NextIntlClientProvider>
           <Providers>
-            <SiteHeader />
-            <main id="main" tabIndex={-1} className="outline-none">
-              {children}
-            </main>
-            <SiteFooter />
-            <Toaster position="bottom-center" />
+            <PageTransitions>
+              <SiteHeader />
+              <main id="main" tabIndex={-1} className="outline-none">
+                {children}
+              </main>
+              <SiteFooter />
+              <Toaster position="bottom-center" />
+            </PageTransitions>
           </Providers>
         </NextIntlClientProvider>
       </body>

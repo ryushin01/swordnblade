@@ -1,7 +1,20 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test } from '@playwright/test';
 
+/** 화면 전환(SSGOI)이 끝날 때까지 기다립니다. 전환 중에는 떠나는 화면과 들어오는 화면이 겹치고 투명도가 바뀝니다. */
+async function waitForPageTransition(page: Page) {
+  await expect(page.locator('[data-ssgoi-transition]')).toHaveCount(1);
+  // SSGOI는 Element.animate로 움직입니다. 스크롤에 묶인 CSS 애니메이션(상세의 부조 연출 등)은 계속 도므로 세지 않습니다.
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .filter((a) => !(a instanceof CSSAnimation) && !(a instanceof CSSTransition))
+      .every((a) => a.playState !== 'running'),
+  );
+}
+
 async function expectNoA11yViolations(page: Page) {
+  await waitForPageTransition(page);
   // 화면 전환 직후에는 문서 제목이 잠시 비어 있어 document-title로 잘못 잡히므로 제목이 채워진 뒤에 검사합니다.
   await expect(page).toHaveTitle(/\S/);
   const results = await new AxeBuilder({ page })
@@ -42,10 +55,12 @@ test('언어 전환: 주소와 검색 조건을 그대로 두고 언어만 바�
   await expect(languages.getByRole('link', { name: '한국어' })).toHaveAttribute('aria-current', 'true');
   await languages.getByRole('link', { name: 'English' }).click();
   await expect(page).toHaveURL(/\/en\?category=legend$/);
+  await waitForPageTransition(page);
   await expect(page.getByRole('heading', { level: 1, name: 'Myth & Legend' })).toBeVisible();
 
   await page.getByRole('navigation', { name: 'Language' }).getByRole('link', { name: '한국어' }).click();
   await expect(page).toHaveURL(/\/\?category=legend$/);
+  await waitForPageTransition(page);
   await expect(page.getByRole('heading', { level: 1, name: '신화·전설' })).toBeVisible();
 });
 
