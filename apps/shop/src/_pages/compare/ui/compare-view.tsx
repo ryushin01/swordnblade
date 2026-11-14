@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import {
   categoryLabel,
-  formatKRW,
   formatLength,
   formatWeight,
   kindLabel,
@@ -16,9 +15,11 @@ import {
 } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
-import { localizeForLocale, useSwords } from '@/entities/sword';
+import { localizeForLocale, SwordPrice, useSwords } from '@/entities/sword';
 import { getPathname, Link } from '@/shared/i18n';
 import { selectClassName } from '@/shared/ui';
+
+import type { ReactNode } from 'react';
 
 export interface SwordOption {
   slug: string;
@@ -114,7 +115,7 @@ export function CompareView({ slugs, options, initialSwords }: CompareViewProps)
 
 function SpecTable({ swords, locale }: { swords: Sword[]; locale: Locale }) {
   const t = useTranslations('Compare');
-  const rows: Array<[label: string, value: (sword: Sword) => string]> = [
+  const rows: Array<[label: string, value: (sword: Sword) => ReactNode]> = [
     [t('region'), (sword) => categoryLabel(sword.category, locale)],
     [t('type'), (sword) => kindLabel(sword.kind, locale)],
     [t('era'), (sword) => sword.era],
@@ -123,7 +124,7 @@ function SpecTable({ swords, locale }: { swords: Sword[]; locale: Locale }) {
     [t('weight'), (sword) => formatWeight(sword.specs.weight, locale)],
     [t('material'), (sword) => sword.specs.material],
     [t('edge'), (sword) => t(sword.specs.edge)],
-    [t('price'), (sword) => formatKRW(sword.price, locale)],
+    [t('price'), (sword) => <SwordPrice sword={sword} />],
   ];
   return (
     // 좁은 화면에서 가로로 스크롤하므로 키보드로도 움직일 수 있게 초점을 받습니다.

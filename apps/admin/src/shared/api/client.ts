@@ -44,7 +44,13 @@ async function ensureMockApi() {
       startMockApi({ storageKey: SITE.mockStorageKey, ...worker }),
     );
   }
-  await mockReady;
+  try {
+    await mockReady;
+  } catch (error) {
+    // 시작하지 못했으면 다음 요청에서 다시 시도하도록 비웁니다.
+    mockReady = null;
+    throw error;
+  }
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {

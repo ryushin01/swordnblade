@@ -433,7 +433,8 @@ function Guard({ art, layout, layer }: { art: SwordArt; layout: HiltLayout; laye
       );
     case 'plate': {
       // 손잡이 쪽 면이 보이도록 비스듬히 그려, 칼날 쪽으로 두툼한 테두리가 드러납니다.
-      const ry = half * 0.42;
+      // 사진처럼 판의 면이 넓게 보이도록 덜 눕혀 그립니다.
+      const ry = half * 0.6;
       const rimY = t * 0.2;
       const bevelY = rimY + (t - rimY) * 0.45;
       const rim = isHeight ? H.mid : accent;
@@ -609,7 +610,8 @@ function Ferrule({
   isHeight: boolean;
 }) {
   const rx = width / 2 + 3;
-  const ry = rx * 0.42;
+  // 코등이 판과 같은 각도로 눕혀 그립니다.
+  const ry = rx * 0.6;
   const end = y0 + ferrule.length;
   const fill = isHeight ? H.top : ferrule.color;
   return (

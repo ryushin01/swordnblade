@@ -60,6 +60,7 @@
     "clearQuery": "Clear search",
     "emptyQuery": "No swords match “{q}”. Try another name.",
     "emptyCategory": "No swords in this category yet.",
+    "emptySale": "No swords are on sale right now.",
     "loading": "Loading the swords.",
     "loadError": "Could not load the swords.",
     "retry": "Try again",
@@ -73,10 +74,18 @@
     "pageStatus": "{from}–{to} of {count} swords",
     "resultPageStatus": "{from}–{to} of {count} results for “{q}”",
     "pagePrefix": "Page ",
-    "pageSuffix": ""
+    "pageSuffix": "",
+    "saleOnly": "On sale only"
   },
   "Tile": {
     "soldOut": "Sold out"
+  },
+  "Price": {
+    "list": "Regular price",
+    "sale": "Sale price",
+    "off": "{rate}% off",
+    "until": "Sale ends {date}",
+    "upcoming": "{rate}% off from {date}"
   },
   "Sword": {
     "loading": "Loading the sword.",
@@ -173,6 +182,7 @@
     "summaryTitle": "Order summary",
     "checkError": "Please check your details.",
     "genericError": "We could not process the payment. Please try again shortly.",
+    "priceChanged": "The total changed to {total} while you were ordering. Check the new amount in the order summary, then pay again.",
     "recipient": "Recipient",
     "fields": {
       "name": "Recipient",

@@ -1,9 +1,9 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getNow, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { categoryLabel, type Locale, SWORD_CATEGORIES, type SwordCategory } from '@snb/domain';
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { filterSwords, localizeForLocale, paginate, toPage, toSwordKind, toSwordSort } from '@/entities/sword';
+import { filterSwords, localizeForLocale, paginate, toPage, toSale, toSwordKind, toSwordSort } from '@/entities/sword';
 import { firstParam } from '@/shared/lib';
 
 import { CategoryNav } from './category-nav';
@@ -12,7 +12,14 @@ import { SwordWall } from './sword-wall';
 
 type Params = Promise<{ locale: string }>;
 type Param = string | string[];
-type SearchParams = Promise<{ category?: Param; q?: Param; sort?: Param; kind?: Param; page?: Param }>;
+type SearchParams = Promise<{
+  category?: Param;
+  q?: Param;
+  sort?: Param;
+  kind?: Param;
+  sale?: Param;
+  page?: Param;
+}>;
 
 export async function HomePage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const { locale } = await params;
@@ -24,6 +31,7 @@ export async function HomePage({ params, searchParams }: { params: Params; searc
     q: firstParam(raw.q),
     sort: firstParam(raw.sort),
     kind: firstParam(raw.kind),
+    sale: firstParam(raw.sale),
     page: firstParam(raw.page),
   };
   const category = SWORD_CATEGORIES.includes(query.category as SwordCategory)
@@ -32,6 +40,8 @@ export async function HomePage({ params, searchParams }: { params: Params; searc
   const q = (query.q ?? '').trim().slice(0, 50);
   const sort = toSwordSort(query.sort);
   const kind = toSwordKind(query.kind);
+  const sale = toSale(query.sale);
+  const now = (await getNow()).getTime();
   const page = toPage(query.page);
   // 서버에서는 시드로 지금 쪽만 먼저 그려 첫 화면과 검색 엔진에 보여 줍니다. 브라우저에서 Mock API 값으로 바뀝니다.
   // 208점 전체를 HTML에 실으면 수백 KB가 되므로 지금 쪽의 칸에 필요한 값만 넘깁니다.
@@ -40,19 +50,20 @@ export async function HomePage({ params, searchParams }: { params: Params; searc
       SEED_SWORDS.filter((sword) => !category || sword.category === category).map((sword) =>
         localizeForLocale(sword, locale as Locale),
       ),
-      { q, sort, kind },
+      { q, sort, kind, sale, now },
     ),
     page,
   );
   const initialView = {
     ...shown,
-    items: shown.items.map(({ id, slug, name, nameEn, nameOriginal, price, stock, art }) => ({
+    items: shown.items.map(({ id, slug, name, nameEn, nameOriginal, price, discount, stock, art }) => ({
       id,
       slug,
       name,
       nameEn,
       nameOriginal,
       price,
+      ...(discount ? { discount } : {}),
       stock,
       art,
     })),
@@ -70,12 +81,13 @@ export async function HomePage({ params, searchParams }: { params: Params; searc
         <p className="max-w-xl text-ink-muted">{t('intro')}</p>
       </div>
       <CategoryNav current={category} />
-      <SearchForm category={category} q={q} sort={sort} kind={kind} />
+      <SearchForm category={category} q={q} sort={sort} kind={kind} sale={sale} />
       <SwordWall
         category={category}
         q={q}
         sort={sort}
         kind={kind}
+        sale={sale}
         page={page}
         initialView={initialView}
         labelledBy="wall-title"

@@ -11,7 +11,7 @@ const sword = SEED_SWORDS[0]!;
 describe('SwordTile', () => {
   it('이름과 가격이 링크 이름이 되고 상세로 이동한다', () => {
     renderWithProviders(<SwordTile sword={sword} />);
-    const link = screen.getByRole('link', { name: /쌍수도.*6,800,000원/ });
+    const link = screen.getByRole('link', { name: /쌍수도.*17,600,000원/ });
     expect(link).toHaveAttribute('href', '/swords/ssangsudo');
   });
 
@@ -30,6 +30,13 @@ describe('SwordTile', () => {
     expect(container.querySelector('svg')).not.toHaveAttribute('data-hero-exit-key');
   });
 
+  it('할인 중이면 정가·할인가·할인율이 링크 이름에 들어간다', () => {
+    renderWithProviders(<SwordTile sword={{ ...sword, discount: { rate: 10 } }} />);
+    expect(
+      screen.getByRole('link', { name: /쌍수도.*정가 17,600,000원.*할인가 15,840,000원.*10% 할인/ }),
+    ).toBeInTheDocument();
+  });
+
   it('재고가 없으면 품절로 보인다', () => {
     renderWithProviders(<SwordTile sword={{ ...sword, stock: 0 }} />);
     expect(screen.getByRole('link', { name: /품절/ })).toBeInTheDocument();
@@ -39,7 +46,7 @@ describe('SwordTile', () => {
 describe('SwordTile (영어)', () => {
   it('영어 화면에서는 원화를 ₩로 쓰고 원어 이름을 부제로 보여 준다', () => {
     renderWithProviders(<SwordTile sword={{ ...sword, name: sword.nameEn }} />, { locale: 'en' });
-    expect(screen.getByRole('link', { name: /Ssangsudo.*雙手刀.*₩6,800,000/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Ssangsudo.*雙手刀.*₩17,600,000/ })).toHaveAttribute(
       'href',
       '/en/swords/ssangsudo',
     );

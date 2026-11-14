@@ -1,13 +1,19 @@
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatKRW, type Locale, type Sword } from '@snb/domain';
 import { SwordRelief } from '@snb/sword-art';
 
 import { Link } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
 
+import { SwordPrice } from './sword-price';
+
+import type { Locale, Sword } from '@snb/domain';
+
 /** 칸을 그리는 데 필요한 값. 서버가 첫 화면에 이 값만 실어 보내 HTML을 가볍게 합니다. */
-export type SwordTileData = Pick<Sword, 'id' | 'slug' | 'name' | 'nameEn' | 'nameOriginal' | 'price' | 'stock' | 'art'>;
+export type SwordTileData = Pick<
+  Sword,
+  'id' | 'slug' | 'name' | 'nameEn' | 'nameOriginal' | 'price' | 'discount' | 'stock' | 'art'
+>;
 
 /**
  * 석고 벽의 한 칸. 부조는 장식이고, 이름과 가격 글자가 링크 이름이 됩니다.
@@ -57,7 +63,11 @@ export function SwordTile({
         ) : (
           <span className="small-caps hidden text-xs text-ink-muted sm:block">{sword.nameOriginal}</span>
         )}
-        <span className="text-sm tabular-nums text-ink">{soldOut ? t('soldOut') : formatKRW(sword.price, locale)}</span>
+        {soldOut ? (
+          <span className="text-sm text-ink">{t('soldOut')}</span>
+        ) : (
+          <SwordPrice sword={sword} className="justify-center text-sm text-ink" />
+        )}
       </span>
     </Link>
   );

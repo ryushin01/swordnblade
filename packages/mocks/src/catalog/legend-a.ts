@@ -99,6 +99,7 @@ export const LEGEND_A: CatalogEntry[] = [
     ],
     specs: [860, 1080, 1500],
     price: 7_200_000,
+    discount: { rate: 10, endsAt: '2027-12-31' },
     art: {
       blade: { length: 860, width: 46, curve: 0, edge: 'double', tip: 'spear', fuller: true, inscription: 'runes' },
       guard: { type: 'quillon', width: 200, color: GOLD, accent: GOLD_LIGHT },

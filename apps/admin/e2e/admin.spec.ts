@@ -51,6 +51,32 @@ test('상품: 가격을 바꿔 저장하면 목록에 반영된다', async ({ pa
   await expect(page.getByRole('row', { name: /환도/ })).toContainText('3,500,000원');
 });
 
+test('상품 할인: 기간을 잘못 고르면 고칠 방법을 알리고, 맞게 고치면 목록에 할인가를 보여 준다', async ({ page }) => {
+  await page.goto('/admin/products/sw-002');
+  await expect(page.getByRole('heading', { level: 1, name: '환도 수정' })).toBeVisible();
+  await page.getByLabel('시작일').fill('2027-02-01');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('할인 기간을 정했다면 할인율도 입력해 주세요.', { exact: false })).toBeVisible();
+  await expect(page.getByLabel('할인율(%)')).toBeFocused();
+
+  await page.getByLabel('할인율(%)').fill('20');
+  await page.getByLabel('종료일').fill('2027-01-31');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('종료일을 시작일과 같거나 그 뒤의 날짜로 골라 주세요.')).toBeVisible();
+
+  await page.getByLabel('시작일').fill('');
+  await page.getByLabel('종료일').fill('2999-12-31');
+  await expect(page.getByRole('status').filter({ hasText: '판매가 2,560,000원' })).toContainText('지금 할인 중');
+  await expectNoA11yViolations(page);
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+
+  await page.goto('/admin/products');
+  const row = page.getByRole('row', { name: /환도/ });
+  await expect(row).toContainText('2,560,000원');
+  await expect(row).toContainText('20% 할인');
+});
+
 test('상품: 필수 칸을 비우면 저장하지 않고 안내한다', async ({ page }) => {
   await page.goto('/admin/products/new');
   await expect(page.getByRole('heading', { level: 1, name: '상품 등록' })).toBeVisible();

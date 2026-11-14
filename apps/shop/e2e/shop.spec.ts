@@ -148,6 +148,51 @@ test('구매 흐름: 담기 → 장바구니 관세 계산 → 주문서 오류 
   await expectNoA11yViolations(page);
 });
 
+test('주문하는 사이 가격이 바뀌면 바뀐 금액을 알리고, 확인한 뒤 다시 결제하면 그 금액으로 주문한다', async ({
+  page,
+}) => {
+  await page.goto('/swords/uchigatana');
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await expect(page.getByText('우치가타나 1점을 장바구니에 담았습니다.')).toBeVisible();
+  await page.goto('/checkout');
+  await expect(page.getByRole('heading', { level: 1, name: '주문서' })).toBeVisible();
+  const summary = page.getByRole('complementary', { name: '주문 요약' });
+  await expect(summary).toContainText('4,500,000원');
+
+  // 주문서를 보는 사이 어드민이 가격을 바꿉니다(이 화면은 아직 예전 가격을 보여 줌).
+  await page.evaluate(async () => {
+    const login = await fetch('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'admin@example.com', password: 'demo1234' }),
+    });
+    const { token } = (await login.json()) as { token: string };
+    const sword = (await (await fetch('/api/swords/uchigatana')).json()) as { id: string };
+    await fetch(`/api/swords/${sword.id}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ...sword, price: 5_000_000 }),
+    });
+  });
+
+  await page.getByLabel(/^받는 분/).fill('김가상');
+  await page.getByLabel(/^이메일/).fill('buyer@example.com');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /신용카드/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+
+  // 주문하지 않고 바뀐 금액을 알리며, 주문 요약도 새 가격으로 바뀝니다.
+  await expect(page.getByRole('alert').filter({ hasText: '결제 금액이' })).toBeFocused();
+  await expect(summary).toContainText('5,000,000원');
+  await expectNoA11yViolations(page);
+
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-\d{8}-\d{4}$/);
+  await expect(page.getByRole('region', { name: '주문 내역' })).toContainText('5,000,000원');
+});
+
 test('없는 도검 주소는 안내를 보여 준다', async ({ page }) => {
   await page.goto('/swords/no-such-sword');
   await expect(page.getByRole('heading', { level: 1, name: '찾는 도검이 벽에 없습니다' })).toBeVisible();
@@ -165,10 +210,32 @@ test('찾기와 정렬: 주소에 남고 결과 수를 알려 준다', async ({ 
 
   await page.goto('/?sort=price-desc');
   // 이동 중에 글자를 한 번에 읽으면 실패할 수 있어, 다시 시도하는 단언으로 확인합니다.
-  await expect(page.locator('ul a[href^="/swords/"]').first()).toContainText('쿠사나기노츠루기');
+  await expect(page.locator('ul a[href^="/swords/"]').first()).toContainText('쌍수도');
 
   await page.goto('/?q=없는이름');
   await expect(page.getByText('‘없는이름’에 맞는 도검이 없습니다.', { exact: false })).toBeVisible();
+  await expectNoA11yViolations(page);
+});
+
+test('할인: 할인 중인 도검만 거르고, 상세에 정가·할인가·할인율을 보여 준다', async ({ page }) => {
+  await page.goto('/');
+  const search = page.getByRole('search', { name: '도검 찾기' });
+  await search.getByLabel('할인 중인 도검만').check();
+  await search.getByRole('button', { name: '찾기' }).click();
+  await expect(page).toHaveURL(/sale=1/);
+  // 기한 없는 시드 할인(바이킹 소드 15%)으로 확인합니다. 줄 그은 정가는 화면 낭독기에 '정가'로 읽힙니다.
+  const viking = page.getByRole('link', { name: /바이킹 소드.*정가 3,100,000원 할인가 2,635,000원 15% 할인/ });
+  await expect(viking).toBeVisible();
+  // 시작 전인 할인(오오타치)은 빠지고, 보이는 칸은 모두 할인 중입니다.
+  await expect(tiles(page).filter({ hasText: '오오타치' })).toHaveCount(0);
+  for (const text of await tiles(page).allTextContents()) expect(text).toMatch(/\d+% 할인/);
+  await expectNoA11yViolations(page);
+
+  await viking.click();
+  const buy = page.getByRole('region', { name: '구매', exact: true });
+  await expect(buy.locator('del')).toContainText('3,100,000원');
+  await expect(buy).toContainText('2,635,000원');
+  await expect(buy).toContainText('15% 할인');
   await expectNoA11yViolations(page);
 });
 

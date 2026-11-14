@@ -32,6 +32,34 @@ test('어드민에서 바꾼 가격이 쇼핑몰에 보인다', async ({ page })
   await expect(page.getByRole('link', { name: /환도.*3,500,000원/ })).toBeVisible();
 });
 
+test('어드민에서 정한 할인이 쇼핑몰 상세와 주문 금액에 반영된다', async ({ page }) => {
+  await page.goto('/admin/products/sw-010');
+  await expect(page.getByRole('heading', { level: 1, name: '글라디우스 수정' })).toBeVisible();
+  await page.getByLabel('할인율(%)').fill('25');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByText('상품을 저장했습니다.')).toBeVisible();
+
+  await page.goto('/swords/gladius');
+  const buy = page.getByRole('region', { name: '구매', exact: true });
+  await expect(buy).toContainText('1,350,000원');
+  await expect(buy).toContainText('25% 할인');
+  await page.getByRole('button', { name: '장바구니에 담기' }).click();
+  await page.goto('/checkout');
+  await page.getByLabel(/^받는 분/).fill('할인확인');
+  await page.getByLabel(/^이메일/).fill('sale@example.com');
+  await page.getByLabel(/^연락처/).fill('010-0000-0000');
+  await page.getByLabel(/^우편번호/).fill('03000');
+  await page.getByLabel(/^주소/).fill('서울특별시 종로구 가상로 1');
+  await page.getByRole('radio', { name: /계좌이체/ }).check();
+  await page.getByRole('checkbox', { name: /허가를 받았거나/ }).check();
+  await page.getByRole('button', { name: '결제하기' }).click();
+  await expect(page).toHaveURL(/\/orders\/SNB-/);
+  // 주문 금액은 Mock 서버가 주문 시각의 할인가로 다시 계산합니다.
+  await expect(page.getByRole('region', { name: '주문 내역' }).getByRole('listitem')).toContainText(
+    '정가 1,800,000원 할인가 1,350,000원',
+  );
+});
+
 test('쇼핑몰 주문이 어드민 주문 목록에 보인다', async ({ page }) => {
   await page.goto('/swords/gladius');
   await page.getByRole('button', { name: '장바구니에 담기' }).click();

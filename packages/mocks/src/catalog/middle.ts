@@ -137,6 +137,7 @@ export const MIDDLE_ENTRIES: CatalogEntry[] = [
     edge: 'sharp',
     price: 3_300_000,
     stock: 3,
+    discount: { rate: 15 },
     art: {
       blade: { length: 800, width: 30, curve: 95, edge: 'single', tip: 'spear' },
       guard: { type: 'cross', width: 90, color: IRON, accent: BRASS },

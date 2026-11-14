@@ -1,4 +1,4 @@
-import type { CountryCode, EdgeKind, Sword, SwordArt, SwordCategory, SwordKind } from '@snb/domain';
+import type { CountryCode, EdgeKind, Sword, SwordArt, SwordCategory, SwordDiscount, SwordKind } from '@snb/domain';
 
 /** [한국어, 영어] */
 export type Pair = readonly [ko: string, en: string];
@@ -26,6 +26,8 @@ export interface CatalogEntry {
   specs: readonly [blade: number, total: number, weight: number];
   edge: EdgeKind;
   price: number;
+  /** 시드에 넣는 기간 할인 */
+  discount?: SwordDiscount;
   stock: number;
   art: SwordArt;
 }
@@ -49,6 +51,7 @@ export function buildCatalog(entries: readonly CatalogEntry[]): Sword[] {
       stories: entry.stories.map(([when, , text]) => ({ when, text })),
       specs: { bladeLength, totalLength, weight, material: entry.material[0], edge: entry.edge },
       price: entry.price,
+      ...(entry.discount ? { discount: entry.discount } : {}),
       stock: entry.stock,
       art: entry.art,
       translations: {

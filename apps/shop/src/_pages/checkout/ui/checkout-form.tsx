@@ -1,7 +1,9 @@
 'use client';
 
 import { type FormEvent, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { type CountryCode, formatKRW, type Locale, type Order } from '@snb/domain';
 
 import { useCreateOrder } from '@/entities/order';
 import { useMe } from '@/entities/session';
@@ -11,8 +13,6 @@ import { Button, ErrorSummary, TextField, useErrorFocus } from '@/shared/ui';
 
 import { type CheckoutErrors, type CheckoutValues, FIELD_ORDER, validateCheckout } from '../model/validate';
 
-import type { CountryCode, Order } from '@snb/domain';
-
 const fieldId = (field: keyof CheckoutValues) => `checkout-${field}`;
 
 interface CheckoutFormProps {
@@ -20,6 +20,8 @@ interface CheckoutFormProps {
   lines: Array<{ swordId: string; quantity: number }>;
   needsPermit: boolean;
   permitNote: string;
+  /** 주문 요약에 보이는 결제 금액. 서버가 다시 계산한 금액과 다르면 주문하지 않고 바뀐 금액을 알립니다. */
+  expectedTotal: number;
   onPlaced: (order: Order) => void;
 }
 
@@ -33,9 +35,17 @@ const INITIAL: CheckoutValues = {
   permitConfirmed: false,
 };
 
-export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPlaced }: CheckoutFormProps) {
+export function CheckoutForm({
+  destination,
+  lines,
+  needsPermit,
+  permitNote,
+  expectedTotal,
+  onPlaced,
+}: CheckoutFormProps) {
   const t = useTranslations('Checkout');
   const common = useTranslations('Common');
+  const locale = useLocale() as Locale;
   const errorText = (field: keyof CheckoutValues) => (errors[field] ? t(`errors.${field}`) : undefined);
   const [values, setValues] = useState<CheckoutValues>(INITIAL);
   const [errors, setErrors] = useState<CheckoutErrors>({});
@@ -87,6 +97,7 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
         lines,
         paymentMethod: values.paymentMethod as Order['paymentMethod'],
         permitConfirmed: values.permitConfirmed,
+        expectedTotal,
         customer: {
           name: values.name.trim(),
           email: values.email.trim(),
@@ -100,7 +111,10 @@ export function CheckoutForm({ destination, lines, needsPermit, permitNote, onPl
         onSuccess: onPlaced,
         onError: (error) => {
           submittingRef.current = false;
-          if (error instanceof ApiRequestError && Object.keys(error.fields).length > 0) {
+          if (error instanceof ApiRequestError && error.code === 'price-changed' && error.total !== undefined) {
+            // 주문하지 않았습니다. 주문 요약이 새 금액으로 바뀌고, 고객이 확인한 뒤 다시 결제하면 주문합니다.
+            showErrors({}, t('priceChanged', { total: formatKRW(error.total, locale) }));
+          } else if (error instanceof ApiRequestError && Object.keys(error.fields).length > 0) {
             // 서버가 알려 준 칸만 표시하고, 안내 문구는 화면 언어로 씁니다.
             const fields = FIELD_ORDER.filter((field) => field in error.fields);
             showErrors(Object.fromEntries(fields.map((field) => [field, true])), t('checkError'));

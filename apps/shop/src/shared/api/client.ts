@@ -5,12 +5,18 @@ import type { ApiError } from '@snb/mocks';
 export class ApiRequestError extends Error {
   readonly status: number;
   readonly fields: Record<string, string>;
+  /** 화면이 따로 안내해야 하는 오류 종류(예: price-changed) */
+  readonly code?: ApiError['code'];
+  /** price-changed일 때 서버가 다시 계산한 결제 금액 */
+  readonly total?: number;
 
   constructor(status: number, body: Partial<ApiError>) {
     super(body.message ?? '요청을 처리하지 못했습니다.');
     this.name = 'ApiRequestError';
     this.status = status;
     this.fields = body.fields ?? {};
+    this.code = body.code;
+    this.total = body.total;
   }
 }
 
@@ -33,7 +39,13 @@ async function ensureMockApi() {
       startMockApi({ storageKey: SITE.mockStorageKey }),
     );
   }
-  await mockReady;
+  try {
+    await mockReady;
+  } catch (error) {
+    // 시작하지 못했으면 다음 요청에서 다시 시도하도록 비웁니다.
+    mockReady = null;
+    throw error;
+  }
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
