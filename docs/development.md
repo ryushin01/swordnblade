@@ -6,7 +6,7 @@
 |---|---|
 | `@snb/domain` | 타입(`Sword`, `Order`, `CustomsConfig`), 관세 계산 `estimateCustoms`, 소지허가 판단, 금액·길이 표시 형식 |
 | `@snb/mocks` | 213점 시드 데이터(`seed.ts`의 16점과 `catalog/`의 197점), 메모리 DB(`createDb`), MSW 핸들러, 브라우저(`/browser`)·Node(`/node`) 진입점 |
-| `@snb/sword-art` | 도검 부조 `SwordRelief` |
+| `@snb/sword-art` | 도검 부조 `SwordRelief`, 칼날 로고 `BladeMark` |
 | `@snb/shop` | 쇼핑몰 (포트 3000) |
 | `@snb/admin` | 어드민 (포트 3001, `basePath: '/admin'`) |
 

@@ -1,5 +1,12 @@
 # 버전 기록
 
+## 0.12.3 - 2026-11-14
+
+- 파비콘·로고를 0.12.2 이전의 칼날 엠블럼(`BladeMark`, 두 앱의 `favicon.svg`)으로 되돌림. 쇼핑몰 워드마크(머리글·바닥글)와 어드민 사이드바도 다시 엠블럼을 씀
+- 엠블럼의 코등이를 칼끝 쪽으로 휜 가지에서 끝이 둥근 곧은 가로대로 바꿈(엠블럼 컴포넌트와 파비콘 모두)
+- 0.12.2에서 더한 Flaticon 아이콘 파일(`favicon.ico`·`icon.png`·`apple-touch-icon.png`·`brand/logo.png`)과 README 출처 줄을 뺌
+- README 화면 11장은 0.12.2 이전 것으로 되돌림. 코등이 모양 차이는 머리글 크기(24~28px)에서 1px 안팎이라 다시 찍지 않음
+
 ## 0.12.2 - 2026-11-14
 
 - 파비콘·홈 화면 아이콘·머리글 로고를 칼날 엠블럼에서 교차한 두 검 아이콘(Flaticon "Crossed", 저작자 Magnific)으로 바꿈. 두 앱 모두 `public`에 `favicon.ico`(16·32·48)·`icon.png`(192)·`apple-touch-icon.png`(180, 석고색 바탕)·`brand/logo.png`(128)를 두고, 메타데이터가 이 파일들을 가리킴(어드민은 `basePath`를 붙인 `/admin/...`). `favicon.svg`는 뺌
