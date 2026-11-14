@@ -21,10 +21,7 @@ const usePrefersReducedMotion = () =>
     () => false,
   );
 
-/**
- * 화면 전환(SSGOI) 제공자. 라우트 경계(RouteBoundary)는 라우트 그룹 (site)의 레이아웃에 둡니다.
- * 없는 주소([...rest])는 그 바깥에 두어 지금처럼 404로 응답합니다.
- */
+/** 화면 전환(SSGOI) 제공자. 라우트 경계(RouteBoundary)는 루트 레이아웃의 main 안에 둡니다. */
 export function PageTransitions({ children }: { children: ReactNode }) {
   const reduced = usePrefersReducedMotion();
   return <Ssgoi config={selectConfig(reduced)}>{children}</Ssgoi>;

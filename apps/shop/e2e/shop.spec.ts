@@ -370,25 +370,78 @@ test('최근 본 도검: 앞서 본 도검을 상세 아래에 보여 준다', a
 });
 
 test.describe('화면 전환', () => {
-  /** 화면에 보이는 라우트 경계 수의 최댓값을 그려진 프레임마다 기록합니다. 전환 중에는 두 화면이 겹칩니다. */
+  /**
+   * 그려진 프레임마다 화면에 보이는 라우트 경계 수를 기록합니다. 전환 중에는 두 화면이 겹칩니다.
+   * 겹친 프레임 수(overlapFrames)도 셉니다. 동작 줄이기에서는 전환이 한 프레임 안에 끝납니다.
+   */
   async function trackOverlap(page: Page) {
     await page.evaluate(() => {
-      const w = window as unknown as { __maxPages: number };
+      const w = window as unknown as { __maxPages: number; __overlapFrames: number };
       w.__maxPages = 0;
+      w.__overlapFrames = 0;
       const tick = () => {
         const visible = [...document.querySelectorAll('[data-ssgoi-transition]')].filter(
           (el) => el.getClientRects().length > 0,
         );
         w.__maxPages = Math.max(w.__maxPages, visible.length);
+        if (visible.length > 1) w.__overlapFrames += 1;
         requestAnimationFrame(tick);
       };
       tick();
     });
   }
   const maxPages = (page: Page) => page.evaluate(() => (window as unknown as { __maxPages: number }).__maxPages);
+  const overlapFrames = (page: Page) =>
+    page.evaluate(() => (window as unknown as { __overlapFrames: number }).__overlapFrames);
+
+  /** 수화(hydration)가 끝나 클라이언트 이동이 될 때까지 기다립니다. 그 전에 누르면 문서를 새로 받습니다. */
+  async function waitForHydration(page: Page) {
+    await page.waitForFunction(() => Boolean((window as unknown as { next?: { router?: unknown } }).next?.router));
+  }
+
+  /**
+   * 화면이 열린 뒤 몇 프레임 기다립니다. SSGOI는 화면이 열린 직후 10프레임 동안의 스크롤을 기록하지 않으므로
+   * (스크롤 복원 중의 움직임을 사용자의 스크롤로 착각하지 않으려는 것), 사람이 스크롤하듯 그 뒤에 움직입니다.
+   */
+  const waitForFrames = (page: Page, frames = 15) =>
+    page.evaluate(
+      (count) =>
+        new Promise<void>((resolve) => {
+          let left = count;
+          const tick = () => (--left <= 0 ? resolve() : requestAnimationFrame(tick));
+          requestAnimationFrame(tick);
+        }),
+      frames,
+    );
+  const scrollY = (page: Page) => page.evaluate(() => Math.round(window.scrollY));
+
+  /**
+   * 스크롤 위치가 30프레임 동안 그대로일 때까지 기다린 뒤 그 위치를 돌려줍니다. 모바일에서는 수화 뒤 머리글의 언어 링크가
+   * 생기며 높이가 바뀌어, 브라우저가 보던 내용을 지키려고 스크롤을 48px 더 내립니다(scroll anchoring).
+   */
+  const settledScrollY = async (page: Page) => {
+    await page.waitForFunction(
+      () =>
+        new Promise<boolean>((resolve) => {
+          const start = window.scrollY;
+          let frames = 0;
+          const check = () => {
+            if (window.scrollY !== start) return resolve(false);
+            if (++frames >= 30) return resolve(true);
+            requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        }),
+      undefined,
+      { polling: 100 },
+    );
+    return scrollY(page);
+  };
+  const distanceFrom = (page: Page, position: number) => async () => Math.abs((await scrollY(page)) - position);
 
   async function openFirstSword(page: Page) {
     await page.goto('/');
+    await waitForHydration(page);
     const art = page.locator('[data-hero-exit-key]').first();
     await expect(art).toBeVisible();
     const slug = await art.getAttribute('data-hero-exit-key');
@@ -404,15 +457,18 @@ test.describe('화면 전환', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await openFirstSword(page);
     expect(await maxPages(page)).toBe(2);
+    // 실측: 움직이면 두 화면이 12~20프레임 겹칩니다(데스크톱 12, 모바일 18~20).
+    expect(await overlapFrames(page)).toBeGreaterThan(5);
     await page.goBack();
     await expect(page).toHaveURL(/\/$/);
     await waitForPageTransition(page);
   });
 
-  test('동작 줄이기를 켜면 화면 전환 없이 바로 바뀐다', async ({ page }) => {
+  test('동작 줄이기를 켜면 움직이지 않고 바로 바뀐다(겹침은 몇 프레임 안)', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await openFirstSword(page);
-    expect(await maxPages(page)).toBe(1);
+    // 스크롤 정책을 지키려고 규칙은 그대로 두고 전환만 즉시 끝나게 하므로, 준비와 정리 동안 두 화면이 몇 프레임 함께 있습니다(실측 2~3).
+    expect(await overlapFrames(page)).toBeLessThanOrEqual(4);
   });
 
   test('언어를 바꾸면 문서를 새로 받아 화면이 하나만 남는다', async ({ page }) => {
@@ -424,8 +480,71 @@ test.describe('화면 전환', () => {
     await expect(page.locator('[data-ssgoi-transition]')).toHaveCount(1);
   });
 
-  test('없는 주소는 화면 전환 영역 밖에서 404로 응답한다', async ({ request }) => {
+  test('없는 주소는 404로 응답한다', async ({ request }) => {
     expect((await request.get('/no/such/page')).status()).toBe(404);
     expect((await request.get('/en/no/such/page')).status()).toBe(404);
+  });
+
+  test('앱 안에서 없는 주소로 이동하면 떠난 화면이 남지 않고 404만 보인다', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    await waitForHydration(page);
+    await expect(page.getByRole('heading', { level: 1, name: '도검의 벽' })).toBeVisible();
+    // 깨진 내부 링크를 누른 것과 같은 클라이언트 이동
+    await page.evaluate(() =>
+      (window as unknown as { next: { router: { push: (href: string) => void } } }).next.router.push('/no/such/page'),
+    );
+    await expect(page).toHaveURL(/\/no\/such\/page$/);
+    await waitForPageTransition(page);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    await expect(page.getByRole('heading', { level: 1, name: '도검의 벽' })).toHaveCount(0);
+  });
+
+  for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+    test(`도검 상세에서 뒤로 가면 벽의 보던 자리로 돌아온다(동작 줄이기: ${reducedMotion})`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion });
+      await page.goto('/');
+      await waitForHydration(page);
+      await waitForFrames(page);
+      const card = page.locator('a[href*="/swords/"]').nth(10);
+      await card.scrollIntoViewIfNeeded();
+      const wallScroll = await settledScrollY(page);
+      expect(wallScroll).toBeGreaterThan(0);
+      await card.click();
+      await expect(page).toHaveURL(/\/swords\//);
+      await waitForPageTransition(page);
+      await page.goBack();
+      await expect(page).toHaveURL(/\/$/);
+      await waitForPageTransition(page);
+      await expect.poll(distanceFrom(page, wallScroll)).toBeLessThanOrEqual(10);
+    });
+  }
+
+  // SSGOI 7.5.0은 문서의 첫 화면을 맨 위로 보내 브라우저가 되살린 위치를 지웠습니다. patches/@ssgoi__core@7.5.0.patch로 고칩니다.
+  test('새로고침해도 보던 자리를 지키고, 그 자리에서 상세로 갔다 돌아와도 같은 자리다', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    await waitForHydration(page);
+    await waitForFrames(page);
+    const card = page.locator('a[href*="/swords/"]').nth(10);
+    await card.scrollIntoViewIfNeeded();
+    const wallScroll = await settledScrollY(page);
+    expect(wallScroll).toBeGreaterThan(0);
+
+    await page.reload();
+    await waitForHydration(page);
+    // 브라우저가 서버 HTML(머리글이 48px 낮음)에서 위치를 되살린 뒤 머리글이 커지면, 스크롤 고정으로 그만큼 더 내려갈 수 있습니다.
+    const reloaded = await settledScrollY(page);
+    expect(reloaded).toBeGreaterThan(wallScroll - 10);
+    expect(reloaded).toBeLessThan(wallScroll + 60);
+
+    // 새로고침 뒤 스크롤하지 않고 바로 이동해도, 되살린 위치가 기록돼 있어야 합니다.
+    await card.click();
+    await expect(page).toHaveURL(/\/swords\//);
+    await waitForPageTransition(page);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+    await waitForPageTransition(page);
+    await expect.poll(distanceFrom(page, reloaded)).toBeLessThanOrEqual(10);
   });
 });

@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
  * `@ssgoi/react/nextjs`의 SsgoiRouteBoundary는 안에 Suspense를 두는데, 그러면 비동기로 그리는 화면(도검 상세 등)이
  * 스트리밍으로 나뉘어 자바스크립트 없이는 내용이 숨은 채로 남습니다. 이 앱은 cacheComponents를 쓰지 않아
  * usePathname이 멈추지 않으므로, 문서의 수동 경계(manual boundary)처럼 Suspense 없이 직접 둡니다.
+ * Suspense가 없으니 없는 주소에서 notFound()가 나도 404 응답이 그대로이고, 404 화면도 이 경계 안에 둡니다.
  */
 export function RouteBoundary({ children, className }: { children: ReactNode; className?: string }) {
   const pathname = usePathname();
