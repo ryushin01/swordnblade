@@ -127,3 +127,12 @@ docs/          문서와 스크린샷
 | [CI · 배포](docs/ci-deploy.md) | GitHub Actions, Vercel, multi-zones, 배포 후 검사, Dependabot |
 | [시퀀스 다이어그램](docs/sequence-diagrams.md) | 쇼핑몰·어드민 데이터 공유, 관세 미리 계산과 주문, 회원 로그인과 내 주문 |
 | [버전 기록](CHANGELOG.md) | 버전별 변경 내용 |
+
+## 출처
+
+| 자료 | 저작자 | 사용 허락 | 원본 |
+|---|---|---|---|
+| Cormorant Garamond 글꼴 | The Cormorant Project Authors | SIL OFL 1.1 | [CatharsisFonts/Cormorant](https://github.com/CatharsisFonts/Cormorant) |
+| Nanum Brush Script(나눔손글씨 붓) 글꼴 (쓰는 글자만 남긴 `sword-brush.woff2`) | NHN(네이버), 디자인 산돌커뮤니케이션 | SIL OFL 1.1 | [Google Fonts](https://fonts.google.com/specimen/Nanum+Brush+Script) |
+
+도검 일러스트는 이미지 파일 없이 코드(SVG)로 그렸습니다.

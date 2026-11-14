@@ -154,7 +154,7 @@ VoiceOver로 직접 들어 보는 점검은 사람이 해야 합니다. 다음�
 ## 품질 예산
 
 - **접근성 린트:** `eslint-config-next`는 jsx-a11y 규칙을 몇 개만 켭니다. 루트 `eslint.config.mjs`에서 이미 등록된 플러그인의 recommended 규칙을 모두 켭니다. 가로 스크롤용 `role="region"` + `tabIndex={0}`은 허용합니다.
-- **번들 크기:** `pnpm --filter @snb/shop size`가 쇼핑몰 전체 JS 535 kB, CSS 10 kB(gzip)를 넘으면 실패합니다. 기준은 `apps/shop/.size-limit.json`에 있습니다. 0.12.0에서 화면 전환(SSGOI, 약 9 kB)을 넣으며 520 kB에서 올렸습니다. 슬라이스 공개 API(`index.ts`)로 내보낸 모듈은 그 슬라이스를 가져오는 화면 묶음마다 들어가므로, 한 화면에서만 쓰는 컴포넌트는 그 페이지 슬라이스에 두고, 화면에 들어가는 공통 모듈에는 다른 곳에서만 쓰는 코드(예: 할인 입력 검증 `discount-validation.ts`)를 섞지 않습니다.
+- **번들 크기:** `pnpm --filter @snb/shop size`가 쇼핑몰 전체 JS 550 kB, CSS 10 kB(gzip)를 넘으면 실패합니다. 기준은 `apps/shop/.size-limit.json`에 있습니다. 0.12.0에서 화면 전환(SSGOI, 약 31 kB)을 넣으며 520 kB에서 올렸습니다. 슬라이스 공개 API(`index.ts`)로 내보낸 모듈은 그 슬라이스를 가져오는 화면 묶음마다 들어가므로, 한 화면에서만 쓰는 컴포넌트는 그 페이지 슬라이스에 두고, 화면에 들어가는 공통 모듈에는 다른 곳에서만 쓰는 코드(예: 할인 입력 검증 `discount-validation.ts`)를 섞지 않습니다.
 - **화면 전환(SSGOI):** 제공자는 `_app/transitions/page-transitions.tsx`, 규칙은 `config.ts`, 경계는 라우트 그룹 `(site)`의 레이아웃이 `RouteBoundary`로 둡니다.
   - 경계는 Suspense 없이 직접 만듭니다. `@ssgoi/react/nextjs`의 `SsgoiRouteBoundary`는 Suspense를 품어, 자바스크립트 없이 열면 비동기로 그리는 화면이 숨은 채로 남습니다(이 앱은 `cacheComponents`를 쓰지 않아 `usePathname`이 멈추지 않음).
   - 없는 주소(`[...rest]`)는 `(site)` 밖에 둡니다. 경계 안에서 `notFound()`가 스트리밍 뒤에 나면 404 대신 200이 됩니다.
