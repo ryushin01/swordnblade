@@ -123,4 +123,5 @@ docs/          문서와 스크린샷
 | [디자인](docs/design.md) | 참고 사이트, 석고 팔레트, 부조 일러스트 원리 |
 | [관세 계산](docs/customs.md) | 계산 규칙, 국가별 예시 값, 허가 안내 |
 | [CI · 배포](docs/ci-deploy.md) | GitHub Actions, Vercel, multi-zones, 배포 후 검사, Dependabot |
+| [시퀀스 다이어그램](docs/sequence-diagrams.md) | 쇼핑몰·어드민 데이터 공유, 관세 미리 계산과 주문, 회원 로그인과 내 주문 |
 | [버전 기록](CHANGELOG.md) | 버전별 변경 내용 |
