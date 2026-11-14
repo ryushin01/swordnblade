@@ -182,6 +182,7 @@
     "summaryTitle": "Order summary",
     "checkError": "Please check your details.",
     "genericError": "We could not process the payment. Please try again shortly.",
+    "priceChanged": "The total changed to {total} while you were ordering. Check the new amount in the order summary, then pay again.",
     "recipient": "Recipient",
     "fields": {
       "name": "Recipient",

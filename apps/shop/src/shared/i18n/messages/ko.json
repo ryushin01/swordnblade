@@ -182,6 +182,7 @@
     "summaryTitle": "주문 요약",
     "checkError": "입력 내용을 확인해 주세요.",
     "genericError": "결제를 처리하지 못했습니다. 잠시 뒤 다시 시도해 주세요.",
+    "priceChanged": "주문하는 사이 결제 금액이 {total}으로 바뀌었습니다. 주문 요약에서 바뀐 금액을 확인한 뒤 다시 결제해 주세요.",
     "recipient": "받는 분 정보",
     "fields": {
       "name": "받는 분",

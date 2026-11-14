@@ -81,6 +81,7 @@ export function CheckoutView() {
           lines={items.map(({ line }) => ({ swordId: line.swordId, quantity: line.quantity }))}
           needsPermit={needsPermit}
           permitNote={permitNote(rule, locale)}
+          expectedTotal={estimate.totals.total}
           onPlaced={handlePlaced}
         />
       </section>

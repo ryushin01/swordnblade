@@ -42,4 +42,12 @@ describe('할인', () => {
     expect(validateDiscount({ rate: 10, startsAt: '2026-12-10', endsAt: '2026-12-01' })).toMatch(/종료일/);
     expect(validateDiscount(null)).not.toBeNull();
   });
+
+  it('달력에 없는 날짜(2월 30일, 평년 2월 29일, 4월 31일)는 거절하고 윤년 2월 29일은 받는다', () => {
+    for (const date of ['2027-02-30', '2027-02-29', '2027-04-31', '2027-13-01']) {
+      expect(validateDiscount({ rate: 10, endsAt: date })).toMatch(/YYYY-MM-DD/);
+      expect(validateDiscount({ rate: 10, startsAt: date })).toMatch(/YYYY-MM-DD/);
+    }
+    expect(validateDiscount({ rate: 10, startsAt: '2028-02-29', endsAt: '2028-03-01' })).toBeNull();
+  });
 });

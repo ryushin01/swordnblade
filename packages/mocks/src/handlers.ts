@@ -28,11 +28,17 @@ export interface CreateOrderBody {
   lines: Array<{ swordId: string; quantity: number }>;
   paymentMethod: Order['paymentMethod'];
   permitConfirmed: boolean;
+  /** 고객이 주문서에서 확인한 결제 금액. 서버가 다시 계산한 금액과 다르면 주문하지 않고 409(price-changed)로 알립니다. */
+  expectedTotal?: number;
 }
 
 export interface ApiError {
   message: string;
   fields?: Record<string, string>;
+  /** 화면이 따로 안내해야 하는 오류. price-changed: 주문하는 사이 결제 금액이 바뀜 */
+  code?: 'price-changed';
+  /** price-changed일 때 서버가 다시 계산한 결제 금액 */
+  total?: number;
 }
 
 export interface DashboardStats {
@@ -258,6 +264,14 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
         };
       });
       const estimate = estimateCustoms(orderLines, body.destination!, state.customs);
+      // 고객이 확인한 금액과 다르면(할인이 끝났거나 가격·관세율이 바뀜) 주문하지 않고 바뀐 금액을 알려 다시 확인받습니다.
+      if (body.expectedTotal !== undefined && body.expectedTotal !== estimate.totals.total) {
+        return error(409, {
+          message: '주문하는 사이 결제 금액이 바뀌었습니다. 바뀐 금액을 확인한 뒤 다시 결제해 주세요.',
+          code: 'price-changed',
+          total: estimate.totals.total,
+        });
+      }
       const buyer = findSessionUser(db, request);
       const now = new Date();
       const order: Order = {

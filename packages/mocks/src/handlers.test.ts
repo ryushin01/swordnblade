@@ -114,6 +114,29 @@ describe('Mock API', () => {
     expect(order.amounts.goods).toBe(7_840_000 + listPrice('sw-007'));
   });
 
+  it('고객이 확인한 금액과 서버가 다시 계산한 금액이 다르면 주문하지 않고 바뀐 금액을 알린다', async () => {
+    const place = (expectedTotal: number) =>
+      fetch(`${BASE}/api/orders`, {
+        method: 'POST',
+        body: JSON.stringify({
+          destination: 'KR',
+          customer,
+          lines: [{ swordId: 'sw-004', quantity: 1 }],
+          paymentMethod: 'card',
+          permitConfirmed: true,
+          expectedTotal,
+        }),
+      });
+    const ordersBefore = db.read().orders.length;
+    const changed = await place(5_000_000);
+    expect(changed.status).toBe(409);
+    expect(await changed.json()).toMatchObject({ code: 'price-changed', total: 5_446_980 });
+    expect(db.read().orders).toHaveLength(ordersBefore);
+    expect(db.read().swords.find((sword) => sword.id === 'sw-004')?.stock).toBe(4);
+    // 바뀐 금액을 확인하고 다시 보내면 주문합니다.
+    expect((await place(5_446_980)).status).toBe(201);
+  });
+
   it('할인 값이 맞지 않으면 상품을 저장하지 않고 422', async () => {
     const sword = db.read().swords.find((item) => item.id === 'sw-003')!;
     const save = (discount: unknown) =>
