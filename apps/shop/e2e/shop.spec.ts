@@ -415,6 +415,30 @@ test.describe('화면 전환', () => {
     );
   const scrollY = (page: Page) => page.evaluate(() => Math.round(window.scrollY));
 
+  /**
+   * 스크롤 위치가 30프레임 동안 그대로일 때까지 기다린 뒤 그 위치를 돌려줍니다. 모바일에서는 수화 뒤 머리글의 언어 링크가
+   * 생기며 높이가 바뀌어, 브라우저가 보던 내용을 지키려고 스크롤을 48px 더 내립니다(scroll anchoring).
+   */
+  const settledScrollY = async (page: Page) => {
+    await page.waitForFunction(
+      () =>
+        new Promise<boolean>((resolve) => {
+          const start = window.scrollY;
+          let frames = 0;
+          const check = () => {
+            if (window.scrollY !== start) return resolve(false);
+            if (++frames >= 30) return resolve(true);
+            requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        }),
+      undefined,
+      { polling: 100 },
+    );
+    return scrollY(page);
+  };
+  const distanceFrom = (page: Page, position: number) => async () => Math.abs((await scrollY(page)) - position);
+
   async function openFirstSword(page: Page) {
     await page.goto('/');
     await waitForHydration(page);
@@ -484,8 +508,7 @@ test.describe('화면 전환', () => {
       await waitForFrames(page);
       const card = page.locator('a[href*="/swords/"]').nth(10);
       await card.scrollIntoViewIfNeeded();
-      await waitForFrames(page, 3);
-      const wallScroll = await scrollY(page);
+      const wallScroll = await settledScrollY(page);
       expect(wallScroll).toBeGreaterThan(0);
       await card.click();
       await expect(page).toHaveURL(/\/swords\//);
@@ -493,7 +516,7 @@ test.describe('화면 전환', () => {
       await page.goBack();
       await expect(page).toHaveURL(/\/$/);
       await waitForPageTransition(page);
-      await expect.poll(() => scrollY(page)).toBeGreaterThan(wallScroll - 10);
+      await expect.poll(distanceFrom(page, wallScroll)).toBeLessThanOrEqual(10);
     });
   }
 
@@ -505,16 +528,15 @@ test.describe('화면 전환', () => {
     await waitForFrames(page);
     const card = page.locator('a[href*="/swords/"]').nth(10);
     await card.scrollIntoViewIfNeeded();
-    await waitForFrames(page, 3);
-    const wallScroll = await scrollY(page);
+    const wallScroll = await settledScrollY(page);
     expect(wallScroll).toBeGreaterThan(0);
 
     await page.reload();
     await waitForHydration(page);
-    await waitForFrames(page);
-    // 수화 뒤 위쪽 요소의 높이가 바뀌면(모바일 머리글의 언어 링크) 브라우저가 보던 내용을 지키려고 스크롤을 더 내릴 수
-    // 있습니다(scroll anchoring). 그래서 정확한 값 대신 되살린 위치보다 위로(맨 위로) 가지 않았는지 봅니다.
-    expect(await scrollY(page)).toBeGreaterThan(wallScroll - 10);
+    // 브라우저가 서버 HTML(머리글이 48px 낮음)에서 위치를 되살린 뒤 머리글이 커지면, 스크롤 고정으로 그만큼 더 내려갈 수 있습니다.
+    const reloaded = await settledScrollY(page);
+    expect(reloaded).toBeGreaterThan(wallScroll - 10);
+    expect(reloaded).toBeLessThan(wallScroll + 60);
 
     // 새로고침 뒤 스크롤하지 않고 바로 이동해도, 되살린 위치가 기록돼 있어야 합니다.
     await card.click();
@@ -523,6 +545,6 @@ test.describe('화면 전환', () => {
     await page.goBack();
     await expect(page).toHaveURL(/\/$/);
     await waitForPageTransition(page);
-    await expect.poll(() => scrollY(page)).toBeGreaterThan(wallScroll - 10);
+    await expect.poll(distanceFrom(page, reloaded)).toBeLessThanOrEqual(10);
   });
 });
