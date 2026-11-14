@@ -51,7 +51,13 @@ export async function generateMetadata({ params }: { params: LayoutParams }): Pr
     // 언어별 대체 주소(hreflang)와 canonical을 절대 주소로 내보냅니다. 하위 페이지에도 적용됩니다.
     metadataBase: new URL(SITE.url),
     // 아이콘이 없으면 브라우저가 /favicon.ico를 찾다가 404를 냅니다.
-    icons: { icon: { url: '/favicon.svg', type: 'image/svg+xml' } },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+      ],
+      apple: '/apple-touch-icon.png',
+    },
     title: { default: t('defaultTitle'), template: `%s · ${t('siteName')}` },
     description: t('description'),
     alternates: languageAlternates('', locale),
