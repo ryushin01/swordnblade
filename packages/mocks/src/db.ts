@@ -66,10 +66,10 @@ const PRICE_FIXES: Record<string, { from: number; to: number }> = {
   'sw-001': { from: 6_800_000, to: 17_600_000 },
 };
 
-/** 출처를 확인하지 못해 시드에서 뺀 도검. 예전 데이터에서도 지웁니다. */
 /** 출처 대조로 원어·영어 이름과 출고국을 바로잡은 도검. 예전 데이터에서도 새 값으로 바꿉니다(한국어 이름·가격은 둠). */
 const IDENTITY_FIXED_IDS = ['sw-kuruchi'];
 
+/** 출처를 확인하지 못했거나 다른 도검으로 바꿔 시드에서 뺀 도검. 예전 데이터에서도 지웁니다. */
 const REMOVED_SEED_IDS = ['sw-ings-sword', 'sw-hwer', 'sw-ecke-king', 'sw-samingeom'];
 
 const clone = <T>(value: T): T => structuredClone(value);
@@ -89,6 +89,7 @@ const seedState = (): DbState => ({
 export function migrateSeed(state: DbState): DbState {
   if ((state.seedVersion ?? 1) >= SEED_VERSION) return state;
   const byId = new Map(state.swords.map((sword) => [sword.id, sword]));
+  const storedVersion = state.seedVersion ?? 1;
   const swords = state.swords.map((sword) => {
     const seed = SEED_SWORDS.find((item) => item.id === sword.id);
     if (!seed) return sword;
@@ -106,10 +107,13 @@ export function migrateSeed(state: DbState): DbState {
       specs: { ...clone(seed.specs) },
       art: clone(seed.art),
       ...(seed.translations ? { translations: clone(seed.translations) } : {}),
+      // 할인은 판매 정보라 어드민 값을 지키고, 할인이 생기기 전(버전 10 미만) 데이터에만 시드 할인을 채웁니다.
+      ...(storedVersion < 10 && seed.discount && sword.discount === undefined
+        ? { discount: clone(seed.discount) }
+        : {}),
     };
   });
   // 저장된 데이터보다 나중 시드 버전에 들어온 도검만 더합니다. 어드민에서 지운 예전 시드 도검은 되살리지 않습니다.
-  const storedVersion = state.seedVersion ?? 1;
   // 삼인검이 남아 있으면 본국검으로 바꾸기 전 데이터라, 그때 없던 본국검을 채웁니다(지운 것이 아님).
   const beforeBongukgeom = byId.has('sw-samingeom');
   const added = SEED_SWORDS.filter(

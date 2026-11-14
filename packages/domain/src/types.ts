@@ -1,3 +1,5 @@
+import type { SwordDiscount } from './discount';
+
 /** ISO 3166-1 alpha-2 국가 코드 중 이 쇼핑몰에서 쓰는 것 */
 export type CountryCode =
   | 'KR'
@@ -169,8 +171,10 @@ export interface Sword {
     material: string;
     edge: EdgeKind;
   };
-  /** 원화 판매가 */
+  /** 원화 정가 */
   price: number;
+  /** 기간 할인. 지금 판매가는 priceOf로 계산합니다. */
+  discount?: SwordDiscount;
   stock: number;
   art: SwordArt;
   /** 상세 갤러리에서 부조 그림 뒤에 보여 줄 사진 */
@@ -190,7 +194,10 @@ export interface OrderLine {
   swordId: string;
   name: string;
   origin: CountryCode;
+  /** 실제로 받은 1점 가격(할인 적용 뒤) */
   unitPrice: number;
+  /** 할인이 적용된 줄의 1점 정가 */
+  listPrice?: number;
   quantity: number;
 }
 

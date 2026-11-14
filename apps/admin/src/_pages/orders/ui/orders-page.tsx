@@ -30,7 +30,14 @@ export function OrdersPage() {
               <Descriptions size="small" column={{ xs: 1, md: 2 }} bordered>
                 <Descriptions.Item label="주문 상품">
                   {order.lines
-                    .map((line) => `${line.name} × ${line.quantity} (${COUNTRY_NAME[line.origin]} 출고)`)
+                    .map(
+                      (line) =>
+                        `${line.name} × ${line.quantity} (${COUNTRY_NAME[line.origin]} 출고${
+                          line.listPrice
+                            ? `, 정가 ${formatKRW(line.listPrice)}에서 할인한 ${formatKRW(line.unitPrice)}`
+                            : ''
+                        })`,
+                    )
                     .join(', ')}
                 </Descriptions.Item>
                 <Descriptions.Item label="배송지">

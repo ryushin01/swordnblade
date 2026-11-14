@@ -7,9 +7,11 @@ import {
   estimateCustoms,
   type Order,
   type OrderStatus,
+  priceOf,
   requiresPossessionPermit,
   type Sword,
   type SwordCategory,
+  validateDiscount,
 } from '@snb/domain';
 
 import { createAdminHandlers, isAdmin } from './admin-handlers';
@@ -26,11 +28,17 @@ export interface CreateOrderBody {
   lines: Array<{ swordId: string; quantity: number }>;
   paymentMethod: Order['paymentMethod'];
   permitConfirmed: boolean;
+  /** 고객이 주문서에서 확인한 결제 금액. 서버가 다시 계산한 금액과 다르면 주문하지 않고 409(price-changed)로 알립니다. */
+  expectedTotal?: number;
 }
 
 export interface ApiError {
   message: string;
   fields?: Record<string, string>;
+  /** 화면이 따로 안내해야 하는 오류. price-changed: 주문하는 사이 결제 금액이 바뀜 */
+  code?: 'price-changed';
+  /** price-changed일 때 서버가 다시 계산한 결제 금액 */
+  total?: number;
 }
 
 export interface DashboardStats {
@@ -44,6 +52,13 @@ export interface DashboardStats {
 const ORDER_STATUSES: OrderStatus[] = ['paid', 'permit-review', 'preparing', 'shipped', 'delivered', 'cancelled'];
 
 const error = (status: number, body: ApiError) => HttpResponse.json(body, { status });
+
+/** 할인 값이 있으면 확인하고, 맞지 않으면 칸 오류로 돌려줍니다. */
+const discountError = (body: Pick<Sword, 'discount'>) => {
+  if (body.discount === undefined) return null;
+  const message = validateDiscount(body.discount);
+  return message ? error(422, { message, fields: { discount: message } }) : null;
+};
 
 const pad = (value: number, length: number) => String(value).padStart(length, '0');
 
@@ -136,6 +151,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       await wait();
       const body = (await request.json()) as Omit<Sword, 'id'>;
       if (!body.slug || !body.name) return error(400, { message: '이름과 주소(slug)는 필수입니다.' });
+      const invalidDiscount = discountError(body);
+      if (invalidDiscount) return invalidDiscount;
       if (db.read().swords.some((sword) => sword.slug === body.slug)) {
         return error(409, {
           message: '같은 주소(slug)의 상품이 있습니다.',
@@ -153,6 +170,8 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
       if (denied) return denied;
       await wait();
       const body = (await request.json()) as Sword;
+      const invalidDiscount = discountError(body);
+      if (invalidDiscount) return invalidDiscount;
       const exists = db.read().swords.some((sword) => sword.id === params.id);
       if (!exists) return error(404, { message: '상품을 찾을 수 없습니다.' });
       const updated: Sword = { ...body, id: params.id };
@@ -231,14 +250,28 @@ export function createHandlers(db: Db, options: HandlerOptions = {}) {
 
       if (Object.keys(fields).length > 0) return error(422, { message: '입력 내용을 확인해 주세요.', fields });
 
-      const orderLines = lines.map(({ line, sword }) => ({
-        swordId: sword!.id,
-        name: sword!.name,
-        origin: sword!.origin,
-        unitPrice: sword!.price,
-        quantity: line.quantity,
-      }));
+      // 주문하는 순간의 판매가(할인 적용)로 계산합니다. 화면에서 보낸 금액은 믿지 않습니다.
+      const pricedAt = Date.now();
+      const orderLines = lines.map(({ line, sword }) => {
+        const { price, listPrice, rate } = priceOf(sword!, pricedAt);
+        return {
+          swordId: sword!.id,
+          name: sword!.name,
+          origin: sword!.origin,
+          unitPrice: price,
+          ...(rate > 0 ? { listPrice } : {}),
+          quantity: line.quantity,
+        };
+      });
       const estimate = estimateCustoms(orderLines, body.destination!, state.customs);
+      // 고객이 확인한 금액과 다르면(할인이 끝났거나 가격·관세율이 바뀜) 주문하지 않고 바뀐 금액을 알려 다시 확인받습니다.
+      if (body.expectedTotal !== undefined && body.expectedTotal !== estimate.totals.total) {
+        return error(409, {
+          message: '주문하는 사이 결제 금액이 바뀌었습니다. 바뀐 금액을 확인한 뒤 다시 결제해 주세요.',
+          code: 'price-changed',
+          total: estimate.totals.total,
+        });
+      }
       const buyer = findSessionUser(db, request);
       const now = new Date();
       const order: Order = {

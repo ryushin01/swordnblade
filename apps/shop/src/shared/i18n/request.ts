@@ -8,6 +8,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
   return {
     locale,
+    // 할인 기간을 가르는 '지금'. 브라우저는 이 값으로 hydrate한 뒤 자기 시계로 바꿉니다.
+    now: new Date(),
+    timeZone: 'Asia/Seoul',
     messages: (await import(`./messages/${locale}.json`)).default,
   };
 });

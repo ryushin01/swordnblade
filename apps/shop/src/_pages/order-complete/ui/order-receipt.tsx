@@ -7,7 +7,7 @@ import { countryName, formatKRW, type Locale, orderStatusLabel } from '@snb/doma
 import { useOrder } from '@/entities/order';
 import { swordNameFor } from '@/entities/sword';
 import { Link } from '@/shared/i18n';
-import { OrnamentHeading } from '@/shared/ui';
+import { OrnamentHeading, PriceTag } from '@/shared/ui';
 
 export function OrderReceipt({ id }: { id: string }) {
   const t = useTranslations('Order');
@@ -59,7 +59,11 @@ export function OrderReceipt({ id }: { id: string }) {
                   {t('shippedFrom', { country: countryName(line.origin, locale) })}
                 </span>
               </span>
-              <span className="tabular-nums">{won(line.unitPrice * line.quantity)}</span>
+              <PriceTag
+                price={line.unitPrice * line.quantity}
+                listPrice={line.listPrice === undefined ? undefined : line.listPrice * line.quantity}
+                className="justify-end"
+              />
             </li>
           ))}
         </ul>

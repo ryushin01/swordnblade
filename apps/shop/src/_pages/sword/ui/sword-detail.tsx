@@ -6,23 +6,25 @@ import {
   categoryLabel,
   countryName,
   estimateCustoms,
-  formatKRW,
   formatLength,
   formatWeight,
   type Locale,
+  priceOf,
   requiresPossessionPermit,
   type Sword,
 } from '@snb/domain';
 
 import { useCartStore } from '@/entities/cart';
-import { localizeForLocale, useSword } from '@/entities/sword';
+import { localizeForLocale, SwordPrice, useSword } from '@/entities/sword';
 import { CustomsBreakdown, useCustomsConfig } from '@/entities/tariff';
 import { DestinationSelect } from '@/features/choose-destination';
 import { ApiRequestError } from '@/shared/api';
 import { Link } from '@/shared/i18n';
+import { useNow } from '@/shared/lib/use-now';
 import { LiveTotal, OrnamentHeading } from '@/shared/ui';
 
 import { AddToCart } from './add-to-cart';
+import { DiscountPeriod } from './discount-period';
 import { RecentSwords } from './recent-swords';
 import { RelatedSwords } from './related-swords';
 import { Reviews } from './reviews';
@@ -121,12 +123,13 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
 
           <section aria-labelledby="buy-title" className="grid gap-4">
             <OrnamentHeading id="buy-title">{t('buyTitle')}</OrnamentHeading>
-            <p className="flex items-baseline justify-between">
-              <span className="text-3xl tabular-nums">{formatKRW(sword.price, locale)}</span>
+            <p className="flex flex-wrap items-baseline justify-between gap-x-4">
+              <SwordPrice sword={sword} size="lg" />
               <span className="text-sm text-ink-muted">
                 {sword.stock > 0 ? t('stockLeft', { count: sword.stock }) : t('soldOut')}
               </span>
             </p>
+            <DiscountPeriod sword={sword} className="-mt-2 text-sm text-ink-muted" />
             <AddToCart sword={sword} />
             <p className="flex flex-wrap items-center gap-3">
               <WishlistButton swordId={sword.id} />
@@ -173,28 +176,20 @@ function ItemCustoms({ sword }: { sword: Sword }) {
   const customs = useTranslations('Customs');
   const { data: config } = useCustomsConfig();
   const destination = useCartStore((state) => state.destination);
+  // 관세는 실제로 내는 값(지금 판매가)에 붙습니다.
+  const unitPrice = priceOf(sword, useNow()).price;
+  const estimate = config
+    ? estimateCustoms([{ origin: sword.origin, unitPrice, quantity: 1 }], destination, config)
+    : null;
 
   return (
     <section aria-labelledby="customs-title" className="grid gap-4">
       <OrnamentHeading id="customs-title">{t('customsTitle')}</OrnamentHeading>
-      {config ? (
+      {config && estimate ? (
         <>
           <DestinationSelect config={config} />
-          <LiveTotal
-            label={customs('total')}
-            total={
-              estimateCustoms([{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }], destination, config)
-                .totals.total
-            }
-          />
-          <CustomsBreakdown
-            estimate={estimateCustoms(
-              [{ origin: sword.origin, unitPrice: sword.price, quantity: 1 }],
-              destination,
-              config,
-            )}
-            config={config}
-          />
+          <LiveTotal label={customs('total')} total={estimate.totals.total} />
+          <CustomsBreakdown estimate={estimate} config={config} />
         </>
       ) : (
         <p className="text-ink-muted">{t('customsLoading')}</p>

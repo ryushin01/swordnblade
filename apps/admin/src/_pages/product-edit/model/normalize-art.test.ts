@@ -1,6 +1,13 @@
 import { SEED_SWORDS } from '@snb/mocks';
 
-import { mergeArt, normalizeArt, normalizeImages, normalizeStories, normalizeTranslation } from './normalize-art';
+import {
+  mergeArt,
+  normalizeArt,
+  normalizeDiscount,
+  normalizeImages,
+  normalizeStories,
+  normalizeTranslation,
+} from './normalize-art';
 
 import type { SwordArt } from '@snb/domain';
 
@@ -127,5 +134,20 @@ describe('mergeArt', () => {
     const merged = mergeArt(template, template);
     expect(merged.blade.sleeve).toBeUndefined();
     expect(merged.grip.ferrule).toBeUndefined();
+  });
+});
+
+describe('normalizeDiscount', () => {
+  it('할인율을 비우면 기간이 남아 있어도 할인을 없앤다', () => {
+    expect(normalizeDiscount({ rate: null, startsAt: '2027-01-01', endsAt: '' })).toBeUndefined();
+    expect(normalizeDiscount(undefined)).toBeUndefined();
+  });
+
+  it('비운 날짜는 속성을 없애 기한 없이 둔다', () => {
+    expect(normalizeDiscount({ rate: 15, startsAt: '', endsAt: '2027-06-30' })).toEqual({
+      rate: 15,
+      endsAt: '2027-06-30',
+    });
+    expect(normalizeDiscount({ rate: 10, startsAt: null, endsAt: undefined })).toEqual({ rate: 10 });
   });
 });

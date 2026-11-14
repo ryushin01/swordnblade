@@ -23,7 +23,13 @@ import {
   CATEGORY_LABEL,
   COUNTRY_NAME,
   type CountryCode,
+  discountedPrice,
+  type DiscountStatus,
+  discountStatus,
+  formatKRW,
   KIND_LABEL,
+  MAX_DISCOUNT_RATE,
+  MIN_DISCOUNT_RATE,
   type Sword,
   SWORD_CATEGORIES,
   SWORD_KINDS,
@@ -34,10 +40,13 @@ import { SwordRelief } from '@snb/sword-art';
 
 import { type SwordInput, useSaveSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
+import { useNow } from '@/shared/lib';
 
 import {
+  type DiscountFields,
   mergeArt,
   normalizeArt,
+  normalizeDiscount,
   normalizeImages,
   normalizeStories,
   normalizeTranslation,
@@ -160,6 +169,29 @@ function ColorField({ name, label, optional }: { name: (string | number)[]; labe
   );
 }
 
+const DISCOUNT_STATUS_LABEL: Record<DiscountStatus, string> = {
+  active: '지금 할인 중',
+  scheduled: '시작일 전이라 아직 정가로 팝니다',
+  ended: '종료일이 지나 정가로 팝니다',
+};
+
+/** 할인 칸을 채우면 쇼핑몰 판매가와 지금 적용 여부를 미리 보여 줍니다. 영역은 늘 두고 내용만 바꿔 화면 낭독기가 읽게 합니다. */
+function DiscountPreview({ price, discount }: { price?: number; discount?: DiscountFields }) {
+  const now = useNow();
+  const rate = discount?.rate;
+  const ready = price != null && rate != null && rate >= MIN_DISCOUNT_RATE && rate <= MAX_DISCOUNT_RATE;
+  const status = ready
+    ? discountStatus({ rate, startsAt: discount?.startsAt || undefined, endsAt: discount?.endsAt || undefined }, now)
+    : undefined;
+  return (
+    <Typography.Paragraph role="status" type="secondary" style={{ margin: 0 }}>
+      {ready && status
+        ? `판매가 ${formatKRW(discountedPrice(price, rate))} (정가 ${formatKRW(price)}에서 ${rate}% 할인, 100원 단위 반올림) · ${DISCOUNT_STATUS_LABEL[status]}`
+        : null}
+    </Typography.Paragraph>
+  );
+}
+
 export function ProductForm({ initial }: { initial?: Sword }) {
   const router = useRouter();
   const [form] = Form.useForm<SwordInput>();
@@ -220,6 +252,10 @@ export function ProductForm({ initial }: { initial?: Sword }) {
           images: normalizeImages(values.images),
           art: normalizeArt(mergeArt(artBase, values.art), values.specs.bladeLength),
         };
+        // 할인율을 비우면 할인을 뺍니다(PUT은 상품 전체를 바꾸므로 속성이 없으면 할인이 끝남).
+        const discount = normalizeDiscount(values.discount as DiscountFields | undefined);
+        if (discount) data.discount = discount;
+        else delete data.discount;
         const en = normalizeTranslation(values.translations?.en);
         // 비우면 빈 객체로 저장해 '일부러 지움'을 남깁니다(쇼핑몰이 시드 번역으로 되돌아가지 않음).
         data.translations = en ? { en } : {};
@@ -381,6 +417,80 @@ export function ProductForm({ initial }: { initial?: Sword }) {
                 </Form.Item>
               </Col>
             </Row>
+          </Card>
+
+          <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>할인</h2>} style={{ marginBottom: 16 }}>
+            <Row gutter={16}>
+              <Col xs={24} md={6}>
+                <Form.Item
+                  name={['discount', 'rate']}
+                  label="할인율(%)"
+                  extra="비우면 할인하지 않습니다."
+                  dependencies={[
+                    ['discount', 'startsAt'],
+                    ['discount', 'endsAt'],
+                  ]}
+                  rules={[
+                    {
+                      type: 'integer',
+                      min: MIN_DISCOUNT_RATE,
+                      max: MAX_DISCOUNT_RATE,
+                      message: `할인율은 ${MIN_DISCOUNT_RATE}~${MAX_DISCOUNT_RATE} 사이의 정수로 입력해 주세요.`,
+                    },
+                    ({ getFieldValue }) => ({
+                      validator: (_, rate?: number | null) =>
+                        rate == null &&
+                        (getFieldValue(['discount', 'startsAt']) || getFieldValue(['discount', 'endsAt']))
+                          ? Promise.reject(
+                              new Error(
+                                '할인 기간을 정했다면 할인율도 입력해 주세요. 할인하지 않으려면 날짜를 지워 주세요.',
+                              ),
+                            )
+                          : Promise.resolve(),
+                    }),
+                  ]}
+                >
+                  <InputNumber
+                    min={MIN_DISCOUNT_RATE}
+                    max={MAX_DISCOUNT_RATE}
+                    precision={0}
+                    style={{ width: '100%' }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={9}>
+                <Form.Item
+                  name={['discount', 'startsAt']}
+                  label="시작일"
+                  extra="이날 0시(한국 시간)부터 할인합니다. 비우면 바로 시작합니다."
+                  normalize={(value?: string) => value || undefined}
+                >
+                  <Input type="date" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={9}>
+                <Form.Item
+                  name={['discount', 'endsAt']}
+                  label="종료일"
+                  extra="이날 23시 59분(한국 시간)까지 할인합니다. 비우면 기한이 없습니다."
+                  normalize={(value?: string) => value || undefined}
+                  dependencies={[['discount', 'startsAt']]}
+                  rules={[
+                    ({ getFieldValue }) => ({
+                      validator: (_, endsAt?: string) => {
+                        const startsAt: string | undefined = getFieldValue(['discount', 'startsAt']);
+                        return endsAt && startsAt && endsAt < startsAt
+                          ? Promise.reject(new Error('종료일을 시작일과 같거나 그 뒤의 날짜로 골라 주세요.'))
+                          : Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <Input type="date" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <DiscountPreview price={watched?.price} discount={watched?.discount as DiscountFields | undefined} />
           </Card>
 
           <Card title={<h2 style={{ margin: 0, fontSize: 16 }}>일러스트</h2>}>

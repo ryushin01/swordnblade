@@ -5,12 +5,18 @@ import type { ApiError } from '@snb/mocks';
 export class ApiRequestError extends Error {
   readonly status: number;
   readonly fields: Record<string, string>;
+  /** 화면이 따로 안내해야 하는 오류 종류(예: price-changed) */
+  readonly code?: ApiError['code'];
+  /** price-changed일 때 서버가 다시 계산한 결제 금액 */
+  readonly total?: number;
 
   constructor(status: number, body: Partial<ApiError>) {
     super(body.message ?? '요청을 처리하지 못했습니다.');
     this.name = 'ApiRequestError';
     this.status = status;
     this.fields = body.fields ?? {};
+    this.code = body.code;
+    this.total = body.total;
   }
 }
 

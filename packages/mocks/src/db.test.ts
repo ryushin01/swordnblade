@@ -4,6 +4,14 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from './db';
 import { SEED_SWORDS } from './seed';
 
+import type { Sword } from '@snb/domain';
+
+const withoutDiscount = (sword: Sword): Sword => {
+  const copy = { ...sword };
+  delete copy.discount;
+  return copy;
+};
+
 describe('createDb (localStorage 공유)', () => {
   beforeEach(() => localStorage.clear());
 
@@ -141,5 +149,35 @@ describe('migrateSeed (시드 버전)', () => {
     expect(createDb({ storageKey: 'test-db' }).read().swords[0]?.price).toBe(17_600_000);
     localStorage.setItem('test-db', JSON.stringify(legacy(7_000_000)));
     expect(createDb({ storageKey: 'test-db' }).read().swords[0]?.price).toBe(7_000_000);
+  });
+  it('할인이 생기기 전 데이터에는 시드 할인을 채우고, 어드민에서 정한 할인은 둔다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const seeded = fresh.swords.find((sword) => sword.id === 'sw-006')?.discount;
+    expect(seeded).toBeDefined();
+    const legacy = {
+      ...fresh,
+      seedVersion: 9,
+      swords: fresh.swords.map((sword) =>
+        sword.id === 'sw-009' ? { ...sword, discount: { rate: 30 } } : withoutDiscount(sword),
+      ),
+    };
+    localStorage.setItem('test-db', JSON.stringify(legacy));
+    const swords = createDb({ storageKey: 'test-db' }).read().swords;
+    expect(swords.find((sword) => sword.id === 'sw-006')?.discount).toEqual(seeded);
+    expect(swords.find((sword) => sword.id === 'sw-009')?.discount).toEqual({ rate: 30 });
+  });
+
+  it('할인을 넣은 뒤의 데이터에서 어드민이 지운 할인은 되살리지 않는다', () => {
+    const fresh = createDb({ storageKey: 'test-db' }).read();
+    const current = {
+      ...fresh,
+      swords: fresh.swords.map(withoutDiscount),
+    };
+    localStorage.setItem('test-db', JSON.stringify(current));
+    expect(
+      createDb({ storageKey: 'test-db' })
+        .read()
+        .swords.some((sword) => sword.discount),
+    ).toBe(false);
   });
 });

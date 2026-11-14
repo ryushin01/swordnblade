@@ -20,6 +20,13 @@ describe('SwordTile', () => {
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('할인 중이면 정가·할인가·할인율이 링크 이름에 들어간다', () => {
+    renderWithProviders(<SwordTile sword={{ ...sword, discount: { rate: 10 } }} />);
+    expect(
+      screen.getByRole('link', { name: /쌍수도.*정가 17,600,000원.*할인가 15,840,000원.*10% 할인/ }),
+    ).toBeInTheDocument();
+  });
+
   it('재고가 없으면 품절로 보인다', () => {
     renderWithProviders(<SwordTile sword={{ ...sword, stock: 0 }} />);
     expect(screen.getByRole('link', { name: /품절/ })).toBeInTheDocument();

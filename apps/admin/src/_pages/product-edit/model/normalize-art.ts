@@ -1,4 +1,4 @@
-import type { SwordArt, SwordImage, SwordStory, SwordTranslation } from '@snb/domain';
+import type { SwordArt, SwordDiscount, SwordImage, SwordStory, SwordTranslation } from '@snb/domain';
 
 /**
  * 폼에서 비운 선택 값을 그림 데이터에 맞게 정리합니다.
@@ -69,4 +69,21 @@ export function normalizeImages(images: Array<Partial<SwordImage>> | undefined):
       const altEn = (image.altEn ?? '').trim();
       return { url: image.url, alt: (image.alt ?? '').trim(), ...(altEn ? { altEn } : {}) };
     });
+}
+
+/** 폼의 할인 칸 값. 비운 숫자 칸은 null, 비운 날짜 칸은 빈 글자나 undefined입니다. */
+export interface DiscountFields {
+  rate?: number | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+}
+
+/** 할인율을 비우면 할인을 없앱니다(undefined). 비운 날짜는 속성을 없애 기한 없이 둡니다. */
+export function normalizeDiscount(discount: DiscountFields | undefined): SwordDiscount | undefined {
+  if (discount?.rate == null) return undefined;
+  return {
+    rate: discount.rate,
+    ...(discount.startsAt ? { startsAt: discount.startsAt } : {}),
+    ...(discount.endsAt ? { endsAt: discount.endsAt } : {}),
+  };
 }

@@ -17,7 +17,7 @@ function Probe() {
   );
 }
 
-const { server } = createMockServer();
+const { server, db } = createMockServer();
 let restoreFetch: () => void = () => {};
 
 beforeAll(() => {
@@ -31,6 +31,7 @@ beforeAll(() => {
 });
 afterEach(() => {
   server.resetHandlers();
+  db.reset();
   useCartStore.setState({ lines: [], destination: 'KR' });
 });
 afterAll(() => {
@@ -49,6 +50,22 @@ describe('useCartQuote', () => {
     });
     renderWithProviders(<Probe />);
     await waitFor(() => expect(screen.getByText(/^ready/)).toHaveTextContent('ready 1 sw-001 true'));
+  });
+
+  it('할인 중인 도검은 할인가로 계산한다', async () => {
+    db.write((state) => ({
+      ...state,
+      swords: state.swords.map((sword) => (sword.id === 'sw-003' ? { ...sword, discount: { rate: 20 } } : sword)),
+    }));
+    useCartStore.setState({ lines: [{ swordId: 'sw-003', quantity: 2 }], destination: 'KR' });
+    function PriceProbe() {
+      const quote = useCartQuote();
+      if (quote.status !== 'ready') return <p>{quote.status}</p>;
+      const [item] = quote.items;
+      return <p>{`ready ${item?.pricing.price} ${item?.pricing.listPrice} ${quote.estimate.totals.goods}`}</p>;
+    }
+    renderWithProviders(<PriceProbe />);
+    await waitFor(() => expect(screen.getByText(/^ready/)).toHaveTextContent('ready 7840000 9800000 15680000'));
   });
 
   it('비어 있으면 품목 없이 준비된다', async () => {

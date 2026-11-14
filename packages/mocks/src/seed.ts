@@ -209,6 +209,7 @@ const SWORDS_KO: Sword[] = [
     specs: { bladeLength: 900, totalLength: 1280, weight: 1650, material: '스프링강, 황동 장식, 면 끈', edge: 'sharp' },
     price: 3_900_000,
     stock: 3,
+    discount: { rate: 10, endsAt: '2027-12-31' },
     art: {
       blade: { length: 900, width: 30, curve: 16, edge: 'single', tip: 'kissaki', fuller: true },
       collar: { color: BRASS },
@@ -283,6 +284,7 @@ const SWORDS_KO: Sword[] = [
     specs: { bladeLength: 780, totalLength: 930, weight: 1200, material: '패턴 용접 강철, 청동, 은선', edge: 'sharp' },
     price: 3_100_000,
     stock: 4,
+    discount: { rate: 15 },
     art: {
       blade: { length: 780, width: 54, curve: 0, edge: 'double', tip: 'round', fuller: true },
       guard: { type: 'cross', width: 110, color: '#7a6a50', accent: GOLD },
@@ -502,7 +504,7 @@ const SWORDS_KO: Sword[] = [
  * 시드 내용(그림·설명·번역·도검 목록)이 바뀔 때마다 올립니다.
  * 브라우저에 저장된 Mock 데이터가 이 값보다 낮으면 db.ts의 migrateSeed가 새 시드에 맞춥니다.
  */
-export const SEED_VERSION = 9;
+export const SEED_VERSION = 10;
 
 /** 영어 번역을 붙인 시드 도검 */
 export const SEED_SWORDS: Sword[] = [

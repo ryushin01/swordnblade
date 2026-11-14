@@ -22,4 +22,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Ssangsudo: Story = {};
 export const Excalibur: Story = { args: { sword: SEED_SWORDS.find((s) => s.slug === 'excalibur')! } };
+export const OnSale: Story = {
+  args: { sword: { ...SEED_SWORDS[0]!, discount: { rate: 10, endsAt: '2999-12-31' } } },
+};
 export const SoldOut: Story = { args: { sword: { ...SEED_SWORDS[3]!, stock: 0 } } };

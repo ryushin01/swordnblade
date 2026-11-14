@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { PlusOutlined } from '@ant-design/icons';
-import { Badge, Button, Flex, Input, Popconfirm, Table, Typography } from 'antd';
+import { Badge, Button, Flex, Input, Popconfirm, Table, Tag, Typography } from 'antd';
 
 import {
   CATEGORY_LABEL,
   COUNTRY_NAME,
+  discountStatus,
   formatKRW,
   KIND_LABEL,
   normalizeSearchText,
+  priceOf,
   requiresPossessionPermit,
   type Sword,
   SWORD_CATEGORIES,
@@ -20,10 +22,36 @@ import { SwordRelief } from '@snb/sword-art';
 
 import { useDeleteSword, useSwords } from '@/entities/sword';
 import { SITE } from '@/shared/config';
+import { useNow } from '@/shared/lib';
 import { ScrollRegion } from '@/shared/ui';
+
+/** 판매가 칸. 할인 중이면 정가에 줄을 긋고 할인율을 글자로 함께 보여 줍니다. */
+function PriceCell({ sword, now }: { sword: Sword; now: number }) {
+  const { price, listPrice, rate } = priceOf(sword, now);
+  const scheduled = sword.discount && discountStatus(sword.discount, now) === 'scheduled' ? sword.discount : undefined;
+  return (
+    <Flex vertical align="flex-end">
+      <span>{formatKRW(price)}</span>
+      {rate > 0 ? (
+        <Flex gap={4} align="center">
+          <Typography.Text type="secondary" delete>
+            <span className="sr-only">정가 </span>
+            {formatKRW(listPrice)}
+          </Typography.Text>
+          <Tag style={{ marginInlineEnd: 0 }}>{rate}% 할인</Tag>
+        </Flex>
+      ) : scheduled ? (
+        <Typography.Text type="secondary">
+          {scheduled.startsAt}부터 {scheduled.rate}% 할인 예정
+        </Typography.Text>
+      ) : null}
+    </Flex>
+  );
+}
 
 export function ProductsPage() {
   const { data, isPending } = useSwords();
+  const now = useNow();
   const remove = useDeleteSword();
   const [query, setQuery] = useState('');
   const needle = normalizeSearchText(query);
@@ -107,11 +135,16 @@ export function ProductsPage() {
                 ),
             },
             {
-              title: '가격',
-              dataIndex: 'price',
+              title: '판매가',
+              key: 'price',
               align: 'right',
-              sorter: (a, b) => a.price - b.price,
-              render: (price: number) => formatKRW(price),
+              sorter: (a, b) => priceOf(a, now).price - priceOf(b, now).price,
+              filters: [
+                { text: '할인 중', value: 'active' },
+                { text: '할인 예정', value: 'scheduled' },
+              ],
+              onFilter: (value, sword) => !!sword.discount && discountStatus(sword.discount, now) === value,
+              render: (_, sword) => <PriceCell sword={sword} now={now} />,
             },
             {
               title: '재고',
