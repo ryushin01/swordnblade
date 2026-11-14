@@ -1,12 +1,11 @@
 'use client';
 
 import { type ReactNode, useEffect, useSyncExternalStore } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { DashboardOutlined, SettingOutlined, ShoppingOutlined, TagsOutlined, TeamOutlined } from '@ant-design/icons';
 import { Button, Flex, Layout, Menu, Typography } from 'antd';
-
-import { BladeMark } from '@snb/sword-art';
 
 import { apiFetch } from '@/shared/api';
 import { SITE } from '@/shared/config';
@@ -55,7 +54,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
           href="/"
           style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '20px 24px', color: 'inherit' }}
         >
-          <BladeMark className="admin-mark" />
+          {/* basePath가 있어 정적 파일 주소에 /admin을 붙입니다(next/image는 붙여 주지 않음). */}
+          <Image src="/admin/brand/logo.png" alt="" width={24} height={24} className="admin-mark" />
           <Typography.Text strong>Sword &amp; Blade</Typography.Text>
         </Link>
         <nav aria-label="관리 메뉴">
