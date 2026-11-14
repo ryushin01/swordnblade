@@ -27,6 +27,8 @@ export function LocaleLinks({ query = {}, className }: { query?: Record<string, 
   const t = useTranslations('Header');
   const locale = useLocale();
   const pathname = usePathname();
+  // 빈 검색 조건을 넘기면 주소가 '/en?'처럼 물음표로 끝나므로, 조건이 있을 때만 붙입니다.
+  const href = Object.keys(query).length > 0 ? { pathname, query } : pathname;
 
   return (
     <nav aria-label={t('languageNav')} className={className}>
@@ -39,7 +41,7 @@ export function LocaleLinks({ query = {}, className }: { query?: Record<string, 
               </span>
             ) : null}
             <a
-              href={getPathname({ href: { pathname, query }, locale: value })}
+              href={getPathname({ href, locale: value })}
               lang={value}
               hrefLang={value}
               aria-current={value === locale ? 'true' : undefined}
