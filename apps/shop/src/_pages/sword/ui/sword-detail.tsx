@@ -165,7 +165,7 @@ function SwordDetailView({ sword: source }: { sword: Sword }) {
       </article>
       <Reviews slug={source.slug} swordId={source.id} />
       <RelatedSwords sword={sword} />
-      <RecentSwords swordId={source.id} />
+      <RecentSwords swordId={source.id} relatedTo={sword} />
     </>
   );
 }
