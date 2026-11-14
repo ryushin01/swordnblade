@@ -132,7 +132,6 @@ docs/          문서와 스크린샷
 
 | 자료 | 저작자 | 사용 허락 | 원본 |
 |---|---|---|---|
-| 교차한 두 검 아이콘 (두 앱의 파비콘·홈 화면 아이콘·머리글 로고) | Magnific | Flaticon 무료 라이선스(저작자 표기 조건) | [Flaticon "Crossed"](https://www.flaticon.com/free-icon/crossed_2858940) — [Crossed icons created by Magnific - Flaticon](https://www.flaticon.com/free-icons/crossed) |
 | Cormorant Garamond 글꼴 | The Cormorant Project Authors | SIL OFL 1.1 | [CatharsisFonts/Cormorant](https://github.com/CatharsisFonts/Cormorant) |
 | Nanum Brush Script(나눔손글씨 붓) 글꼴 (쓰는 글자만 남긴 `sword-brush.woff2`) | NHN(네이버), 디자인 산돌커뮤니케이션 | SIL OFL 1.1 | [Google Fonts](https://fonts.google.com/specimen/Nanum+Brush+Script) |
 
