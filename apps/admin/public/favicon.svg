@@ -5,7 +5,10 @@
     <circle cx="32" cy="34" r="19" stroke-width="1.8"/>
     <path d="M32 2.5 L34.6 15 L33.9 45 L30.1 45 L29.4 15 Z" fill="#2f2e2a" stroke="none"/>
     <path d="M32 14 L32 42.5" stroke="#dddcd7" stroke-width="0.9"/>
-    <path d="M24 47.2 Q32 44.4 40 47.2" stroke-width="2.6"/>
+    <!-- 코등이: 끝이 둥근 곧은 가로대 -->
+    <path d="M24.5 46.2 H39.5" stroke-width="2.6"/>
+    <circle cx="23.6" cy="46.2" r="1.7" fill="#2f2e2a" stroke="none"/>
+    <circle cx="40.4" cy="46.2" r="1.7" fill="#2f2e2a" stroke="none"/>
     <path d="M32 49 L32 58.4" stroke-width="3.2"/>
     <path d="M29.8 60.6 L32 58.4 L34.2 60.6 L32 62.8 Z" fill="#2f2e2a" stroke="none"/>
   </g>

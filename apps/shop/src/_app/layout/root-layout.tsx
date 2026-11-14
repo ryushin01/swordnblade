@@ -11,6 +11,8 @@ import { SiteFooter } from '@/widgets/site-footer';
 import { SiteHeader } from '@/widgets/site-header';
 
 import { Providers } from '../query-client/providers';
+import { PageTransitions } from '../transitions/page-transitions';
+import { RouteBoundary } from '../transitions/route-boundary';
 
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
@@ -87,12 +89,16 @@ export async function RootLayout({ children, params }: { children: ReactNode; pa
         </a>
         <NextIntlClientProvider>
           <Providers>
-            <SiteHeader />
-            <main id="main" tabIndex={-1} className="outline-none">
-              {children}
-            </main>
-            <SiteFooter />
-            <Toaster position="bottom-center" />
+            <PageTransitions>
+              <SiteHeader />
+              {/* 화면 전환: 떠나는 화면은 main을 기준으로 겹쳐 놓입니다(relative·z-0). overflow-x는 hidden이 아니라 clip이어야
+                  스크롤 복원이 맞습니다. 404 화면도 경계 안에 있어야 다른 화면에서 넘어올 때 떠나는 화면이 지워집니다. */}
+              <main id="main" tabIndex={-1} className="relative z-0 min-h-dvh overflow-x-clip outline-none">
+                <RouteBoundary className="min-h-dvh bg-wall">{children}</RouteBoundary>
+              </main>
+              <SiteFooter />
+              <Toaster position="bottom-center" />
+            </PageTransitions>
           </Providers>
         </NextIntlClientProvider>
       </body>

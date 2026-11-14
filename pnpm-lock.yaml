@@ -162,6 +162,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@ssgoi/core@7.5.0': 6a52c704bf8bec1b96b2b150b1bbcdb1ed800f499ec8a35050f5da4a5c56c333
+
 importers:
 
   .:
@@ -326,6 +329,9 @@ importers:
       '@snb/sword-art':
         specifier: workspace:*
         version: link:../../packages/sword-art
+      '@ssgoi/react':
+        specifier: 7.5.0
+        version: 7.5.0(next@16.4.5(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@playwright/test@1.65.0)(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@7.2.0)
       '@tanstack/react-query':
         specifier: ^5.106.1
         version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
@@ -2896,6 +2902,30 @@ packages:
     engines: {node: ^22.19.0 || ^24.5.0 || >=26.0.0}
     peerDependencies:
       size-limit: 14.3.0
+
+  '@ssgoi/core@7.5.0':
+    resolution: {integrity: sha512-H62KSHDzYath4TfLtmsoDP62OIAwEi8qaHPuQYJSWPYqpiBT1dRsj2gPA4x1PXKrtoA8OFcs1McWfJtgI8fBEw==}
+    engines: {node: '>=18.0.0'}
+
+  '@ssgoi/react@7.5.0':
+    resolution: {integrity: sha512-Jw5exRdv9HHFwsXgqHmlA62NUjATS4ipVYoLuw0sqXbAZIQeP+d8lLdhumRgIjWyQtMp+tuAgEkIHiZXoY2y4g==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@remix-run/react': '*'
+      '@tanstack/react-router': '*'
+      next: '*'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+      react-router: '*'
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@tanstack/react-router':
+        optional: true
+      next:
+        optional: true
+      react-router:
+        optional: true
 
   '@storybook/addon-a11y@10.6.6':
     resolution: {integrity: sha512-+LdCNVDELDqYWWbWkMX8LH9CXxDXnizfzvyJUVfkdF5CPZFRZu1xpv+jvLBFEumw/sQmizPZUXlw8zbdO1jvEQ==}
@@ -6236,6 +6266,10 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
+  unplugin@2.3.11:
+    resolution: {integrity: sha512-5uKD0nqiYVzlmCRs01Fhs2BdkEgBS3SAVP6ndrBsuK42iC2+JHyxM05Rm9G8+5mkmRtzMZGY8Ct5+mliZxU/Ww==}
+    engines: {node: '>=18.12.0'}
+
   unrs-resolver@1.13.0:
     resolution: {integrity: sha512-mcPQo9Vm6kXd84d/WqMiYBi2CcA57QHBX/ev5PoUEb8b2oQzUvJ6xYsfseQblnCncgnVmCZGWiFwK7KkS5JZJA==}
 
@@ -6421,6 +6455,9 @@ packages:
   webidl-conversions@8.0.1:
     resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
     engines: {node: '>=20'}
+
+  webpack-virtual-modules@0.6.2:
+    resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
   whatwg-fetch@3.6.20:
     resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
@@ -8841,6 +8878,20 @@ snapshots:
   '@size-limit/file@14.3.0(size-limit@14.3.0)':
     dependencies:
       size-limit: 14.3.0
+
+  '@ssgoi/core@7.5.0(patch_hash=6a52c704bf8bec1b96b2b150b1bbcdb1ed800f499ec8a35050f5da4a5c56c333)': {}
+
+  '@ssgoi/react@7.5.0(next@16.4.5(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@playwright/test@1.65.0)(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@7.2.0)':
+    dependencies:
+      '@babel/core': 7.29.13(supports-color@7.2.0)
+      '@ssgoi/core': 7.5.0(patch_hash=6a52c704bf8bec1b96b2b150b1bbcdb1ed800f499ec8a35050f5da4a5c56c333)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+      unplugin: 2.3.11
+    optionalDependencies:
+      next: 16.4.5(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@playwright/test@1.65.0)(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+    transitivePeerDependencies:
+      - supports-color
 
   '@storybook/addon-a11y@10.6.6(storybook@10.6.6(@types/react@19.3.0)(prettier@3.9.10)(react@19.3.1))':
     dependencies:
@@ -12640,6 +12691,13 @@ snapshots:
 
   unpipe@1.0.0: {}
 
+  unplugin@2.3.11:
+    dependencies:
+      '@jridgewell/remapping': 2.3.5
+      acorn: 8.19.0
+      picomatch: 4.0.7
+      webpack-virtual-modules: 0.6.2
+
   unrs-resolver@1.13.0:
     dependencies:
       napi-postinstall: 0.3.8
@@ -12801,6 +12859,8 @@ snapshots:
   webidl-conversions@3.0.1: {}
 
   webidl-conversions@8.0.1: {}
+
+  webpack-virtual-modules@0.6.2: {}
 
   whatwg-fetch@3.6.20: {}
 

@@ -30,8 +30,10 @@ export function BladeMark({ className, label }: BladeMarkProps) {
         {/* 칼날: 가늘고 긴 칼날이 길게 좁아지며 뾰족한 칼끝으로 끝납니다. */}
         <path d="M32 1.5 L34.3 15 L33.6 45 L30.4 45 L29.7 15 Z" fill="currentColor" stroke="none" />
         <path d="M32 14 L32 42.5" stroke="var(--mark-groove, #ffffff)" strokeWidth="0.7" opacity="0.75" />
-        {/* 코등이: 칼끝 쪽으로 살짝 휜 짧은 가지 */}
-        <path d="M24.5 47.2 Q32 44.6 39.5 47.2" strokeWidth="2" />
+        {/* 코등이: 끝이 둥근 곧은 가로대 */}
+        <path d="M25 46.2 H39" strokeWidth="2" />
+        <circle cx="24.2" cy="46.2" r="1.4" fill="currentColor" stroke="none" />
+        <circle cx="39.8" cy="46.2" r="1.4" fill="currentColor" stroke="none" />
         {/* 손잡이와 끝장식 */}
         <path d="M32 48.8 L32 58.6" strokeWidth="2.6" />
         <path d="M30.2 60.6 L32 58.8 L33.8 60.6 L32 62.4 Z" fill="currentColor" stroke="none" />
